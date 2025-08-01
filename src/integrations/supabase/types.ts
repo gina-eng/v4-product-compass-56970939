@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          bpmn: boolean
+          bpmn_url: string | null
+          categoria: Database["public"]["Enums"]["categoria_produto"]
+          certificacao: boolean
+          certificacao_url: string | null
+          created_at: string
+          description: string
+          detailed_description: string
+          dono: string
+          duracao: string
+          entregas: string
+          icp: boolean
+          icp_url: string | null
+          id: string
+          objetivos: string
+          pitch: boolean
+          pitch_url: string | null
+          playbook: boolean
+          playbook_url: string | null
+          prerequisitos: string
+          pricing: boolean
+          pricing_url: string | null
+          produto: string
+          spiced_data: Json
+          status: Database["public"]["Enums"]["status_produto"]
+          updated_at: string
+          valor: string
+        }
+        Insert: {
+          bpmn?: boolean
+          bpmn_url?: string | null
+          categoria: Database["public"]["Enums"]["categoria_produto"]
+          certificacao?: boolean
+          certificacao_url?: string | null
+          created_at?: string
+          description: string
+          detailed_description: string
+          dono: string
+          duracao: string
+          entregas: string
+          icp?: boolean
+          icp_url?: string | null
+          id?: string
+          objetivos: string
+          pitch?: boolean
+          pitch_url?: string | null
+          playbook?: boolean
+          playbook_url?: string | null
+          prerequisitos: string
+          pricing?: boolean
+          pricing_url?: string | null
+          produto: string
+          spiced_data?: Json
+          status?: Database["public"]["Enums"]["status_produto"]
+          updated_at?: string
+          valor: string
+        }
+        Update: {
+          bpmn?: boolean
+          bpmn_url?: string | null
+          categoria?: Database["public"]["Enums"]["categoria_produto"]
+          certificacao?: boolean
+          certificacao_url?: string | null
+          created_at?: string
+          description?: string
+          detailed_description?: string
+          dono?: string
+          duracao?: string
+          entregas?: string
+          icp?: boolean
+          icp_url?: string | null
+          id?: string
+          objetivos?: string
+          pitch?: boolean
+          pitch_url?: string | null
+          playbook?: boolean
+          playbook_url?: string | null
+          prerequisitos?: string
+          pricing?: boolean
+          pricing_url?: string | null
+          produto?: string
+          spiced_data?: Json
+          status?: Database["public"]["Enums"]["status_produto"]
+          updated_at?: string
+          valor?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +112,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      categoria_produto: "saber" | "ter" | "executar" | "potencializar"
+      status_produto: "Disponível" | "Em produção" | "Em homologação"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +240,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      categoria_produto: ["saber", "ter", "executar", "potencializar"],
+      status_produto: ["Disponível", "Em produção", "Em homologação"],
+    },
   },
 } as const
