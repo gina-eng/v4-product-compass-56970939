@@ -4,10 +4,11 @@ const Header = () => {
   return <header className="bg-header-bg text-header-foreground py-6 px-4">
       <div className="container mx-auto">
         <div className="flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <Building2 size={32} />
-            <h1 className="text-2xl font-bold">STEP Framework</h1>
-          </div>
+          <img 
+            src="/lovable-uploads/e952505a-6ba3-468e-a269-0a74e7fbdd8e.png" 
+            alt="Logo" 
+            className="h-12"
+          />
         </div>
       </div>
     </header>;
