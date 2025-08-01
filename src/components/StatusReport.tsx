@@ -1,14 +1,17 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, Clock } from "lucide-react";
 
 const StatusReport = () => {
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+
   const statusData = [
     {
       id: "1",
       produto: "Diagnóstico de Mídia Paga (Meta e Google Ads)",
-      categoria: "Saber",
+      categoria: "saber",
       duracao: "15-30",
       dono: "Paulo Barros",
       pitch: true,
@@ -22,7 +25,7 @@ const StatusReport = () => {
     {
       id: "2", 
       produto: "E-commerce",
-      categoria: "Ter",
+      categoria: "ter",
       duracao: "45-60",
       dono: "Oriana Finta",
       pitch: false,
@@ -36,7 +39,7 @@ const StatusReport = () => {
     {
       id: "3",
       produto: "Profissional de Google Ads",
-      categoria: "Executar",
+      categoria: "executar",
       duracao: "30-45",
       dono: "Maria Silva",
       pitch: true,
@@ -48,6 +51,18 @@ const StatusReport = () => {
       status: "Em homologação"
     }
   ];
+
+  const filters = [
+    { key: "all", label: "Todos", color: "default" },
+    { key: "saber", label: "SABER", color: "saber" },
+    { key: "ter", label: "TER", color: "ter" },
+    { key: "executar", label: "EXECUTAR", color: "executar" },
+    { key: "potencializar", label: "POTENCIALIZAR", color: "potencializar" }
+  ];
+
+  const filteredData = activeFilter === "all" 
+    ? statusData 
+    : statusData.filter(item => item.categoria === activeFilter);
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -61,12 +76,22 @@ const StatusReport = () => {
 
   const getCategoryColor = (categoria: string) => {
     const colors = {
-      "Saber": "saber",
-      "Ter": "ter", 
-      "Executar": "executar",
-      "Potencializar": "potencializar"
+      "saber": "saber",
+      "ter": "ter", 
+      "executar": "executar",
+      "potencializar": "potencializar"
     };
     return colors[categoria as keyof typeof colors] || "saber";
+  };
+
+  const getCategoryLabel = (categoria: string) => {
+    const labels = {
+      "saber": "SABER",
+      "ter": "TER", 
+      "executar": "EXECUTAR",
+      "potencializar": "POTENCIALIZAR"
+    };
+    return labels[categoria as keyof typeof labels] || categoria.toUpperCase();
   };
 
   const StatusIcon = ({ value }: { value: boolean }) => (
@@ -82,7 +107,22 @@ const StatusReport = () => {
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Portfólio Status Report</h2>
-          <p className="text-gray-600">Painel administrativo para controle de produtos e status</p>
+          <p className="text-muted-foreground mb-8">Painel administrativo para controle de produtos e status</p>
+          
+          {/* Filtros */}
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            {filters.map((filter) => (
+              <Button
+                key={filter.key}
+                variant={activeFilter === filter.key ? filter.color as any : "outline"}
+                size="sm"
+                onClick={() => setActiveFilter(filter.key)}
+                className="transition-all duration-200"
+              >
+                {filter.label}
+              </Button>
+            ))}
+          </div>
         </div>
 
         <Card className="overflow-hidden">
@@ -126,10 +166,14 @@ const StatusReport = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {statusData.map((item) => (
+                {filteredData.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{item.produto}</div>
+                      <div className="max-w-xs">
+                        <div className="text-sm font-semibold text-foreground leading-5 break-words">
+                          {item.produto}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <Badge 
@@ -137,11 +181,11 @@ const StatusReport = () => {
                         className="text-white"
                         style={{backgroundColor: `hsl(var(--${getCategoryColor(item.categoria)}))`}}
                       >
-                        {item.categoria}
+                        {getCategoryLabel(item.categoria)}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.duracao}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{item.dono}</td>
+                    <td className="px-6 py-4 text-sm text-foreground">{item.duracao}</td>
+                    <td className="px-6 py-4 text-sm text-foreground">{item.dono}</td>
                     <td className="px-6 py-4 text-center">
                       <StatusIcon value={item.pitch} />
                     </td>
@@ -171,6 +215,12 @@ const StatusReport = () => {
             </table>
           </div>
         </Card>
+
+        {filteredData.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Nenhum produto encontrado para esta categoria.</p>
+          </div>
+        )}
       </div>
     </section>
   );
