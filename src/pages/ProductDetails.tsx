@@ -4,6 +4,15 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ExternalLink, User, Clock, CheckCircle, XCircle } from "lucide-react";
+import SpicedTable from "@/components/SpicedTable";
+
+interface SpicedData {
+  situation: { objetivo: string; perguntas: string; observar: string };
+  pain: { objetivo: string; perguntas: string; observar: string };
+  impact: { objetivo: string; perguntas: string; observar: string };
+  criticalEvent: { objetivo: string; perguntas: string; observar: string };
+  decision: { objetivo: string; perguntas: string; observar: string };
+}
 
 interface Product {
   id: string;
@@ -28,6 +37,7 @@ interface Product {
   description: string;
   detailedDescription: string;
   objetivos: string;
+  spicedData: SpicedData;
   entregas: string;
   prerequisitos: string;
 }
@@ -59,6 +69,13 @@ const ProductDetails = () => {
       description: "Diagnóstico estratégico de performance em mídia paga para negócios que investem de forma consistente e desejam maximizar resultados.",
       detailedDescription: "Análise completa das campanhas de mídia paga nas principais plataformas digitais, incluindo Meta Ads e Google Ads. O diagnóstico identifica oportunidades de otimização, gaps estratégicos e recomendações específicas para maximizar o ROI dos investimentos em publicidade digital.",
       objetivos: "Identificar oportunidades de melhoria; Otimizar performance das campanhas; Aumentar ROI dos investimentos; Definir estratégias de crescimento",
+      spicedData: {
+        situation: { objetivo: "Entender situação atual", perguntas: "Como está o desempenho atual?", observar: "Resultados das campanhas" },
+        pain: { objetivo: "Identificar dores", perguntas: "Quais são os principais problemas?", observar: "Indicadores de performance baixa" },
+        impact: { objetivo: "Medir impacto", perguntas: "Qual o impacto financeiro?", observar: "ROI atual vs potencial" },
+        criticalEvent: { objetivo: "Definir urgência", perguntas: "Quando precisa de resultados?", observar: "Pressão de mercado/concorrência" },
+        decision: { objetivo: "Facilitar decisão", perguntas: "O que precisa para decidir?", observar: "Critérios de decisão do cliente" }
+      },
       entregas: "Relatório executivo com diagnóstico completo; Planilha com análise detalhada das campanhas; Apresentação com recomendações estratégicas; Plano de ação para otimização",
       prerequisitos: "Acesso às contas de anúncios; Histórico de pelo menos 3 meses de campanhas; Dados de conversão configurados"
     },
@@ -82,6 +99,13 @@ const ProductDetails = () => {
       description: "Implementação completa de plataforma de e-commerce com foco em conversão e experiência do usuário.",
       detailedDescription: "Desenvolvimento e implementação de loja virtual completa, incluindo design responsivo, integração com gateways de pagamento, sistema de gestão de produtos, relatórios analíticos e otimização para conversão.",
       objetivos: "Criar presença digital forte; Aumentar vendas online; Melhorar experiência do cliente; Automatizar processos de venda",
+      spicedData: {
+        situation: { objetivo: "Avaliar presença digital", perguntas: "Como vendem atualmente?", observar: "Canais de venda existentes" },
+        pain: { objetivo: "Identificar limitações", perguntas: "Quais dificuldades têm?", observar: "Perda de vendas por falta de plataforma" },
+        impact: { objetivo: "Calcular potencial", perguntas: "Quanto poderiam vender online?", observar: "Volume de vendas atual vs mercado" },
+        criticalEvent: { objetivo: "Definir prazo", perguntas: "Quando querem lançar?", observar: "Sazonalidade/datas importantes" },
+        decision: { objetivo: "Alinhar expectativas", perguntas: "Qual o investimento disponível?", observar: "Budget e recursos técnicos" }
+      },
       entregas: "Plataforma e-commerce completa; Design responsivo e otimizado; Integração com pagamentos; Sistema de gestão de produtos; Relatórios e analytics",
       prerequisitos: "Catálogo de produtos definido; Identidade visual da marca; Conta nos gateways de pagamento"
     },
@@ -106,6 +130,13 @@ const ProductDetails = () => {
       description: "Serviço especializado de gestão e otimização de campanhas Google Ads para maximizar resultados.",
       detailedDescription: "Gestão completa de campanhas Google Ads por profissional certificado, incluindo criação de campanhas, otimização contínua, relatórios detalhados e estratégias avançadas de bidding e segmentação.",
       objetivos: "Maximizar performance das campanhas; Reduzir custo por aquisição; Aumentar volume de conversões; Melhorar qualidade do tráfego",
+      spicedData: {
+        situation: { objetivo: "Entender cenário atual", perguntas: "Como está o Google Ads hoje?", observar: "Performance atual das campanhas" },
+        pain: { objetivo: "Mapear problemas", perguntas: "Quais são os maiores desafios?", observar: "CPA alto, baixa conversão" },
+        impact: { objetivo: "Quantificar oportunidade", perguntas: "Quanto podem economizar/ganhar?", observar: "Potencial de melhoria do ROAS" },
+        criticalEvent: { objetivo: "Criar urgência", perguntas: "Quando precisam de resultados?", observar: "Metas de crescimento/budget" },
+        decision: { objetivo: "Facilitar aprovação", perguntas: "Quem decide sobre investimentos?", observar: "Processo de aprovação interno" }
+      },
       entregas: "Gestão completa das campanhas; Relatórios semanais de performance; Otimizações contínuas; Consultoria estratégica mensal",
       prerequisitos: "Conta Google Ads ativa; Budget mínimo definido; Pixel de conversão instalado"
     }
@@ -217,7 +248,10 @@ const ProductDetails = () => {
           {/* Como vender */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como vender o produto?</h2>
-            <p className="text-muted-foreground leading-relaxed">{product.objetivos}</p>
+            <p className="text-muted-foreground leading-relaxed mb-6">{product.objetivos}</p>
+            
+            {/* Tabela SPICED */}
+            <SpicedTable data={product.spicedData} readOnly />
           </Card>
 
           {/* Como cobrar */}
