@@ -41,8 +41,8 @@ const StepIntroduction = () => {
     <section className="py-16 px-4">
       <div className="container mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-6">Introdução ao modelo - STEP</h2>
-          <div className="max-w-4xl mx-auto text-gray-600 leading-relaxed space-y-4">
+          <h2 className="text-3xl font-bold mb-6 text-foreground">Introdução ao modelo - STEP</h2>
+          <div className="max-w-4xl mx-auto text-foreground/70 leading-relaxed space-y-4">
             <p>
               Toda empresa, independente do tamanho, passa por quatro momentos distintos em sua jornada de crescimento. 
               Cada momento exige uma abordagem específica e uma solução certa. O objetivo é vender e servir o cliente certo, 
@@ -59,22 +59,35 @@ const StepIntroduction = () => {
           {stepItems.map((item, index) => {
             const IconComponent = item.icon;
             return (
-              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 border-2 hover:border-opacity-50" 
-                    style={{borderColor: `hsl(var(--${item.color}))`}}>
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4`} 
-                     style={{backgroundColor: `hsl(var(--${item.color}))`}}>
-                  <IconComponent className="h-8 w-8 text-white" />
+              <div 
+                key={index} 
+                className="bg-card border-2 rounded-xl p-6 text-center transition-all duration-300 hover:shadow-lg hover:scale-105" 
+                style={{borderColor: `hsl(var(--${item.color}))`}}
+              >
+                <div className="flex flex-col items-center space-y-4">
+                  <div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center" 
+                    style={{backgroundColor: `hsl(var(--${item.color}))`}}
+                  >
+                    <IconComponent className="w-8 h-8 text-white" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 
+                      className="text-xl font-bold"
+                      style={{color: `hsl(var(--${item.color}))`}}
+                    >
+                      {item.letter} - {item.title}
+                    </h3>
+                    <p className="text-sm font-medium text-foreground">
+                      "{item.subtitle}"
+                    </p>
+                    <p className="text-sm text-foreground/70 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
                 </div>
-                <div className={`text-xl font-bold mb-2`} style={{color: `hsl(var(--${item.color}))`}}>
-                  {item.letter} - {item.title}
-                </div>
-                <div className="text-sm font-medium text-gray-700 mb-3">
-                  "{item.subtitle}"
-                </div>
-                <div className="text-xs text-gray-500 leading-relaxed">
-                  {item.description}
-                </div>
-              </Card>
+              </div>
             );
           })}
         </div>
