@@ -52,6 +52,28 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// STEP Framework Colors
+				saber: {
+					DEFAULT: 'hsl(var(--saber))',
+					foreground: 'hsl(var(--saber-foreground))'
+				},
+				ter: {
+					DEFAULT: 'hsl(var(--ter))',
+					foreground: 'hsl(var(--ter-foreground))'
+				},
+				executar: {
+					DEFAULT: 'hsl(var(--executar))',
+					foreground: 'hsl(var(--executar-foreground))'
+				},
+				potencializar: {
+					DEFAULT: 'hsl(var(--potencializar))',
+					foreground: 'hsl(var(--potencializar-foreground))'
+				},
+				// Header
+				header: {
+					bg: 'hsl(var(--header-bg))',
+					foreground: 'hsl(var(--header-foreground))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
