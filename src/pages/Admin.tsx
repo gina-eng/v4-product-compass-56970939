@@ -266,7 +266,7 @@ const Admin = () => {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="description">Descrição Breve</Label>
+                    <Label htmlFor="description">O que é o produto?</Label>
                     <Textarea
                       id="description"
                       value={formData.description || ""}
@@ -277,34 +277,34 @@ const Admin = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="detailedDescription">Descrição Detalhada</Label>
+                    <Label htmlFor="detailedDescription">Pra quem é o produto?</Label>
                     <Textarea
                       id="detailedDescription"
                       value={formData.detailedDescription || ""}
                       onChange={(e) => setFormData({...formData, detailedDescription: e.target.value})}
-                      placeholder="Descrição completa do produto e sua metodologia"
+                      placeholder="Público-alvo e perfil do cliente ideal para o produto"
                       rows={4}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="objetivos">Objetivos</Label>
+                    <Label htmlFor="objetivos">Como vender o produto?</Label>
                     <Textarea
                       id="objetivos"
                       value={formData.objetivos || ""}
                       onChange={(e) => setFormData({...formData, objetivos: e.target.value})}
-                      placeholder="Principais objetivos e resultados esperados"
+                      placeholder="Estratégias e abordagens de vendas para o produto"
                       rows={3}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="entregas">Entregas</Label>
+                    <Label htmlFor="entregas">Como cobrar o produto?</Label>
                     <Textarea
                       id="entregas"
                       value={formData.entregas || ""}
                       onChange={(e) => setFormData({...formData, entregas: e.target.value})}
-                      placeholder="Lista de entregas e materiais fornecidos"
+                      placeholder="Modelo de precificação e formas de cobrança"
                       rows={3}
                     />
                   </div>
