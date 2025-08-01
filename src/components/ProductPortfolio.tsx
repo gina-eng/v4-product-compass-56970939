@@ -13,42 +13,48 @@ const ProductPortfolio = () => {
       name: "Diagnóstico de Mídia Paga (Meta e Google Ads)",
       description: "Diagnóstico estratégico de performance em mídia paga para negócios que investem de forma consistente e desejam maximizar resultados.",
       category: "saber" as const,
-      status: "Disponível"
+      status: "Disponível",
+      valorBase: "R$ 2.500,00"
     },
     {
       id: "2", 
       name: "Implementação de E-commerce",
       description: "Diagnóstico estratégico de performance em mídia paga para negócios que investem de forma consistente e desejam maximizar resultados.",
       category: "ter" as const,
-      status: "Disponível"
+      status: "Disponível",
+      valorBase: "R$ 15.000,00"
     },
     {
       id: "3",
       name: "Profissional de Google Ads",
       description: "Diagnóstico estratégico de performance em mídia paga para negócios que investem de forma consistente e desejam maximizar resultados.",
       category: "executar" as const,
-      status: "Em Desenvolvimento"
+      status: "Em Desenvolvimento",
+      valorBase: "R$ 8.000,00"
     },
     {
       id: "4",
       name: "Consultoria Estratégica Avançada",
       description: "Análise profunda e estratégias personalizadas para empresas que buscam crescimento exponencial e resultados extraordinários.",
       category: "potencializar" as const,
-      status: "Disponível"
+      status: "Disponível",
+      valorBase: "R$ 25.000,00"
     },
     {
       id: "5",
       name: "Auditoria de Marketing Digital",
       description: "Avaliação completa da presença digital da empresa, identificando oportunidades de melhoria e gaps estratégicos.",
       category: "saber" as const,
-      status: "Pausado"
+      status: "Pausado",
+      valorBase: "R$ 5.000,00"
     },
     {
       id: "6",
       name: "Plataforma de Automação de Vendas", 
       description: "Sistema completo de CRM e automação para estruturar e otimizar o processo comercial da empresa.",
       category: "ter" as const,
-      status: "Disponível"
+      status: "Disponível",
+      valorBase: "R$ 12.000,00"
     }
   ];
 
@@ -99,6 +105,7 @@ const ProductPortfolio = () => {
               name={product.name}
               description={product.description}
               category={product.category}
+              valorBase={product.valorBase}
               onViewDetails={handleViewDetails}
             />
           ))}

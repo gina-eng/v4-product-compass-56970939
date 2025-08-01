@@ -7,10 +7,11 @@ interface ProductCardProps {
   name: string;
   description: string;
   category: "saber" | "ter" | "executar" | "potencializar";
+  valorBase: string;
   onViewDetails: (id: string) => void;
 }
 
-const ProductCard = ({ id, name, description, category, onViewDetails }: ProductCardProps) => {
+const ProductCard = ({ id, name, description, category, valorBase, onViewDetails }: ProductCardProps) => {
   const categoryLabels = {
     saber: "SABER",
     ter: "TER", 
@@ -33,9 +34,14 @@ const ProductCard = ({ id, name, description, category, onViewDetails }: Product
         {name}
       </h3>
       
-      <p className="text-sm text-gray-600 mb-6 leading-relaxed line-clamp-3">
+      <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-3">
         {description}
       </p>
+      
+      <div className="mb-6">
+        <span className="text-xs text-gray-500 uppercase tracking-wide">Valor Base</span>
+        <p className="text-lg font-semibold text-gray-900">{valorBase}</p>
+      </div>
       
       <Button 
         variant="details" 
