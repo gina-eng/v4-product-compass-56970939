@@ -23,6 +23,12 @@ interface Product {
   icp: boolean;
   pricing: boolean;
   certificacao: boolean;
+  pitchUrl?: string;
+  bpmnUrl?: string;
+  playbookUrl?: string;
+  icpUrl?: string;
+  pricingUrl?: string;
+  certificacaoUrl?: string;
   status: "Disponível" | "Em produção" | "Em homologação";
   description: string;
   detailedDescription: string;
@@ -321,59 +327,145 @@ const Admin = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="pitch"
-                      checked={formData.pitch || false}
-                      onCheckedChange={(checked) => setFormData({...formData, pitch: checked as boolean})}
-                    />
-                    <Label htmlFor="pitch">Pitch</Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="bpmn"
-                      checked={formData.bpmn || false}
-                      onCheckedChange={(checked) => setFormData({...formData, bpmn: checked as boolean})}
-                    />
-                    <Label htmlFor="bpmn">BPMN</Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="playbook"
-                      checked={formData.playbook || false}
-                      onCheckedChange={(checked) => setFormData({...formData, playbook: checked as boolean})}
-                    />
-                    <Label htmlFor="playbook">Playbook</Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="icp"
-                      checked={formData.icp || false}
-                      onCheckedChange={(checked) => setFormData({...formData, icp: checked as boolean})}
-                    />
-                    <Label htmlFor="icp">ICP</Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="pricing"
-                      checked={formData.pricing || false}
-                      onCheckedChange={(checked) => setFormData({...formData, pricing: checked as boolean})}
-                    />
-                    <Label htmlFor="pricing">Pricing</Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="certificacao"
-                      checked={formData.certificacao || false}
-                      onCheckedChange={(checked) => setFormData({...formData, certificacao: checked as boolean})}
-                    />
-                    <Label htmlFor="certificacao">Certificação</Label>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Pitch */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="pitch"
+                          checked={formData.pitch || false}
+                          onCheckedChange={(checked) => setFormData({...formData, pitch: checked as boolean})}
+                        />
+                        <Label htmlFor="pitch">Pitch</Label>
+                      </div>
+                      {formData.pitch && (
+                        <div className="space-y-2">
+                          <Label htmlFor="pitchUrl">URL do Pitch</Label>
+                          <Input
+                            id="pitchUrl"
+                            value={formData.pitchUrl || ""}
+                            onChange={(e) => setFormData({...formData, pitchUrl: e.target.value})}
+                            placeholder="https://exemplo.com/pitch"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* BPMN */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="bpmn"
+                          checked={formData.bpmn || false}
+                          onCheckedChange={(checked) => setFormData({...formData, bpmn: checked as boolean})}
+                        />
+                        <Label htmlFor="bpmn">BPMN</Label>
+                      </div>
+                      {formData.bpmn && (
+                        <div className="space-y-2">
+                          <Label htmlFor="bpmnUrl">URL do BPMN</Label>
+                          <Input
+                            id="bpmnUrl"
+                            value={formData.bpmnUrl || ""}
+                            onChange={(e) => setFormData({...formData, bpmnUrl: e.target.value})}
+                            placeholder="https://exemplo.com/bpmn"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Playbook */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="playbook"
+                          checked={formData.playbook || false}
+                          onCheckedChange={(checked) => setFormData({...formData, playbook: checked as boolean})}
+                        />
+                        <Label htmlFor="playbook">Playbook</Label>
+                      </div>
+                      {formData.playbook && (
+                        <div className="space-y-2">
+                          <Label htmlFor="playbookUrl">URL do Playbook</Label>
+                          <Input
+                            id="playbookUrl"
+                            value={formData.playbookUrl || ""}
+                            onChange={(e) => setFormData({...formData, playbookUrl: e.target.value})}
+                            placeholder="https://exemplo.com/playbook"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ICP */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="icp"
+                          checked={formData.icp || false}
+                          onCheckedChange={(checked) => setFormData({...formData, icp: checked as boolean})}
+                        />
+                        <Label htmlFor="icp">ICP</Label>
+                      </div>
+                      {formData.icp && (
+                        <div className="space-y-2">
+                          <Label htmlFor="icpUrl">URL do ICP</Label>
+                          <Input
+                            id="icpUrl"
+                            value={formData.icpUrl || ""}
+                            onChange={(e) => setFormData({...formData, icpUrl: e.target.value})}
+                            placeholder="https://exemplo.com/icp"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Pricing */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="pricing"
+                          checked={formData.pricing || false}
+                          onCheckedChange={(checked) => setFormData({...formData, pricing: checked as boolean})}
+                        />
+                        <Label htmlFor="pricing">Pricing</Label>
+                      </div>
+                      {formData.pricing && (
+                        <div className="space-y-2">
+                          <Label htmlFor="pricingUrl">URL do Pricing</Label>
+                          <Input
+                            id="pricingUrl"
+                            value={formData.pricingUrl || ""}
+                            onChange={(e) => setFormData({...formData, pricingUrl: e.target.value})}
+                            placeholder="https://exemplo.com/pricing"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Certificação */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="certificacao"
+                          checked={formData.certificacao || false}
+                          onCheckedChange={(checked) => setFormData({...formData, certificacao: checked as boolean})}
+                        />
+                        <Label htmlFor="certificacao">Certificação</Label>
+                      </div>
+                      {formData.certificacao && (
+                        <div className="space-y-2">
+                          <Label htmlFor="certificacaoUrl">URL da Certificação</Label>
+                          <Input
+                            id="certificacaoUrl"
+                            value={formData.certificacaoUrl || ""}
+                            onChange={(e) => setFormData({...formData, certificacaoUrl: e.target.value})}
+                            placeholder="https://exemplo.com/certificacao"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 

@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 
 const ProductPortfolio = () => {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
   const products = [
@@ -57,8 +59,7 @@ const ProductPortfolio = () => {
     : products.filter(product => product.category === activeFilter);
 
   const handleViewDetails = (productId: string) => {
-    console.log(`Viewing details for product: ${productId}`);
-    // Aqui seria implementada a navegação para detalhes do produto
+    navigate(`/produto/${productId}`);
   };
 
   return (
