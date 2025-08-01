@@ -12,37 +12,43 @@ const ProductPortfolio = () => {
       id: "1",
       name: "Diagnóstico de Mídia Paga (Meta e Google Ads)",
       description: "Diagnóstico estratégico de performance em mídia paga para negócios que investem de forma consistente e desejam maximizar resultados.",
-      category: "saber" as const
+      category: "saber" as const,
+      status: "Disponível"
     },
     {
       id: "2", 
       name: "Implementação de E-commerce",
       description: "Diagnóstico estratégico de performance em mídia paga para negócios que investem de forma consistente e desejam maximizar resultados.",
-      category: "ter" as const
+      category: "ter" as const,
+      status: "Disponível"
     },
     {
       id: "3",
       name: "Profissional de Google Ads",
       description: "Diagnóstico estratégico de performance em mídia paga para negócios que investem de forma consistente e desejam maximizar resultados.",
-      category: "executar" as const
+      category: "executar" as const,
+      status: "Em Desenvolvimento"
     },
     {
       id: "4",
       name: "Consultoria Estratégica Avançada",
       description: "Análise profunda e estratégias personalizadas para empresas que buscam crescimento exponencial e resultados extraordinários.",
-      category: "potencializar" as const
+      category: "potencializar" as const,
+      status: "Disponível"
     },
     {
       id: "5",
       name: "Auditoria de Marketing Digital",
       description: "Avaliação completa da presença digital da empresa, identificando oportunidades de melhoria e gaps estratégicos.",
-      category: "saber" as const
+      category: "saber" as const,
+      status: "Pausado"
     },
     {
       id: "6",
       name: "Plataforma de Automação de Vendas", 
       description: "Sistema completo de CRM e automação para estruturar e otimizar o processo comercial da empresa.",
-      category: "ter" as const
+      category: "ter" as const,
+      status: "Disponível"
     }
   ];
 
@@ -54,9 +60,9 @@ const ProductPortfolio = () => {
     { key: "potencializar", label: "POTENCIALIZAR", color: "potencializar" }
   ];
 
-  const filteredProducts = activeFilter === "all" 
-    ? products 
-    : products.filter(product => product.category === activeFilter);
+  const filteredProducts = products
+    .filter(product => product.status === "Disponível")
+    .filter(product => activeFilter === "all" || product.category === activeFilter);
 
   const handleViewDetails = (productId: string) => {
     navigate(`/produto/${productId}`);
