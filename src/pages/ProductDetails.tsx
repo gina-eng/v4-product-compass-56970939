@@ -11,6 +11,7 @@ interface Product {
   categoria: "saber" | "ter" | "executar" | "potencializar";
   duracao: string;
   dono: string;
+  valor: string;
   pitch: boolean;
   bpmn: boolean;
   playbook: boolean;
@@ -44,6 +45,7 @@ const ProductDetails = () => {
       categoria: "saber",
       duracao: "15-30",
       dono: "Paulo Barros",
+      valor: "R$ 2.500,00",
       pitch: true,
       bpmn: true,
       playbook: false,
@@ -66,6 +68,7 @@ const ProductDetails = () => {
       categoria: "ter",
       duracao: "45-60",
       dono: "Oriana Finta",
+      valor: "R$ 15.000,00",
       pitch: false,
       bpmn: false,
       playbook: true,
@@ -88,6 +91,7 @@ const ProductDetails = () => {
       categoria: "executar",
       duracao: "30-45",
       dono: "Maria Silva",
+      valor: "R$ 8.000,00",
       pitch: true,
       bpmn: true,
       playbook: true,
@@ -188,6 +192,9 @@ const ProductDetails = () => {
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   <span>{product.duracao} dias</span>
+                </div>
+                <div className="text-lg font-semibold text-foreground">
+                  {product.valor}
                 </div>
               </div>
             </div>

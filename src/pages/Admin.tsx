@@ -17,6 +17,7 @@ interface Product {
   categoria: "saber" | "ter" | "executar" | "potencializar";
   duracao: string;
   dono: string;
+  valor: string;
   pitch: boolean;
   bpmn: boolean;
   playbook: boolean;
@@ -48,6 +49,7 @@ const Admin = () => {
       categoria: "saber",
       duracao: "15-30",
       dono: "Paulo Barros",
+      valor: "R$ 2.500,00",
       pitch: true,
       bpmn: true,
       playbook: false,
@@ -67,6 +69,7 @@ const Admin = () => {
       categoria: "ter",
       duracao: "45-60",
       dono: "Oriana Finta",
+      valor: "R$ 15.000,00",
       pitch: false,
       bpmn: false,
       playbook: true,
@@ -86,6 +89,7 @@ const Admin = () => {
       categoria: "executar",
       duracao: "30-45",
       dono: "Maria Silva",
+      valor: "R$ 8.000,00",
       pitch: true,
       bpmn: true,
       playbook: true,
@@ -251,6 +255,17 @@ const Admin = () => {
                       id="dono"
                       value={formData.dono || ""}
                       onChange={(e) => setFormData({...formData, dono: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="valor">Valor Base</Label>
+                    <Input
+                      id="valor"
+                      value={formData.valor || ""}
+                      onChange={(e) => setFormData({...formData, valor: e.target.value})}
+                      placeholder="ex: R$ 5.000,00"
                       required
                     />
                   </div>
@@ -497,6 +512,9 @@ const Admin = () => {
                     Duração (dias)
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Valor Base
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Dono
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -541,6 +559,7 @@ const Admin = () => {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 text-sm text-card-foreground">{item.duracao}</td>
+                    <td className="px-6 py-4 text-sm text-card-foreground font-medium">{item.valor}</td>
                     <td className="px-6 py-4 text-sm text-card-foreground">{item.dono}</td>
                     <td className="px-6 py-4 text-center">
                       <StatusIcon value={item.pitch} />
