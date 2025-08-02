@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 const ProductPortfolio = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,8 +51,14 @@ const ProductPortfolio = () => {
     { key: "potencializar", label: "POTENCIALIZAR", color: "potencializar" }
   ];
 
+  const statusFilters = [
+    { key: "all", label: "Todos os Status", color: "default" },
+    { key: "Disponível", label: "Disponível", color: "default" },
+    { key: "Em produção", label: "Em Produção", color: "secondary" }
+  ];
+
   const filteredProducts = products
-    .filter(product => product.status === "Disponível" || product.status === "Em produção")
+    .filter(product => statusFilter === "all" || product.status === statusFilter)
     .filter(product => activeFilter === "all" || product.category === activeFilter);
 
   const handleViewDetails = (productId: string) => {
@@ -64,19 +71,40 @@ const ProductPortfolio = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-8">Portfólio de Produtos</h2>
           
-          {/* Filtros */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            {filters.map((filter) => (
-              <Button
-                key={filter.key}
-                variant={activeFilter === filter.key ? filter.color as any : "outline"}
-                size="sm"
-                onClick={() => setActiveFilter(filter.key)}
-                className="transition-all duration-200"
-              >
-                {filter.label}
-              </Button>
-            ))}
+          {/* Filtros por Categoria */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-4">Filtrar por Categoria</h3>
+            <div className="flex flex-wrap justify-center gap-3">
+              {filters.map((filter) => (
+                <Button
+                  key={filter.key}
+                  variant={activeFilter === filter.key ? filter.color as any : "outline"}
+                  size="sm"
+                  onClick={() => setActiveFilter(filter.key)}
+                  className="transition-all duration-200"
+                >
+                  {filter.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Filtros por Status */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-4">Filtrar por Status</h3>
+            <div className="flex flex-wrap justify-center gap-3">
+              {statusFilters.map((filter) => (
+                <Button
+                  key={filter.key}
+                  variant={statusFilter === filter.key ? filter.color as any : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter(filter.key)}
+                  className="transition-all duration-200"
+                >
+                  {filter.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 
