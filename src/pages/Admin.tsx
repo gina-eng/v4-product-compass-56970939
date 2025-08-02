@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { NumericFormat } from 'react-number-format';
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -151,20 +152,74 @@ const Admin = () => {
 
   useEffect(() => {
     fetchProducts();
-    // fetchPositions(); // Comentado temporariamente até os tipos serem atualizados
+    fetchPositions();
   }, []);
 
-  // Funções para gerenciar posições (placeholder por enquanto)
+  // Funções para gerenciar posições
   const fetchPositions = async () => {
-    // Implementação temporária - será ativada quando os tipos forem atualizados
-    setPositions([]);
+    try {
+      const { data, error } = await supabase
+        .from('positions' as any)
+        .select('*')
+        .order('nome');
+      
+      if (error) throw error;
+      setPositions((data as unknown as Position[]) || []);
+    } catch (error) {
+      console.error('Erro ao buscar posições:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as posições.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePositionSubmit = async () => {
-    toast({
-      title: "Info",
-      description: "Funcionalidade será ativada em breve.",
-    });
+    try {
+      const positionData = {
+        nome: positionForm.nome,
+        investimento_total: parseFloat(positionForm.investimento_total),
+        cph: parseFloat(positionForm.cph)
+      };
+
+      if (editingPosition) {
+        const { error } = await supabase
+          .from('positions' as any)
+          .update(positionData)
+          .eq('id', editingPosition.id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Posição atualizada com sucesso!",
+        });
+      } else {
+        const { error } = await supabase
+          .from('positions' as any)
+          .insert([positionData]);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Posição criada com sucesso!",
+        });
+      }
+
+      setIsPositionDialogOpen(false);
+      setEditingPosition(null);
+      setPositionForm({ nome: '', investimento_total: '', cph: '' });
+      fetchPositions();
+    } catch (error) {
+      console.error('Erro ao salvar posição:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar a posição.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEditPosition = (position: Position) => {
@@ -178,10 +233,28 @@ const Admin = () => {
   };
 
   const handleDeletePosition = async (id: string) => {
-    toast({
-      title: "Info",
-      description: "Funcionalidade será ativada em breve.",
-    });
+    try {
+      const { error } = await supabase
+        .from('positions' as any)
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Sucesso",
+        description: "Posição excluída com sucesso!",
+      });
+      
+      fetchPositions();
+    } catch (error) {
+      console.error('Erro ao excluir posição:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir a posição.",
+        variant: "destructive",
+      });
+    }
   };
 
   const openNewPositionDialog = () => {
@@ -1488,25 +1561,37 @@ const Admin = () => {
 
                     <div>
                       <Label htmlFor="positionInvestimento">Investimento Total (R$)</Label>
-                      <Input
+                      <NumericFormat
                         id="positionInvestimento"
-                        type="number"
-                        step="0.01"
                         value={positionForm.investimento_total}
-                        onChange={(e) => setPositionForm({ ...positionForm, investimento_total: e.target.value })}
-                        placeholder="20000.00"
+                        onValueChange={(values) => {
+                          setPositionForm({ ...positionForm, investimento_total: values.value || '' });
+                        }}
+                        thousandSeparator="."
+                        decimalSeparator=","
+                        decimalScale={2}
+                        fixedDecimalScale={true}
+                        allowNegative={false}
+                        placeholder="20.000,00"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       />
                     </div>
 
                     <div>
                       <Label htmlFor="positionCph">CPH - Custo por Hora (R$)</Label>
-                      <Input
+                      <NumericFormat
                         id="positionCph"
-                        type="number"
-                        step="0.01"
                         value={positionForm.cph}
-                        onChange={(e) => setPositionForm({ ...positionForm, cph: e.target.value })}
-                        placeholder="119.05"
+                        onValueChange={(values) => {
+                          setPositionForm({ ...positionForm, cph: values.value || '' });
+                        }}
+                        thousandSeparator="."
+                        decimalSeparator=","
+                        decimalScale={2}
+                        fixedDecimalScale={true}
+                        allowNegative={false}
+                        placeholder="119,05"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       />
                     </div>
                   </div>
