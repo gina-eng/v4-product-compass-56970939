@@ -241,13 +241,13 @@ const ProductDetails = () => {
           {/* Público-alvo */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">O que é o produto?</h2>
-            <p className="text-muted-foreground leading-relaxed">{product.oQueEProduto}</p>
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line">{product.oQueEProduto}</div>
           </Card>
 
           {/* Como vender */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu vendo?</h2>
-            <p className="text-muted-foreground leading-relaxed mb-6">{product.comoVendo}</p>
+            <div className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line">{product.comoVendo}</div>
             
             {/* Tabela SPICED */}
             <SpicedTable data={product.spicedData} readOnly />
@@ -256,23 +256,23 @@ const ProductDetails = () => {
           {/* Como cobrar */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">O que eu entrego?</h2>
-            <p className="text-muted-foreground leading-relaxed">{product.oQueEntrego}</p>
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line">{product.oQueEntrego}</div>
           </Card>
 
           {/* Pra quem ele serve */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Pra quem ele serve?</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.paraQuemServe || "Informação a ser definida para este produto."}
-            </p>
+            </div>
           </Card>
 
           {/* Como ele entrega valor */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como ele entrega valor?</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.comoEntregaValor || "Informação a ser definida para este produto."}
-            </p>
+            </div>
           </Card>
 
           {/* Recursos disponíveis */}
