@@ -876,27 +876,6 @@ const Admin = () => {
                           />
                         </div>
 
-
-                        <div className="space-y-2">
-                          <Label htmlFor="comoVendo">Como eu vendo?</Label>
-                          <Textarea
-                            id="comoVendo"
-                            value={formData.comoVendo}
-                            onChange={(e) => setFormData({...formData, comoVendo: e.target.value})}
-                            rows={4}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="oQueEntrego">O que eu entrego?</Label>
-                          <Textarea
-                            id="oQueEntrego"
-                            value={formData.oQueEntrego}
-                            onChange={(e) => setFormData({...formData, oQueEntrego: e.target.value})}
-                            rows={4}
-                          />
-                        </div>
-
                         <div className="space-y-2">
                           <Label htmlFor="paraQuemServe">Pra quem ele serve?</Label>
                           <Textarea
@@ -913,6 +892,26 @@ const Admin = () => {
                             id="comoEntregaValor"
                             value={formData.comoEntregaValor || ""}
                             onChange={(e) => setFormData({...formData, comoEntregaValor: e.target.value})}
+                            rows={4}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="oQueEntrego">O que eu entrego?</Label>
+                          <Textarea
+                            id="oQueEntrego"
+                            value={formData.oQueEntrego}
+                            onChange={(e) => setFormData({...formData, oQueEntrego: e.target.value})}
+                            rows={4}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="comoVendo">Como eu vendo?</Label>
+                          <Textarea
+                            id="comoVendo"
+                            value={formData.comoVendo}
+                            onChange={(e) => setFormData({...formData, comoVendo: e.target.value})}
                             rows={4}
                           />
                         </div>

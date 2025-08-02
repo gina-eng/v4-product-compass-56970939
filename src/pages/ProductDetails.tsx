@@ -232,25 +232,10 @@ const ProductDetails = () => {
         </div>
 
         <div className="grid gap-6">
-          {/* Descrição principal */}
+          {/* Descrição - O que é o Produto? */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Descrição - O que é o Produto?</h2>
             <p className="text-muted-foreground leading-relaxed text-justify">{product.description}</p>
-          </Card>
-
-          {/* Como vender */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu vendo?</h2>
-            <div className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line text-justify">{product.comoVendo}</div>
-            
-            {/* Tabela SPICED */}
-            <SpicedTable data={product.spicedData} readOnly />
-          </Card>
-
-          {/* Como cobrar */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">O que eu entrego?</h2>
-            <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">{product.oQueEntrego}</div>
           </Card>
 
           {/* Pra quem ele serve */}
@@ -267,6 +252,21 @@ const ProductDetails = () => {
             <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">
               {product.comoEntregaValor || "Informação a ser definida para este produto."}
             </div>
+          </Card>
+
+          {/* O que eu entrego */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">O que eu entrego?</h2>
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">{product.oQueEntrego}</div>
+          </Card>
+
+          {/* Como eu vendo */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu vendo?</h2>
+            <div className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line text-justify">{product.comoVendo}</div>
+            
+            {/* Tabela SPICED */}
+            <SpicedTable data={product.spicedData} readOnly />
           </Card>
 
           {/* Recursos disponíveis */}
