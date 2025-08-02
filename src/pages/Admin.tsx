@@ -141,14 +141,22 @@ const Admin = () => {
   }, [settings]);
 
   const handleSettingChange = (key: string, value: string) => {
-    setLocalSettings(prev => ({ ...prev, [key]: value }));
+    const newLocalSettings = { ...localSettings, [key]: value };
+    setLocalSettings(newLocalSettings);
     
-    // Forçar verificação se há mudanças
-    const hasChanges = value !== settings[key as keyof typeof settings] || 
-                      localSettings.step_title !== settings.step_title ||
-                      localSettings.step_description !== settings.step_description;
+    // Verificar se há mudanças comparando todos os campos
+    const hasChanges = Object.keys(newLocalSettings).some(settingKey => 
+      newLocalSettings[settingKey as keyof typeof newLocalSettings] !== settings[settingKey as keyof typeof settings]
+    );
     
-    console.log('Mudança detectada:', { key, value, hasChanges, settings });
+    console.log('Verificando mudanças:', { 
+      key, 
+      value, 
+      hasChanges, 
+      newLocalSettings, 
+      settings 
+    });
+    
     setSettingsChanged(hasChanges);
   };
 
