@@ -59,6 +59,12 @@ interface Product {
 
 const Admin = () => {
   const { settings, updateSetting, isTableAvailable } = useSiteSettings();
+  const [localSettings, setLocalSettings] = useState({
+    step_title: '',
+    step_description: ''
+  });
+  const [settingsChanged, setSettingsChanged] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -108,6 +114,55 @@ const Admin = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Sincronizar configurações locais com as globais
+  useEffect(() => {
+    setLocalSettings({
+      step_title: settings.step_title,
+      step_description: settings.step_description
+    });
+    setSettingsChanged(false);
+  }, [settings]);
+
+  const handleSettingChange = (key: string, value: string) => {
+    setLocalSettings(prev => ({ ...prev, [key]: value }));
+    setSettingsChanged(
+      value !== settings[key as keyof typeof settings]
+    );
+  };
+
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      // Salvar todas as configurações que foram alteradas
+      const promises = [];
+      
+      if (localSettings.step_title !== settings.step_title) {
+        promises.push(updateSetting('step_title', localSettings.step_title));
+      }
+      
+      if (localSettings.step_description !== settings.step_description) {
+        promises.push(updateSetting('step_description', localSettings.step_description));
+      }
+
+      await Promise.all(promises);
+      
+      toast({
+        title: "Configurações salvas",
+        description: "As configurações do site foram atualizadas com sucesso.",
+      });
+      
+      setSettingsChanged(false);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar configurações.",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -1008,14 +1063,23 @@ const Admin = () => {
             
             <div className="space-y-6">
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Textos da Página Principal</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Textos da Página Principal</h3>
+                  {!isTableAvailable && (
+                    <Badge variant="outline" className="text-xs">
+                      Apenas Preview (Tabela não disponível)
+                    </Badge>
+                  )}
+                </div>
+                
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="stepTitle">Título da Seção STEP</Label>
                     <Input
                       id="stepTitle"
-                      defaultValue={settings.step_title}
-                      onBlur={(e) => updateSetting('step_title', e.target.value)}
+                      value={localSettings.step_title}
+                      onChange={(e) => handleSettingChange('step_title', e.target.value)}
+                      placeholder="Digite o título da seção STEP"
                     />
                   </div>
                   
@@ -1023,11 +1087,43 @@ const Admin = () => {
                     <Label htmlFor="stepDescription">Descrição da Seção STEP</Label>
                     <Textarea
                       id="stepDescription"
-                      rows={4}
-                      defaultValue={settings.step_description}
-                      onBlur={(e) => updateSetting('step_description', e.target.value)}
+                      rows={6}
+                      value={localSettings.step_description}
+                      onChange={(e) => handleSettingChange('step_description', e.target.value)}
+                      placeholder="Digite a descrição da seção STEP"
                     />
                   </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <Button 
+                      onClick={handleSaveSettings}
+                      disabled={!settingsChanged || savingSettings}
+                      className="gap-2"
+                    >
+                      {savingSettings ? "Salvando..." : "Salvar Alterações"}
+                    </Button>
+                    
+                    {settingsChanged && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setLocalSettings({
+                            step_title: settings.step_title,
+                            step_description: settings.step_description
+                          });
+                          setSettingsChanged(false);
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {settingsChanged && (
+                    <p className="text-sm text-amber-600">
+                      ⚠️ Você tem alterações não salvas
+                    </p>
+                  )}
                 </div>
               </Card>
             </div>
