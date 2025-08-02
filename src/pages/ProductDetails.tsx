@@ -37,11 +37,10 @@ interface Product {
   certificacaoUrl?: string;
   status: "Disponível" | "Em produção" | "Em homologação";
   description: string;
-  detailedDescription: string;
-  objetivos: string;
+  oQueEProduto: string;
+  comoVendo: string;
   spicedData: SpicedData;
-  entregas: string;
-  prerequisitos: string;
+  oQueEntrego: string;
   paraQuemServe?: string;
   comoEntregaValor?: string;
   bonusKpi?: string;
@@ -96,11 +95,10 @@ const ProductDetails = () => {
             certificacaoUrl: data.certificacao_url,
             status: data.status,
             description: data.description,
-            detailedDescription: data.detailed_description,
-            objetivos: data.objetivos,
+            oQueEProduto: data.o_que_e_produto,
+            comoVendo: data.como_vendo,
             spicedData: (data.spiced_data as unknown) as SpicedData,
-            entregas: data.entregas,
-            prerequisitos: data.prerequisitos,
+            oQueEntrego: data.o_que_entrego,
             paraQuemServe: data.para_quem_serve,
             comoEntregaValor: data.como_entrega_valor,
             bonusKpi: data.bonus_kpi,
@@ -243,13 +241,13 @@ const ProductDetails = () => {
           {/* Público-alvo */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">O que é o produto?</h2>
-            <p className="text-muted-foreground leading-relaxed">{product.detailedDescription}</p>
+            <p className="text-muted-foreground leading-relaxed">{product.oQueEProduto}</p>
           </Card>
 
           {/* Como vender */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu vendo?</h2>
-            <p className="text-muted-foreground leading-relaxed mb-6">{product.objetivos}</p>
+            <p className="text-muted-foreground leading-relaxed mb-6">{product.comoVendo}</p>
             
             {/* Tabela SPICED */}
             <SpicedTable data={product.spicedData} readOnly />
@@ -258,7 +256,7 @@ const ProductDetails = () => {
           {/* Como cobrar */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">O que eu entrego?</h2>
-            <p className="text-muted-foreground leading-relaxed">{product.entregas}</p>
+            <p className="text-muted-foreground leading-relaxed">{product.oQueEntrego}</p>
           </Card>
 
           {/* Pra quem ele serve */}

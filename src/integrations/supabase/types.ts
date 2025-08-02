@@ -23,25 +23,24 @@ export type Database = {
           certificacao: boolean
           certificacao_url: string | null
           como_entrega_valor: string | null
+          como_vendo: string
           created_at: string
           description: string
-          detailed_description: string
           dono: string
           duracao: string
-          entregas: string
           entregaveis_relacionados: string | null
           garantia_especifica: string | null
           icp: boolean
           icp_url: string | null
           id: string
           kpi_principal: Database["public"]["Enums"]["kpi_tipo"] | null
-          objetivos: string
+          o_que_e_produto: string
+          o_que_entrego: string
           para_quem_serve: string | null
           pitch: boolean
           pitch_url: string | null
           playbook: boolean
           playbook_url: string | null
-          prerequisitos: string
           pricing: boolean
           pricing_url: string | null
           produto: string
@@ -60,25 +59,24 @@ export type Database = {
           certificacao?: boolean
           certificacao_url?: string | null
           como_entrega_valor?: string | null
+          como_vendo: string
           created_at?: string
           description: string
-          detailed_description: string
           dono: string
           duracao: string
-          entregas: string
           entregaveis_relacionados?: string | null
           garantia_especifica?: string | null
           icp?: boolean
           icp_url?: string | null
           id?: string
           kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
-          objetivos: string
+          o_que_e_produto: string
+          o_que_entrego: string
           para_quem_serve?: string | null
           pitch?: boolean
           pitch_url?: string | null
           playbook?: boolean
           playbook_url?: string | null
-          prerequisitos: string
           pricing?: boolean
           pricing_url?: string | null
           produto: string
@@ -97,25 +95,24 @@ export type Database = {
           certificacao?: boolean
           certificacao_url?: string | null
           como_entrega_valor?: string | null
+          como_vendo?: string
           created_at?: string
           description?: string
-          detailed_description?: string
           dono?: string
           duracao?: string
-          entregas?: string
           entregaveis_relacionados?: string | null
           garantia_especifica?: string | null
           icp?: boolean
           icp_url?: string | null
           id?: string
           kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
-          objetivos?: string
+          o_que_e_produto?: string
+          o_que_entrego?: string
           para_quem_serve?: string | null
           pitch?: boolean
           pitch_url?: string | null
           playbook?: boolean
           playbook_url?: string | null
-          prerequisitos?: string
           pricing?: boolean
           pricing_url?: string | null
           produto?: string

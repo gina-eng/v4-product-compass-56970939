@@ -46,11 +46,10 @@ interface Product {
   certificacaoUrl?: string;
   status: string;
   description: string;
-  detailedDescription: string;
-  objetivos: string;
+  oQueEProduto: string;
+  comoVendo: string;
   spicedData: SpicedData;
-  entregas: string;
-  prerequisitos: string;
+  oQueEntrego: string;
   paraQuemServe?: string;
   comoEntregaValor?: string;
   bonusKpi?: string;
@@ -104,8 +103,8 @@ const Admin = () => {
     certificacaoUrl: "",
     status: "Em produção",
     description: "",
-    detailedDescription: "",
-    objetivos: "",
+    oQueEProduto: "",
+    comoVendo: "",
     spicedData: {
       situation: { objetivo: "", perguntas: "", observar: "" },
       pain: { objetivo: "", perguntas: "", observar: "" },
@@ -113,8 +112,7 @@ const Admin = () => {
       criticalEvent: { objetivo: "", perguntas: "", observar: "" },
       decision: { objetivo: "", perguntas: "", observar: "" }
     } as SpicedData,
-    entregas: "",
-    prerequisitos: "",
+    oQueEntrego: "",
     paraQuemServe: "",
     comoEntregaValor: "",
     bonusKpi: "",
@@ -265,8 +263,8 @@ const Admin = () => {
         certificacaoUrl: product.certificacao_url,
         status: product.status,
         description: product.description,
-        detailedDescription: product.detailed_description,
-        objetivos: product.objetivos,
+        oQueEProduto: product.o_que_e_produto,
+        comoVendo: product.como_vendo,
         spicedData: (product.spiced_data as unknown as SpicedData) || {
           situation: { objetivo: "", perguntas: "", observar: "" },
           pain: { objetivo: "", perguntas: "", observar: "" },
@@ -274,8 +272,7 @@ const Admin = () => {
           criticalEvent: { objetivo: "", perguntas: "", observar: "" },
           decision: { objetivo: "", perguntas: "", observar: "" }
         },
-        entregas: product.entregas,
-        prerequisitos: product.prerequisitos,
+        oQueEntrego: product.o_que_entrego,
         paraQuemServe: product.para_quem_serve,
         comoEntregaValor: product.como_entrega_valor,
         bonusKpi: product.bonus_kpi,
@@ -327,11 +324,10 @@ const Admin = () => {
             certificacao_url: formData.certificacaoUrl || null,
             status: formData.status as any,
             description: formData.description,
-            detailed_description: formData.detailedDescription,
-            objetivos: formData.objetivos,
+            o_que_e_produto: formData.oQueEProduto,
+            como_vendo: formData.comoVendo,
             spiced_data: formData.spicedData as any,
-            entregas: formData.entregas,
-            prerequisitos: formData.prerequisitos,
+            o_que_entrego: formData.oQueEntrego,
             para_quem_serve: formData.paraQuemServe || null,
             como_entrega_valor: formData.comoEntregaValor || null,
             bonus_kpi: formData.bonusKpi || null,
@@ -373,8 +369,8 @@ const Admin = () => {
             certificacao_url: formData.certificacaoUrl || null,
             status: formData.status as any,
             description: formData.description,
-            detailed_description: formData.detailedDescription,
-            objetivos: formData.objetivos,
+            o_que_e_produto: formData.oQueEProduto,
+            como_vendo: formData.comoVendo,
             spiced_data: (formData.spicedData || {
               situation: { objetivo: "", perguntas: "", observar: "" },
               pain: { objetivo: "", perguntas: "", observar: "" },
@@ -382,8 +378,7 @@ const Admin = () => {
               criticalEvent: { objetivo: "", perguntas: "", observar: "" },
               decision: { objetivo: "", perguntas: "", observar: "" }
             }) as any,
-            entregas: formData.entregas,
-            prerequisitos: formData.prerequisitos,
+            o_que_entrego: formData.oQueEntrego,
             para_quem_serve: formData.paraQuemServe || null,
             como_entrega_valor: formData.comoEntregaValor || null,
             bonus_kpi: formData.bonusKpi || null,
@@ -424,8 +419,8 @@ const Admin = () => {
         pricingUrl: "",
         certificacaoUrl: "",
         description: "",
-        detailedDescription: "",
-        objetivos: "",
+        oQueEProduto: "",
+        comoVendo: "",
         spicedData: {
           situation: { objetivo: "", perguntas: "", observar: "" },
           pain: { objetivo: "", perguntas: "", observar: "" },
@@ -433,8 +428,7 @@ const Admin = () => {
           criticalEvent: { objetivo: "", perguntas: "", observar: "" },
           decision: { objetivo: "", perguntas: "", observar: "" }
         },
-        entregas: "",
-        prerequisitos: "",
+        oQueEntrego: "",
         paraQuemServe: "",
         comoEntregaValor: "",
         bonusKpi: "",
@@ -477,11 +471,10 @@ const Admin = () => {
       certificacaoUrl: product.certificacaoUrl || "",
       status: product.status,
       description: product.description,
-      detailedDescription: product.detailedDescription,
-      objetivos: product.objetivos,
+      oQueEProduto: product.oQueEProduto,
+      comoVendo: product.comoVendo,
       spicedData: product.spicedData,
-      entregas: product.entregas,
-      prerequisitos: product.prerequisitos,
+      oQueEntrego: product.oQueEntrego,
       paraQuemServe: product.paraQuemServe || "",
       comoEntregaValor: product.comoEntregaValor || "",
       bonusKpi: product.bonusKpi || "",
@@ -543,8 +536,8 @@ const Admin = () => {
       pricingUrl: "",
       certificacaoUrl: "",
       description: "",
-      detailedDescription: "",
-      objetivos: "",
+      oQueEProduto: "",
+      comoVendo: "",
       spicedData: {
         situation: { objetivo: "", perguntas: "", observar: "" },
         pain: { objetivo: "", perguntas: "", observar: "" },
@@ -552,8 +545,7 @@ const Admin = () => {
         criticalEvent: { objetivo: "", perguntas: "", observar: "" },
         decision: { objetivo: "", perguntas: "", observar: "" }
       },
-      entregas: "",
-      prerequisitos: "",
+      oQueEntrego: "",
       paraQuemServe: "",
       comoEntregaValor: "",
       bonusKpi: "",
@@ -892,31 +884,31 @@ const Admin = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="detailedDescription">O que é o produto?</Label>
+                          <Label htmlFor="oQueEProduto">O que é o produto?</Label>
                           <Textarea
-                            id="detailedDescription"
-                            value={formData.detailedDescription}
-                            onChange={(e) => setFormData({...formData, detailedDescription: e.target.value})}
+                            id="oQueEProduto"
+                            value={formData.oQueEProduto}
+                            onChange={(e) => setFormData({...formData, oQueEProduto: e.target.value})}
                             rows={6}
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="objetivos">Como eu vendo?</Label>
+                          <Label htmlFor="comoVendo">Como eu vendo?</Label>
                           <Textarea
-                            id="objetivos"
-                            value={formData.objetivos}
-                            onChange={(e) => setFormData({...formData, objetivos: e.target.value})}
+                            id="comoVendo"
+                            value={formData.comoVendo}
+                            onChange={(e) => setFormData({...formData, comoVendo: e.target.value})}
                             rows={4}
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="entregas">O que eu entrego?</Label>
+                          <Label htmlFor="oQueEntrego">O que eu entrego?</Label>
                           <Textarea
-                            id="entregas"
-                            value={formData.entregas}
-                            onChange={(e) => setFormData({...formData, entregas: e.target.value})}
+                            id="oQueEntrego"
+                            value={formData.oQueEntrego}
+                            onChange={(e) => setFormData({...formData, oQueEntrego: e.target.value})}
                             rows={4}
                           />
                         </div>
