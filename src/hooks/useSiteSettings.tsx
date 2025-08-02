@@ -35,6 +35,11 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
           settingsObj[item.setting_key] = item.setting_value;
         });
         
+        // Combinar step_description_1 e step_description_2 em step_description
+        if (settingsObj.step_description_1 && settingsObj.step_description_2) {
+          settingsObj.step_description = `${settingsObj.step_description_1}\n\n${settingsObj.step_description_2}`;
+        }
+        
         // Manter valores padrão para chaves que não existem
         setSettings(prev => ({ ...prev, ...settingsObj }));
       }
