@@ -257,10 +257,20 @@ const ProductDetails = () => {
             <p className="text-muted-foreground leading-relaxed">{product.entregas}</p>
           </Card>
 
-          {/* Pré-requisitos */}
+          {/* Pra quem ele serve */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Pré-requisitos</h2>
-            <p className="text-muted-foreground leading-relaxed">{product.prerequisitos}</p>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Pra quem ele serve?</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {product.stackDigital || "Informação a ser definida para este produto."}
+            </p>
+          </Card>
+
+          {/* Como ele entrega valor */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Como ele entrega valor?</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {product.entregaveisRelacionados || "Informação a ser definida para este produto."}
+            </p>
           </Card>
 
           {/* Recursos disponíveis */}
@@ -326,20 +336,6 @@ const ProductDetails = () => {
                 <div className="md:col-span-2">
                   <h3 className="font-medium text-foreground mb-2">Garantia Específica</h3>
                   <p className="text-muted-foreground leading-relaxed">{product.garantiaEspecifica}</p>
-                </div>
-              )}
-              
-              {product.stackDigital && (
-                <div className="md:col-span-2">
-                  <h3 className="font-medium text-foreground mb-2">Stack Digital</h3>
-                  <p className="text-muted-foreground leading-relaxed">{product.stackDigital}</p>
-                </div>
-              )}
-              
-              {product.entregaveisRelacionados && (
-                <div className="md:col-span-2">
-                  <h3 className="font-medium text-foreground mb-2">Entregáveis Relacionados</h3>
-                  <p className="text-muted-foreground leading-relaxed">{product.entregaveisRelacionados}</p>
                 </div>
               )}
             </div>
