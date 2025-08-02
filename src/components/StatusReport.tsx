@@ -63,7 +63,7 @@ const StatusReport = () => {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       "Disponível": { variant: "default" as const, color: "bg-green-100 text-green-800" },
-      "Em produção": { variant: "secondary" as const, color: "bg-blue-100 text-blue-800" },
+      "Em produção": { variant: "secondary" as const, color: "bg-purple-100 text-purple-800" },
       "Em homologação": { variant: "outline" as const, color: "bg-yellow-100 text-yellow-800" }
     };
     

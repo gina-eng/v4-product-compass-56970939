@@ -125,7 +125,7 @@ const Admin = () => {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       "Disponível": { color: "bg-green-100 text-green-800" },
-      "Em produção": { color: "bg-blue-100 text-blue-800" },
+      "Em produção": { color: "bg-purple-100 text-purple-800" },
       "Em homologação": { color: "bg-yellow-100 text-yellow-800" }
     };
     

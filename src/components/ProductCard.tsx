@@ -25,7 +25,7 @@ const ProductCard = ({ id, name, description, category, valorBase, status, onVie
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       "Disponível": { variant: "default" as const, className: "bg-green-100 text-green-800" },
-      "Em produção": { variant: "secondary" as const, className: "bg-blue-100 text-blue-800" },
+      "Em produção": { variant: "secondary" as const, className: "bg-purple-100 text-purple-800" },
       "Em homologação": { variant: "outline" as const, className: "bg-yellow-100 text-yellow-800" }
     };
     
