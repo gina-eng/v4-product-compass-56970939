@@ -26,6 +26,13 @@ interface SpicedData {
   decision: { objetivo: string; perguntas: string; observar: string };
 }
 
+interface Position {
+  id: string;
+  nome: string;
+  investimento_total: number;
+  cph: number;
+}
+
 interface ComoEntregoItem {
   etapa: string;
   tarefa: string;
@@ -71,6 +78,16 @@ interface Product {
 
 const Admin = () => {
   const { settings, updateSetting, isTableAvailable } = useSiteSettings();
+  
+  // Estados para gerenciar posições
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [isPositionDialogOpen, setIsPositionDialogOpen] = useState(false);
+  const [editingPosition, setEditingPosition] = useState<Position | null>(null);
+  const [positionForm, setPositionForm] = useState({
+    nome: '',
+    investimento_total: '',
+    cph: ''
+  });
   const [localSettings, setLocalSettings] = useState({
     step_title: '',
     step_description: '',
@@ -134,7 +151,116 @@ const Admin = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchPositions();
   }, []);
+
+  // Funções para gerenciar posições
+  const fetchPositions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('positions')
+        .select('*')
+        .order('nome');
+      
+      if (error) throw error;
+      setPositions(data || []);
+    } catch (error) {
+      console.error('Erro ao buscar posições:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as posições.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePositionSubmit = async () => {
+    try {
+      const positionData = {
+        nome: positionForm.nome,
+        investimento_total: parseFloat(positionForm.investimento_total),
+        cph: parseFloat(positionForm.cph)
+      };
+
+      if (editingPosition) {
+        const { error } = await supabase
+          .from('positions')
+          .update(positionData)
+          .eq('id', editingPosition.id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Posição atualizada com sucesso!",
+        });
+      } else {
+        const { error } = await supabase
+          .from('positions')
+          .insert([positionData]);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Posição criada com sucesso!",
+        });
+      }
+
+      setIsPositionDialogOpen(false);
+      setEditingPosition(null);
+      setPositionForm({ nome: '', investimento_total: '', cph: '' });
+      fetchPositions();
+    } catch (error) {
+      console.error('Erro ao salvar posição:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar a posição.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditPosition = (position: Position) => {
+    setEditingPosition(position);
+    setPositionForm({
+      nome: position.nome,
+      investimento_total: position.investimento_total.toString(),
+      cph: position.cph.toString()
+    });
+    setIsPositionDialogOpen(true);
+  };
+
+  const handleDeletePosition = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('positions')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Sucesso",
+        description: "Posição excluída com sucesso!",
+      });
+      
+      fetchPositions();
+    } catch (error) {
+      console.error('Erro ao excluir posição:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir a posição.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openNewPositionDialog = () => {
+    setEditingPosition(null);
+    setPositionForm({ nome: '', investimento_total: '', cph: '' });
+    setIsPositionDialogOpen(true);
+  };
 
   // Sincronizar configurações locais com as globais
   useEffect(() => {
@@ -628,6 +754,7 @@ const Admin = () => {
         <Tabs defaultValue="products" className="space-y-6">
           <TabsList>
             <TabsTrigger value="products">Produtos</TabsTrigger>
+            <TabsTrigger value="positions">Posições & Custos</TabsTrigger>
             <TabsTrigger value="settings">Informações Gerais</TabsTrigger>
           </TabsList>
 
