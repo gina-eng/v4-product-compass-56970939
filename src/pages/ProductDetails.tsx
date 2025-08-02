@@ -238,13 +238,13 @@ const ProductDetails = () => {
 
           {/* Público-alvo */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Descrição Detalhada</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">O que é o produto?</h2>
             <p className="text-muted-foreground leading-relaxed">{product.detailedDescription}</p>
           </Card>
 
           {/* Como vender */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Objetivos</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu vendo?</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">{product.objetivos}</p>
             
             {/* Tabela SPICED */}
@@ -253,7 +253,7 @@ const ProductDetails = () => {
 
           {/* Como cobrar */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Entregas</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">O que eu entrego?</h2>
             <p className="text-muted-foreground leading-relaxed">{product.entregas}</p>
           </Card>
 
