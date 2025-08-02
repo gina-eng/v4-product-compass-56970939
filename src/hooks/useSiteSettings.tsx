@@ -57,20 +57,47 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
     try {
       console.log('Tentando salvar no banco:', { key, value });
       
-      const { error } = await supabase
+      // Primeiro, verificar se o registro já existe
+      const { data: existingData, error: selectError } = await supabase
         .from('site_settings')
-        .upsert({ 
-          setting_key: key, 
-          setting_value: value,
-          description: getDescriptionForKey(key)
-        });
+        .select('id')
+        .eq('setting_key', key)
+        .single();
 
-      if (error) {
-        console.error('Erro Supabase:', error);
-        throw error;
+      if (selectError && selectError.code !== 'PGRST116') {
+        console.error('Erro ao verificar registro existente:', selectError);
+        throw selectError;
+      }
+
+      let result;
+      if (existingData) {
+        // Registro existe, fazer UPDATE
+        console.log('Registro existe, fazendo UPDATE');
+        result = await supabase
+          .from('site_settings')
+          .update({ 
+            setting_value: value,
+            updated_at: new Date().toISOString()
+          })
+          .eq('setting_key', key);
+      } else {
+        // Registro não existe, fazer INSERT
+        console.log('Registro não existe, fazendo INSERT');
+        result = await supabase
+          .from('site_settings')
+          .insert({ 
+            setting_key: key, 
+            setting_value: value,
+            description: getDescriptionForKey(key)
+          });
+      }
+
+      if (result.error) {
+        console.error('Erro na operação:', result.error);
+        throw result.error;
       }
       
-      console.log('Salvamento no banco realizado com sucesso');
+      console.log('Salvamento realizado com sucesso:', result);
       
       // Forçar atualização dos dados após salvar
       await fetchSettings();
