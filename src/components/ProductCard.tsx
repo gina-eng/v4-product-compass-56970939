@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ChevronDown } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 
@@ -9,10 +10,11 @@ interface ProductCardProps {
   description: string;
   category: "saber" | "ter" | "executar" | "potencializar";
   valorBase: string;
+  status: "Disponível" | "Em produção" | "Em homologação";
   onViewDetails: (id: string) => void;
 }
 
-const ProductCard = ({ id, name, description, category, valorBase, onViewDetails }: ProductCardProps) => {
+const ProductCard = ({ id, name, description, category, valorBase, status, onViewDetails }: ProductCardProps) => {
   const categoryLabels = {
     saber: "SABER",
     ter: "TER", 
@@ -20,15 +22,31 @@ const ProductCard = ({ id, name, description, category, valorBase, onViewDetails
     potencializar: "POTENCIALIZAR"
   };
 
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      "Disponível": { variant: "default" as const, className: "bg-green-100 text-green-800" },
+      "Em produção": { variant: "secondary" as const, className: "bg-blue-100 text-blue-800" },
+      "Em homologação": { variant: "outline" as const, className: "bg-yellow-100 text-yellow-800" }
+    };
+    
+    return statusConfig[status as keyof typeof statusConfig] || statusConfig["Disponível"];
+  };
+
   return (
     <Card className="p-6 hover:shadow-lg transition-all duration-300 group">
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <div 
-          className={`inline-block px-3 py-1 rounded-full text-xs font-medium text-white mb-4`}
+          className={`inline-block px-3 py-1 rounded-full text-xs font-medium text-white`}
           style={{backgroundColor: `hsl(var(--${category}))`}}
         >
           {categoryLabels[category]}
         </div>
+        <Badge 
+          variant={getStatusBadge(status).variant}
+          className={getStatusBadge(status).className}
+        >
+          {status}
+        </Badge>
       </div>
       
       <h3 className="text-lg font-semibold mb-3 text-gray-900 group-hover:text-gray-700 transition-colors">

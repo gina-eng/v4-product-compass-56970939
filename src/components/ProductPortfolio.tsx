@@ -94,6 +94,7 @@ const ProductPortfolio = () => {
                 name={product.name}
                 description={product.description}
                 category={product.category}
+                status={product.status}
                 valorBase={product.valorBase}
                 onViewDetails={handleViewDetails}
               />
