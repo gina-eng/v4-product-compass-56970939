@@ -103,7 +103,7 @@ const StatusReport = () => {
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Portfólio Status Report</h2>
-          <p className="text-muted-foreground mb-8">Painel administrativo para controle de produtos e status</p>
+          <p className="text-muted-foreground mb-8 text-justify">Painel administrativo para controle de produtos e status</p>
           
           {/* Filtros */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ExternalLink, User, Clock, CheckCircle, XCircle } from "lucide-react";
 import SpicedTable from "@/components/SpicedTable";
 import { supabase } from "@/integrations/supabase/client";
+import Header from "@/components/Header";
 import { formatCurrency } from "@/lib/formatters";
 
 interface SpicedData {
@@ -188,6 +189,7 @@ const ProductDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <div className="container mx-auto py-8 px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
@@ -235,19 +237,19 @@ const ProductDetails = () => {
           {/* Descrição principal */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Descrição Curta</h2>
-            <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+            <p className="text-muted-foreground leading-relaxed text-justify">{product.description}</p>
           </Card>
 
           {/* Público-alvo */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">O que é o produto?</h2>
-            <div className="text-muted-foreground leading-relaxed whitespace-pre-line">{product.oQueEProduto}</div>
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">{product.oQueEProduto}</div>
           </Card>
 
           {/* Como vender */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu vendo?</h2>
-            <div className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line">{product.comoVendo}</div>
+            <div className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line text-justify">{product.comoVendo}</div>
             
             {/* Tabela SPICED */}
             <SpicedTable data={product.spicedData} readOnly />
@@ -256,13 +258,13 @@ const ProductDetails = () => {
           {/* Como cobrar */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">O que eu entrego?</h2>
-            <div className="text-muted-foreground leading-relaxed whitespace-pre-line">{product.oQueEntrego}</div>
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">{product.oQueEntrego}</div>
           </Card>
 
           {/* Pra quem ele serve */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Pra quem ele serve?</h2>
-            <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">
               {product.paraQuemServe || "Informação a ser definida para este produto."}
             </div>
           </Card>
@@ -270,7 +272,7 @@ const ProductDetails = () => {
           {/* Como ele entrega valor */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como ele entrega valor?</h2>
-            <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
+            <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">
               {product.comoEntregaValor || "Informação a ser definida para este produto."}
             </div>
           </Card>
@@ -330,14 +332,14 @@ const ProductDetails = () => {
               {product.bonusKpi && (
                 <div className="md:col-span-2">
                   <h3 className="font-medium text-foreground mb-2">Bonus KPI</h3>
-                  <p className="text-muted-foreground leading-relaxed">{product.bonusKpi}</p>
+                  <p className="text-muted-foreground leading-relaxed text-justify">{product.bonusKpi}</p>
                 </div>
               )}
               
               {product.garantiaEspecifica && (
                 <div className="md:col-span-2">
                   <h3 className="font-medium text-foreground mb-2">Garantia Específica</h3>
-                  <p className="text-muted-foreground leading-relaxed">{product.garantiaEspecifica}</p>
+                  <p className="text-muted-foreground leading-relaxed text-justify">{product.garantiaEspecifica}</p>
                 </div>
               )}
             </div>

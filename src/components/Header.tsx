@@ -24,6 +24,12 @@ const Header = () => {
                 Home
               </Button>
             </Link>
+            <Link to="/admin">
+              <Button variant="ghost" size="sm" className="text-header-foreground hover:bg-white/10">
+                <Settings className="w-4 h-4 mr-2" />
+                Admin
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
