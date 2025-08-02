@@ -46,7 +46,6 @@ interface Product {
   certificacaoUrl?: string;
   status: string;
   description: string;
-  oQueEProduto: string;
   comoVendo: string;
   spicedData: SpicedData;
   oQueEntrego: string;
@@ -103,7 +102,6 @@ const Admin = () => {
     certificacaoUrl: "",
     status: "Em produção",
     description: "",
-    oQueEProduto: "",
     comoVendo: "",
     spicedData: {
       situation: { objetivo: "", perguntas: "", observar: "" },
@@ -263,7 +261,7 @@ const Admin = () => {
         certificacaoUrl: product.certificacao_url,
         status: product.status,
         description: product.description,
-        oQueEProduto: product.o_que_e_produto,
+        
         comoVendo: product.como_vendo,
         spicedData: (product.spiced_data as unknown as SpicedData) || {
           situation: { objetivo: "", perguntas: "", observar: "" },
@@ -324,7 +322,6 @@ const Admin = () => {
             certificacao_url: formData.certificacaoUrl || null,
             status: formData.status as any,
             description: formData.description,
-            o_que_e_produto: formData.oQueEProduto,
             como_vendo: formData.comoVendo,
             spiced_data: formData.spicedData as any,
             o_que_entrego: formData.oQueEntrego,
@@ -369,7 +366,6 @@ const Admin = () => {
             certificacao_url: formData.certificacaoUrl || null,
             status: formData.status as any,
             description: formData.description,
-            o_que_e_produto: formData.oQueEProduto,
             como_vendo: formData.comoVendo,
             spiced_data: (formData.spicedData || {
               situation: { objetivo: "", perguntas: "", observar: "" },
@@ -419,7 +415,6 @@ const Admin = () => {
         pricingUrl: "",
         certificacaoUrl: "",
         description: "",
-        oQueEProduto: "",
         comoVendo: "",
         spicedData: {
           situation: { objetivo: "", perguntas: "", observar: "" },
@@ -471,7 +466,6 @@ const Admin = () => {
       certificacaoUrl: product.certificacaoUrl || "",
       status: product.status,
       description: product.description,
-      oQueEProduto: product.oQueEProduto,
       comoVendo: product.comoVendo,
       spicedData: product.spicedData,
       oQueEntrego: product.oQueEntrego,
@@ -536,7 +530,6 @@ const Admin = () => {
       pricingUrl: "",
       certificacaoUrl: "",
       description: "",
-      oQueEProduto: "",
       comoVendo: "",
       spicedData: {
         situation: { objetivo: "", perguntas: "", observar: "" },
@@ -883,15 +876,6 @@ const Admin = () => {
                           />
                         </div>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="oQueEProduto">O que é o produto?</Label>
-                          <Textarea
-                            id="oQueEProduto"
-                            value={formData.oQueEProduto}
-                            onChange={(e) => setFormData({...formData, oQueEProduto: e.target.value})}
-                            rows={6}
-                          />
-                        </div>
 
                         <div className="space-y-2">
                           <Label htmlFor="comoVendo">Como eu vendo?</Label>

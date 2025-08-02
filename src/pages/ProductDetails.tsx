@@ -38,7 +38,6 @@ interface Product {
   certificacaoUrl?: string;
   status: "Disponível" | "Em produção" | "Em homologação";
   description: string;
-  oQueEProduto: string;
   comoVendo: string;
   spicedData: SpicedData;
   oQueEntrego: string;
@@ -96,7 +95,6 @@ const ProductDetails = () => {
             certificacaoUrl: data.certificacao_url,
             status: data.status,
             description: data.description,
-            oQueEProduto: data.o_que_e_produto,
             comoVendo: data.como_vendo,
             spicedData: (data.spiced_data as unknown) as SpicedData,
             oQueEntrego: data.o_que_entrego,
@@ -236,14 +234,8 @@ const ProductDetails = () => {
         <div className="grid gap-6">
           {/* Descrição principal */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Descrição Curta</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Descrição - O que é o Produto?</h2>
             <p className="text-muted-foreground leading-relaxed text-justify">{product.description}</p>
-          </Card>
-
-          {/* Público-alvo */}
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">O que é o produto?</h2>
-            <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">{product.oQueEProduto}</div>
           </Card>
 
           {/* Como vender */}
