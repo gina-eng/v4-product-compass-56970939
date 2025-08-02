@@ -2,16 +2,15 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ExternalLink } from "lucide-react";
 
 interface ComoEntregoItem {
   etapa: string;
   tarefa: string;
   dri: string;
   estimativaHoras: string;
-  comoExecutar: string;
+  comoExecutar: string; // URL do POP
 }
 
 interface ComoEntregoTableProps {
@@ -103,7 +102,19 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
                       <div className="font-mono">{row.estimativaHoras}h</div>
                     </td>
                     <td className="border border-border p-3">
-                      <div className="whitespace-pre-line text-sm">{row.comoExecutar}</div>
+                      {row.comoExecutar ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => window.open(row.comoExecutar, '_blank')}
+                          className="h-8 px-2 text-primary hover:text-primary-foreground"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Ver POP
+                        </Button>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Não definido</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -203,12 +214,12 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
                 </div>
 
                 <div className="mt-4 space-y-2">
-                  <label className="text-sm font-medium">Como Executar (POP)</label>
-                  <Textarea
+                  <label className="text-sm font-medium">Como Executar (POP) - URL</label>
+                  <Input
+                    type="url"
                     value={row.comoExecutar}
                     onChange={(e) => handleUpdateRow(index, 'comoExecutar', e.target.value)}
-                    placeholder="Descreva o procedimento operacional padrão para executar esta tarefa..."
-                    rows={4}
+                    placeholder="https://exemplo.com/procedimento-operacional-padrao"
                   />
                 </div>
               </Card>
