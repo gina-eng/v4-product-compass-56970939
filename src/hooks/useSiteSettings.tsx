@@ -15,15 +15,13 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
     try {
       setIsLoading(true);
       
-      // Tentar buscar diretamente - se der erro, a tabela não existe
       const { data: settingsData, error: settingsError } = await supabase
-        .from('site_settings' as any)
+        .from('site_settings')
         .select('setting_key, setting_value');
 
       if (settingsError) {
-        console.log('Tabela site_settings não disponível ainda');
+        console.log('Erro ao buscar configurações:', settingsError);
         setIsTableAvailable(false);
-        setIsLoading(false);
         return;
       }
 
@@ -35,17 +33,12 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
           settingsObj[item.setting_key] = item.setting_value;
         });
         
-        // Combinar step_description_1 e step_description_2 em step_description
-        if (settingsObj.step_description_1 && settingsObj.step_description_2) {
-          settingsObj.step_description = `${settingsObj.step_description_1}\n\n${settingsObj.step_description_2}`;
-        }
-        
         // Manter valores padrão para chaves que não existem
         setSettings(prev => ({ ...prev, ...settingsObj }));
       }
       
     } catch (error) {
-      console.log('Erro ao verificar tabela site_settings');
+      console.log('Erro ao buscar configurações:', error);
       setIsTableAvailable(false);
     } finally {
       setIsLoading(false);
@@ -63,7 +56,7 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
 
     try {
       const { error } = await supabase
-        .from('site_settings' as any)
+        .from('site_settings')
         .upsert({ 
           setting_key: key, 
           setting_value: value,
