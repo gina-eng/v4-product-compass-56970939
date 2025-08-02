@@ -313,7 +313,8 @@ const ProductDetails = () => {
           <div className="flex justify-center">
             <Button 
               className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
-              onClick={() => window.open('#', '_blank')}
+              onClick={() => window.open(product.playbookUrl || '#', '_blank')}
+              disabled={!product.playbookUrl}
             >
               Utilize o Playbook no eKyte
             </Button>
