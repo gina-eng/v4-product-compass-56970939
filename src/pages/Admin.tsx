@@ -140,58 +140,81 @@ const Admin = () => {
     setSettingsChanged(false);
   }, [settings]);
 
+  // Verificar mudanças sempre que localSettings mudar
+  useEffect(() => {
+    checkForChanges();
+  }, [localSettings, settings]);
+
   const handleSettingChange = (key: string, value: string) => {
     const newLocalSettings = { ...localSettings, [key]: value };
     setLocalSettings(newLocalSettings);
     
-    // Verificar se há mudanças comparando todos os campos
-    const hasChanges = Object.keys(newLocalSettings).some(settingKey => 
-      newLocalSettings[settingKey as keyof typeof newLocalSettings] !== settings[settingKey as keyof typeof settings]
-    );
-    
-    console.log('Verificando mudanças:', { 
-      key, 
-      value, 
-      hasChanges, 
-      newLocalSettings, 
-      settings 
+    // Detectar mudanças usando setTimeout para garantir que o estado seja atualizado
+    setTimeout(() => {
+      checkForChanges(newLocalSettings);
+    }, 0);
+  };
+
+  const checkForChanges = (currentLocalSettings = localSettings) => {
+    const hasChanges = Object.keys(currentLocalSettings).some(key => {
+      const localValue = currentLocalSettings[key as keyof typeof currentLocalSettings];
+      const globalValue = settings[key as keyof typeof settings] || '';
+      const isDifferent = localValue !== globalValue;
+      
+      if (isDifferent) {
+        console.log(`Mudança detectada em ${key}:`, { localValue, globalValue });
+      }
+      
+      return isDifferent;
     });
     
+    console.log('Status das mudanças:', { hasChanges, currentLocalSettings, settings });
     setSettingsChanged(hasChanges);
   };
 
   const handleSaveSettings = async () => {
     setSavingSettings(true);
-    console.log('Iniciando salvamento das configurações...', { localSettings, isTableAvailable });
+    console.log('Iniciando salvamento das configurações...', { localSettings, settings, isTableAvailable });
     
     try {
-      let hasChanges = false;
-      
-      if (localSettings.step_title !== settings.step_title) {
-        console.log('Salvando step_title:', localSettings.step_title);
-        const result = await updateSetting('step_title', localSettings.step_title);
-        console.log('Resultado step_title:', result);
-        hasChanges = true;
-      }
-      
-      if (localSettings.step_description !== settings.step_description) {
-        console.log('Salvando step_description:', localSettings.step_description);
-        const result = await updateSetting('step_description', localSettings.step_description);
-        console.log('Resultado step_description:', result);
-        hasChanges = true;
+      const fieldsToSave = Object.keys(localSettings).filter(key => {
+        const localValue = localSettings[key as keyof typeof localSettings];
+        const globalValue = settings[key as keyof typeof settings] || '';
+        return localValue !== globalValue;
+      });
+
+      console.log('Campos que serão salvos:', fieldsToSave);
+
+      if (fieldsToSave.length === 0) {
+        toast({
+          title: "Nenhuma alteração",
+          description: "Não há alterações para salvar.",
+        });
+        setSavingSettings(false);
+        return;
       }
 
-      if (hasChanges) {
+      // Salvar cada campo modificado
+      const savePromises = fieldsToSave.map(async (key) => {
+        const value = localSettings[key as keyof typeof localSettings];
+        console.log(`Salvando ${key}: "${value}"`);
+        
+        const result = await updateSetting(key, value);
+        console.log(`Resultado ${key}:`, result);
+        return result;
+      });
+
+      const results = await Promise.all(savePromises);
+      const allSuccessful = results.every(result => result === true);
+
+      if (allSuccessful) {
         toast({
           title: "Configurações salvas",
           description: "As configurações do site foram atualizadas com sucesso.",
         });
         setSettingsChanged(false);
       } else {
-        toast({
-          title: "Nenhuma alteração",
-          description: "Não há alterações para salvar.",
-        });
+        throw new Error('Nem todas as configurações foram salvas com sucesso');
       }
       
     } catch (error) {
