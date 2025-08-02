@@ -1,7 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Brain, Package, Wrench, Rocket } from "lucide-react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const StepIntroduction = () => {
+  const { settings } = useSiteSettings();
+
   const stepItems = [
     {
       icon: Brain,
@@ -41,17 +44,11 @@ const StepIntroduction = () => {
     <section className="py-16 px-4">
       <div className="container mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-6 text-foreground">Introdução ao modelo - STEP</h2>
+          <h2 className="text-3xl font-bold mb-6 text-foreground">{settings.step_title}</h2>
           <div className="max-w-4xl mx-auto text-foreground/70 leading-relaxed space-y-4">
-            <p>
-              Toda empresa, independente do tamanho, passa por quatro momentos distintos em sua jornada de crescimento. 
-              Cada momento exige uma abordagem específica e uma solução certa. O objetivo é vender e servir o cliente certo, 
-              no momento certo, com a solução certa.
-            </p>
-            <p>
-              O framework STEP identifica onde o cliente está e qual solução ele realmente precisa, categorizando nossos 
-              produtos em quatro etapas fundamentais para o sucesso empresarial.
-            </p>
+            {settings.step_description.split('\n\n').map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
           </div>
         </div>
 

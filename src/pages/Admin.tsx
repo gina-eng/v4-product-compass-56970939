@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import SpicedTable from "@/components/SpicedTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -57,6 +58,7 @@ interface Product {
 }
 
 const Admin = () => {
+  const { settings, updateSetting, isTableAvailable } = useSiteSettings();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -64,7 +66,6 @@ const Admin = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>("Todas");
   const [statusFilter, setStatusFilter] = useState<string>("Todos");
   const [loading, setLoading] = useState(true);
-  const [siteSettings, setSiteSettings] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     produto: "",
     categoria: "saber",
@@ -106,7 +107,6 @@ const Admin = () => {
 
   useEffect(() => {
     fetchProducts();
-    fetchSiteSettings();
   }, []);
 
   const fetchProducts = async () => {
@@ -171,15 +171,6 @@ const Admin = () => {
     }
   };
 
-  const fetchSiteSettings = async () => {
-    // TODO: Implementar após migração ser executada
-    console.log('Site settings will be available after migration');
-  };
-
-  const updateSiteSetting = async (key: string, value: string) => {
-    // TODO: Implementar após migração ser executada
-    console.log('Site settings update will be available after migration');
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1023,8 +1014,8 @@ const Admin = () => {
                     <Label htmlFor="stepTitle">Título da Seção STEP</Label>
                     <Input
                       id="stepTitle"
-                      defaultValue={siteSettings.find(s => s.setting_key === 'step_title')?.setting_value || 'Introdução ao modelo - STEP'}
-                      onBlur={(e) => updateSiteSetting('step_title', e.target.value)}
+                      defaultValue={settings.step_title}
+                      onBlur={(e) => updateSetting('step_title', e.target.value)}
                     />
                   </div>
                   
@@ -1033,8 +1024,8 @@ const Admin = () => {
                     <Textarea
                       id="stepDescription"
                       rows={4}
-                      defaultValue={siteSettings.find(s => s.setting_key === 'step_description')?.setting_value || 'Toda empresa, independente do tamanho, passa por quatro momentos distintos em sua jornada de crescimento. Cada momento exige uma abordagem específica e uma solução certa. O objetivo é vender e servir o cliente certo, no momento certo, com a solução certa.\n\nO framework STEP identifica onde o cliente está e qual solução ele realmente precisa, categorizando nossos produtos em quatro etapas fundamentais para o sucesso empresarial.'}
-                      onBlur={(e) => updateSiteSetting('step_description', e.target.value)}
+                      defaultValue={settings.step_description}
+                      onBlur={(e) => updateSetting('step_description', e.target.value)}
                     />
                   </div>
                 </div>
