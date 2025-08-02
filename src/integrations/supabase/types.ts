@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       products: {
         Row: {
+          bonus_kpi: string | null
           bpmn: boolean
           bpmn_url: string | null
           categoria: Database["public"]["Enums"]["categoria_produto"]
@@ -27,9 +28,12 @@ export type Database = {
           dono: string
           duracao: string
           entregas: string
+          entregaveis_relacionados: string | null
+          garantia_especifica: string | null
           icp: boolean
           icp_url: string | null
           id: string
+          kpi_principal: Database["public"]["Enums"]["kpi_tipo"] | null
           objetivos: string
           pitch: boolean
           pitch_url: string | null
@@ -40,11 +44,14 @@ export type Database = {
           pricing_url: string | null
           produto: string
           spiced_data: Json
+          stack_digital: string | null
           status: Database["public"]["Enums"]["status_produto"]
+          tempo_meta_kpi: Database["public"]["Enums"]["tempo_meta"] | null
           updated_at: string
           valor: string
         }
         Insert: {
+          bonus_kpi?: string | null
           bpmn?: boolean
           bpmn_url?: string | null
           categoria: Database["public"]["Enums"]["categoria_produto"]
@@ -56,9 +63,12 @@ export type Database = {
           dono: string
           duracao: string
           entregas: string
+          entregaveis_relacionados?: string | null
+          garantia_especifica?: string | null
           icp?: boolean
           icp_url?: string | null
           id?: string
+          kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
           objetivos: string
           pitch?: boolean
           pitch_url?: string | null
@@ -69,11 +79,14 @@ export type Database = {
           pricing_url?: string | null
           produto: string
           spiced_data?: Json
+          stack_digital?: string | null
           status?: Database["public"]["Enums"]["status_produto"]
+          tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
           updated_at?: string
           valor: string
         }
         Update: {
+          bonus_kpi?: string | null
           bpmn?: boolean
           bpmn_url?: string | null
           categoria?: Database["public"]["Enums"]["categoria_produto"]
@@ -85,9 +98,12 @@ export type Database = {
           dono?: string
           duracao?: string
           entregas?: string
+          entregaveis_relacionados?: string | null
+          garantia_especifica?: string | null
           icp?: boolean
           icp_url?: string | null
           id?: string
+          kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
           objetivos?: string
           pitch?: boolean
           pitch_url?: string | null
@@ -98,7 +114,9 @@ export type Database = {
           pricing_url?: string | null
           produto?: string
           spiced_data?: Json
+          stack_digital?: string | null
           status?: Database["public"]["Enums"]["status_produto"]
+          tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
           updated_at?: string
           valor?: string
         }
@@ -113,7 +131,9 @@ export type Database = {
     }
     Enums: {
       categoria_produto: "saber" | "ter" | "executar" | "potencializar"
+      kpi_tipo: "CPL" | "CTR" | "CONVERSÃO" | "ENGAJAMENTO" | "TAXA DE ABERTURA"
       status_produto: "Disponível" | "Em produção" | "Em homologação"
+      tempo_meta: "3 meses" | "6 meses" | "12 meses"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -242,7 +262,9 @@ export const Constants = {
   public: {
     Enums: {
       categoria_produto: ["saber", "ter", "executar", "potencializar"],
+      kpi_tipo: ["CPL", "CTR", "CONVERSÃO", "ENGAJAMENTO", "TAXA DE ABERTURA"],
       status_produto: ["Disponível", "Em produção", "Em homologação"],
+      tempo_meta: ["3 meses", "6 meses", "12 meses"],
     },
   },
 } as const
