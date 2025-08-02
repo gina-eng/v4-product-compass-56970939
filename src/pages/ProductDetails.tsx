@@ -309,6 +309,16 @@ const ProductDetails = () => {
             <ComoEntregoTable data={product.comoEntregoDados} readOnly positions={positions} />
           </Card>
 
+          {/* Botão Playbook */}
+          <div className="flex justify-center">
+            <Button 
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+              onClick={() => window.open('#', '_blank')}
+            >
+              Utilize o Playbook no eKyte
+            </Button>
+          </div>
+
           {/* Recursos disponíveis */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Recursos Disponíveis</h2>
