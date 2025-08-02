@@ -61,7 +61,15 @@ const Admin = () => {
   const { settings, updateSetting, isTableAvailable } = useSiteSettings();
   const [localSettings, setLocalSettings] = useState({
     step_title: '',
-    step_description: ''
+    step_description: '',
+    saber_subtitle: '',
+    saber_description: '',
+    ter_subtitle: '',
+    ter_description: '',
+    executar_subtitle: '',
+    executar_description: '',
+    potencializar_subtitle: '',
+    potencializar_description: ''
   });
   const [settingsChanged, setSettingsChanged] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -119,7 +127,15 @@ const Admin = () => {
   useEffect(() => {
     setLocalSettings({
       step_title: settings.step_title,
-      step_description: settings.step_description
+      step_description: settings.step_description,
+      saber_subtitle: settings.saber_subtitle,
+      saber_description: settings.saber_description,
+      ter_subtitle: settings.ter_subtitle,
+      ter_description: settings.ter_description,
+      executar_subtitle: settings.executar_subtitle,
+      executar_description: settings.executar_description,
+      potencializar_subtitle: settings.potencializar_subtitle,
+      potencializar_description: settings.potencializar_description
     });
     setSettingsChanged(false);
   }, [settings]);
@@ -1112,6 +1128,112 @@ const Admin = () => {
                     />
                   </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    {/* Categoria Saber */}
+                    <Card className="p-4 border-red-200">
+                      <h4 className="text-md font-semibold mb-3 text-red-600">S - SABER</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="saberSubtitle">Subtítulo</Label>
+                          <Input
+                            id="saberSubtitle"
+                            value={localSettings.saber_subtitle}
+                            onChange={(e) => handleSettingChange('saber_subtitle', e.target.value)}
+                            placeholder="Ex: Não sei o que não sei"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="saberDescription">Descrição</Label>
+                          <Textarea
+                            id="saberDescription"
+                            rows={3}
+                            value={localSettings.saber_description}
+                            onChange={(e) => handleSettingChange('saber_description', e.target.value)}
+                            placeholder="Descrição da categoria Saber"
+                          />
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Categoria Ter */}
+                    <Card className="p-4 border-green-200">
+                      <h4 className="text-md font-semibold mb-3 text-green-600">T - TER</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="terSubtitle">Subtítulo</Label>
+                          <Input
+                            id="terSubtitle"
+                            value={localSettings.ter_subtitle}
+                            onChange={(e) => handleSettingChange('ter_subtitle', e.target.value)}
+                            placeholder="Ex: Sei o que preciso, mas não tenho"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="terDescription">Descrição</Label>
+                          <Textarea
+                            id="terDescription"
+                            rows={3}
+                            value={localSettings.ter_description}
+                            onChange={(e) => handleSettingChange('ter_description', e.target.value)}
+                            placeholder="Descrição da categoria Ter"
+                          />
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Categoria Executar */}
+                    <Card className="p-4 border-orange-200">
+                      <h4 className="text-md font-semibold mb-3 text-orange-600">E - EXECUTAR</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="executarSubtitle">Subtítulo</Label>
+                          <Input
+                            id="executarSubtitle"
+                            value={localSettings.executar_subtitle}
+                            onChange={(e) => handleSettingChange('executar_subtitle', e.target.value)}
+                            placeholder="Ex: Tenho tudo, mas preciso fazer funcionar"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="executarDescription">Descrição</Label>
+                          <Textarea
+                            id="executarDescription"
+                            rows={3}
+                            value={localSettings.executar_description}
+                            onChange={(e) => handleSettingChange('executar_description', e.target.value)}
+                            placeholder="Descrição da categoria Executar"
+                          />
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Categoria Potencializar */}
+                    <Card className="p-4 border-purple-200">
+                      <h4 className="text-md font-semibold mb-3 text-purple-600">P - POTENCIALIZAR</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="potencializarSubtitle">Subtítulo</Label>
+                          <Input
+                            id="potencializarSubtitle"
+                            value={localSettings.potencializar_subtitle}
+                            onChange={(e) => handleSettingChange('potencializar_subtitle', e.target.value)}
+                            placeholder="Ex: Domino tudo, quero resultados extraordinários"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="potencializarDescription">Descrição</Label>
+                          <Textarea
+                            id="potencializarDescription"
+                            rows={3}
+                            value={localSettings.potencializar_description}
+                            onChange={(e) => handleSettingChange('potencializar_description', e.target.value)}
+                            placeholder="Descrição da categoria Potencializar"
+                          />
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+
                   <div className="flex gap-3 pt-4">
                     <Button 
                       onClick={handleSaveSettings}
@@ -1127,7 +1249,15 @@ const Admin = () => {
                         onClick={() => {
                           setLocalSettings({
                             step_title: settings.step_title,
-                            step_description: settings.step_description
+                            step_description: settings.step_description,
+                            saber_subtitle: settings.saber_subtitle,
+                            saber_description: settings.saber_description,
+                            ter_subtitle: settings.ter_subtitle,
+                            ter_description: settings.ter_description,
+                            executar_subtitle: settings.executar_subtitle,
+                            executar_description: settings.executar_description,
+                            potencializar_subtitle: settings.potencializar_subtitle,
+                            potencializar_description: settings.potencializar_description
                           });
                           setSettingsChanged(false);
                         }}

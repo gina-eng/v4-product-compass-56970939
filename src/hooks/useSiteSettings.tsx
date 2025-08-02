@@ -6,7 +6,15 @@ export const useSiteSettings = () => {
     step_title: "Introdução ao modelo - STEP",
     step_description: `Toda empresa, independente do tamanho, passa por quatro momentos distintos em sua jornada de crescimento. Cada momento exige uma abordagem específica e uma solução certa. O objetivo é vender e servir o cliente certo, no momento certo, com a solução certa.
 
-O framework STEP identifica onde o cliente está e qual solução ele realmente precisa, categorizando nossos produtos em quatro etapas fundamentais para o sucesso empresarial.`
+O framework STEP identifica onde o cliente está e qual solução ele realmente precisa, categorizando nossos produtos em quatro etapas fundamentais para o sucesso empresarial.`,
+    saber_subtitle: "Não sei o que não sei",
+    saber_description: "Identificar necessidades e oportunidades ainda desconhecidas",
+    ter_subtitle: "Sei o que preciso, mas não tenho", 
+    ter_description: "Adquirir recursos e ferramentas necessárias",
+    executar_subtitle: "Tenho tudo, mas preciso fazer funcionar",
+    executar_description: "Implementar e operacionalizar soluções",
+    potencializar_subtitle: "Domino tudo, quero resultados extraordinários",
+    potencializar_description: "Otimizar e escalar para máxima performance"
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isTableAvailable, setIsTableAvailable] = useState(false);
@@ -113,7 +121,15 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
   const getDescriptionForKey = (key: string) => {
     const descriptions: Record<string, string> = {
       step_title: 'Título da seção STEP',
-      step_description: 'Descrição da seção STEP'
+      step_description: 'Descrição da seção STEP',
+      saber_subtitle: 'Subtítulo da categoria Saber',
+      saber_description: 'Descrição da categoria Saber',
+      ter_subtitle: 'Subtítulo da categoria Ter',
+      ter_description: 'Descrição da categoria Ter',
+      executar_subtitle: 'Subtítulo da categoria Executar',
+      executar_description: 'Descrição da categoria Executar',
+      potencializar_subtitle: 'Subtítulo da categoria Potencializar',
+      potencializar_description: 'Descrição da categoria Potencializar'
     };
     return descriptions[key] || '';
   };

@@ -10,32 +10,32 @@ const StepIntroduction = () => {
       icon: Brain,
       letter: "S",
       title: "SABER",
-      subtitle: "Não sei o que não sei",
-      description: "Identificar necessidades e oportunidades ainda desconhecidas",
+      subtitle: settings.saber_subtitle,
+      description: settings.saber_description,
       color: "saber"
     },
     {
       icon: Package,
       letter: "T", 
       title: "TER",
-      subtitle: "Sei o que preciso, mas não tenho",
-      description: "Adquirir recursos e ferramentas necessárias",
+      subtitle: settings.ter_subtitle,
+      description: settings.ter_description,
       color: "ter"
     },
     {
       icon: Wrench,
       letter: "E",
       title: "EXECUTAR", 
-      subtitle: "Tenho tudo, mas preciso fazer funcionar",
-      description: "Implementar e operacionalizar soluções",
+      subtitle: settings.executar_subtitle,
+      description: settings.executar_description,
       color: "executar"
     },
     {
       icon: Rocket,
       letter: "P",
       title: "POTENCIALIZAR",
-      subtitle: "Domino tudo, quero resultados extraordinários",
-      description: "Otimizar e escalar para máxima performance",
+      subtitle: settings.potencializar_subtitle,
+      description: settings.potencializar_description,
       color: "potencializar"
     }
   ];
