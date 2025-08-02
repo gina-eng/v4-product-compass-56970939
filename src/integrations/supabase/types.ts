@@ -22,6 +22,7 @@ export type Database = {
           categoria: Database["public"]["Enums"]["categoria_produto"]
           certificacao: boolean
           certificacao_url: string | null
+          como_entrega_valor: string | null
           created_at: string
           description: string
           detailed_description: string
@@ -35,6 +36,7 @@ export type Database = {
           id: string
           kpi_principal: Database["public"]["Enums"]["kpi_tipo"] | null
           objetivos: string
+          para_quem_serve: string | null
           pitch: boolean
           pitch_url: string | null
           playbook: boolean
@@ -57,6 +59,7 @@ export type Database = {
           categoria: Database["public"]["Enums"]["categoria_produto"]
           certificacao?: boolean
           certificacao_url?: string | null
+          como_entrega_valor?: string | null
           created_at?: string
           description: string
           detailed_description: string
@@ -70,6 +73,7 @@ export type Database = {
           id?: string
           kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
           objetivos: string
+          para_quem_serve?: string | null
           pitch?: boolean
           pitch_url?: string | null
           playbook?: boolean
@@ -92,6 +96,7 @@ export type Database = {
           categoria?: Database["public"]["Enums"]["categoria_produto"]
           certificacao?: boolean
           certificacao_url?: string | null
+          como_entrega_valor?: string | null
           created_at?: string
           description?: string
           detailed_description?: string
@@ -105,6 +110,7 @@ export type Database = {
           id?: string
           kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
           objetivos?: string
+          para_quem_serve?: string | null
           pitch?: boolean
           pitch_url?: string | null
           playbook?: boolean

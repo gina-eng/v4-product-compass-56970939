@@ -42,6 +42,8 @@ interface Product {
   spicedData: SpicedData;
   entregas: string;
   prerequisitos: string;
+  paraQuemServe?: string;
+  comoEntregaValor?: string;
   bonusKpi?: string;
   kpiPrincipal?: "CPL" | "CTR" | "CONVERSÃO" | "ENGAJAMENTO" | "TAXA DE ABERTURA";
   tempoMetaKpi?: "3 meses" | "6 meses" | "12 meses";
@@ -99,6 +101,8 @@ const ProductDetails = () => {
             spicedData: (data.spiced_data as unknown) as SpicedData,
             entregas: data.entregas,
             prerequisitos: data.prerequisitos,
+            paraQuemServe: data.para_quem_serve,
+            comoEntregaValor: data.como_entrega_valor,
             bonusKpi: data.bonus_kpi,
             kpiPrincipal: data.kpi_principal,
             tempoMetaKpi: data.tempo_meta_kpi,
@@ -261,7 +265,7 @@ const ProductDetails = () => {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Pra quem ele serve?</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {product.stackDigital || "Informação a ser definida para este produto."}
+              {product.paraQuemServe || "Informação a ser definida para este produto."}
             </p>
           </Card>
 
@@ -269,7 +273,7 @@ const ProductDetails = () => {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como ele entrega valor?</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {product.entregaveisRelacionados || "Informação a ser definida para este produto."}
+              {product.comoEntregaValor || "Informação a ser definida para este produto."}
             </p>
           </Card>
 
