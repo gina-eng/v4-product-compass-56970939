@@ -232,19 +232,19 @@ const ProductDetails = () => {
         <div className="grid gap-6">
           {/* Descrição principal */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">O que é o produto?</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Descrição Curta</h2>
             <p className="text-muted-foreground leading-relaxed">{product.description}</p>
           </Card>
 
           {/* Público-alvo */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Pra quem é o produto?</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Descrição Detalhada</h2>
             <p className="text-muted-foreground leading-relaxed">{product.detailedDescription}</p>
           </Card>
 
           {/* Como vender */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Como vender o produto?</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Objetivos</h2>
             <p className="text-muted-foreground leading-relaxed mb-6">{product.objetivos}</p>
             
             {/* Tabela SPICED */}
@@ -253,7 +253,7 @@ const ProductDetails = () => {
 
           {/* Como cobrar */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">Como cobrar o produto?</h2>
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Entregas</h2>
             <p className="text-muted-foreground leading-relaxed">{product.entregas}</p>
           </Card>
 
@@ -317,21 +317,21 @@ const ProductDetails = () => {
               
               {product.bonusKpi && (
                 <div className="md:col-span-2">
-                  <h3 className="font-medium text-foreground mb-2">Bônus KPI</h3>
+                  <h3 className="font-medium text-foreground mb-2">Bonus KPI</h3>
                   <p className="text-muted-foreground leading-relaxed">{product.bonusKpi}</p>
                 </div>
               )}
               
               {product.garantiaEspecifica && (
                 <div className="md:col-span-2">
-                  <h3 className="font-medium text-foreground mb-2">Garantia Específica do Produto</h3>
+                  <h3 className="font-medium text-foreground mb-2">Garantia Específica</h3>
                   <p className="text-muted-foreground leading-relaxed">{product.garantiaEspecifica}</p>
                 </div>
               )}
               
               {product.stackDigital && (
                 <div className="md:col-span-2">
-                  <h3 className="font-medium text-foreground mb-2">Stack Digital Acoplada</h3>
+                  <h3 className="font-medium text-foreground mb-2">Stack Digital</h3>
                   <p className="text-muted-foreground leading-relaxed">{product.stackDigital}</p>
                 </div>
               )}
