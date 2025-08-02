@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { Check, X, Plus, Edit, Trash2, Filter } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/hooks/use-toast";
 import SpicedTable from "@/components/SpicedTable";
-import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -24,7 +25,7 @@ interface SpicedData {
 interface Product {
   id: string;
   produto: string;
-  categoria: "saber" | "ter" | "executar" | "potencializar";
+  categoria: string;
   duracao: string;
   dono: string;
   valor: string;
@@ -40,7 +41,7 @@ interface Product {
   icpUrl?: string;
   pricingUrl?: string;
   certificacaoUrl?: string;
-  status: "Disponível" | "Em produção" | "Em homologação";
+  status: string;
   description: string;
   detailedDescription: string;
   objetivos: string;
@@ -48,61 +49,88 @@ interface Product {
   entregas: string;
   prerequisitos: string;
   bonusKpi?: string;
-  kpiPrincipal?: "CPL" | "CTR" | "CONVERSÃO" | "ENGAJAMENTO" | "TAXA DE ABERTURA";
-  tempoMetaKpi?: "3 meses" | "6 meses" | "12 meses";
+  kpiPrincipal?: string;
+  tempoMetaKpi?: string;
   garantiaEspecifica?: string;
   stackDigital?: string;
   entregaveisRelacionados?: string;
 }
 
 const Admin = () => {
-  const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string>("Todas");
+  const [statusFilter, setStatusFilter] = useState<string>("Todos");
   const [loading, setLoading] = useState(true);
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-
-  const [formData, setFormData] = useState<Partial<Product>>({
+  const [siteSettings, setSiteSettings] = useState<any[]>([]);
+  const [formData, setFormData] = useState({
+    produto: "",
     categoria: "saber",
-    status: "Em produção"
+    duracao: "",
+    dono: "",
+    valor: "",
+    pitch: false,
+    bpmn: false,
+    playbook: false,
+    icp: false,
+    pricing: false,
+    certificacao: false,
+    pitchUrl: "",
+    bpmnUrl: "",
+    playbookUrl: "",
+    icpUrl: "",
+    pricingUrl: "",
+    certificacaoUrl: "",
+    status: "Em produção",
+    description: "",
+    detailedDescription: "",
+    objetivos: "",
+    spicedData: {
+      situation: { objetivo: "", perguntas: "", observar: "" },
+      pain: { objetivo: "", perguntas: "", observar: "" },
+      impact: { objetivo: "", perguntas: "", observar: "" },
+      criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+      decision: { objetivo: "", perguntas: "", observar: "" }
+    } as SpicedData,
+    entregas: "",
+    prerequisitos: "",
+    bonusKpi: "",
+    kpiPrincipal: "",
+    tempoMetaKpi: "",
+    garantiaEspecifica: "",
+    stackDigital: "",
+    entregaveisRelacionados: ""
   });
 
   useEffect(() => {
     fetchProducts();
+    fetchSiteSettings();
   }, []);
 
   const fetchProducts = async () => {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('*');
-      
-      if (error) {
-        console.error('Error fetching products:', error);
-        toast({
-          title: "Erro ao carregar produtos",
-          description: "Não foi possível carregar os produtos do banco de dados.",
-          variant: "destructive"
-        });
-        return;
-      }
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      const formattedProducts = data?.map(product => ({
+      if (error) throw error;
+
+      const formattedProducts: Product[] = (data || []).map(product => ({
         id: product.id,
         produto: product.produto,
         categoria: product.categoria,
         duracao: product.duracao,
         dono: product.dono,
         valor: product.valor,
-        pitch: product.pitch,
-        bpmn: product.bpmn,
-        playbook: product.playbook,
-        icp: product.icp,
-        pricing: product.pricing,
-        certificacao: product.certificacao,
+        pitch: product.pitch || false,
+        bpmn: product.bpmn || false,
+        playbook: product.playbook || false,
+        icp: product.icp || false,
+        pricing: product.pricing || false,
+        certificacao: product.certificacao || false,
         pitchUrl: product.pitch_url,
         bpmnUrl: product.bpmn_url,
         playbookUrl: product.playbook_url,
@@ -113,7 +141,13 @@ const Admin = () => {
         description: product.description,
         detailedDescription: product.detailed_description,
         objetivos: product.objetivos,
-        spicedData: (product.spiced_data as unknown) as SpicedData,
+        spicedData: (product.spiced_data as SpicedData) || {
+          situation: { objetivo: "", perguntas: "", observar: "" },
+          pain: { objetivo: "", perguntas: "", observar: "" },
+          impact: { objetivo: "", perguntas: "", observar: "" },
+          criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+          decision: { objetivo: "", perguntas: "", observar: "" }
+        },
         entregas: product.entregas,
         prerequisitos: product.prerequisitos,
         bonusKpi: product.bonus_kpi,
@@ -121,50 +155,31 @@ const Admin = () => {
         tempoMetaKpi: product.tempo_meta_kpi,
         garantiaEspecifica: product.garantia_especifica,
         stackDigital: product.stack_digital,
-        entregaveisRelacionados: product.entregaveis_relacionados
-      })) || [];
-      
+        entregaveisRelacionados: product.entregaveis_relacionados,
+      }));
+
       setProducts(formattedProducts);
-      setFilteredProducts(formattedProducts);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Erro ao carregar produtos:', error);
       toast({
-        title: "Erro inesperado",
-        description: "Ocorreu um erro ao conectar com o banco de dados.",
-        variant: "destructive"
+        title: "Erro",
+        description: "Erro ao carregar produtos.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      "Disponível": { color: "bg-green-100 text-green-800" },
-      "Em produção": { color: "bg-purple-100 text-purple-800" },
-      "Em homologação": { color: "bg-yellow-100 text-yellow-800" }
-    };
-    
-    return statusConfig[status as keyof typeof statusConfig] || statusConfig["Disponível"];
+  const fetchSiteSettings = async () => {
+    // TODO: Implementar após migração ser executada
+    console.log('Site settings will be available after migration');
   };
 
-  const getCategoryColor = (categoria: string) => {
-    const colors = {
-      "saber": "saber",
-      "ter": "ter", 
-      "executar": "executar",
-      "potencializar": "potencializar"
-    };
-    return colors[categoria as keyof typeof colors] || "saber";
+  const updateSiteSetting = async (key: string, value: string) => {
+    // TODO: Implementar após migração ser executada
+    console.log('Site settings update will be available after migration');
   };
-
-  const StatusIcon = ({ value }: { value: boolean }) => (
-    value ? (
-      <Check className="h-4 w-4 text-green-600" />
-    ) : (
-      <X className="h-4 w-4 text-red-400" />
-    )
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,12 +195,12 @@ const Admin = () => {
             duracao: formData.duracao,
             dono: formData.dono,
             valor: formData.valor,
-            pitch: formData.pitch,
-            bpmn: formData.bpmn,
-            playbook: formData.playbook,
-            icp: formData.icp,
-            pricing: formData.pricing,
-            certificacao: formData.certificacao,
+            pitch: formData.pitch || false,
+            bpmn: formData.bpmn || false,
+            playbook: formData.playbook || false,
+            icp: formData.icp || false,
+            pricing: formData.pricing || false,
+            certificacao: formData.certificacao || false,
             pitch_url: formData.pitchUrl,
             bpmn_url: formData.bpmnUrl,
             playbook_url: formData.playbookUrl,
@@ -196,7 +211,7 @@ const Admin = () => {
             description: formData.description,
             detailed_description: formData.detailedDescription,
             objetivos: formData.objetivos,
-            spiced_data: formData.spicedData as any,
+            spiced_data: formData.spicedData,
             entregas: formData.entregas,
             prerequisitos: formData.prerequisitos,
             bonus_kpi: formData.bonusKpi,
@@ -261,33 +276,64 @@ const Admin = () => {
 
         toast({
           title: "Produto criado",
-          description: "Novo produto adicionado ao portfólio com sucesso.",
+          description: "O produto foi criado com sucesso.",
         });
       }
-      
-      // Recarregar a lista de produtos
-      await fetchProducts();
-      
+
       setIsDialogOpen(false);
       setEditingProduct(null);
-      setFormData({ categoria: "saber", status: "Em produção" });
+      setFormData({ categoria: "saber", status: "Em produção" } as any);
+      await fetchProducts();
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error('Erro ao salvar produto:', error);
       toast({
-        title: "Erro ao salvar",
-        description: "Não foi possível salvar o produto. Tente novamente.",
-        variant: "destructive"
+        title: "Erro",
+        description: "Erro ao salvar produto.",
+        variant: "destructive",
       });
     }
   };
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
-    setFormData(product);
+    setFormData({
+      produto: product.produto,
+      categoria: product.categoria,
+      duracao: product.duracao,
+      dono: product.dono,
+      valor: product.valor,
+      pitch: product.pitch,
+      bpmn: product.bpmn,
+      playbook: product.playbook,
+      icp: product.icp,
+      pricing: product.pricing,
+      certificacao: product.certificacao,
+      pitchUrl: product.pitchUrl || "",
+      bpmnUrl: product.bpmnUrl || "",
+      playbookUrl: product.playbookUrl || "",
+      icpUrl: product.icpUrl || "",
+      pricingUrl: product.pricingUrl || "",
+      certificacaoUrl: product.certificacaoUrl || "",
+      status: product.status,
+      description: product.description,
+      detailedDescription: product.detailedDescription,
+      objetivos: product.objetivos,
+      spicedData: product.spicedData,
+      entregas: product.entregas,
+      prerequisitos: product.prerequisitos,
+      bonusKpi: product.bonusKpi || "",
+      kpiPrincipal: product.kpiPrincipal || "",
+      tempoMetaKpi: product.tempoMetaKpi || "",
+      garantiaEspecifica: product.garantiaEspecifica || "",
+      stackDigital: product.stackDigital || "",
+      entregaveisRelacionados: product.entregaveisRelacionados || "",
+    });
     setIsDialogOpen(true);
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
+
     try {
       const { error } = await supabase
         .from('products')
@@ -297,39 +343,70 @@ const Admin = () => {
       if (error) throw error;
 
       toast({
-        title: "Produto removido",
-        description: "O produto foi removido do portfólio.",
+        title: "Produto excluído",
+        description: "O produto foi excluído com sucesso.",
       });
-      
-      // Recarregar a lista de produtos
+
       await fetchProducts();
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error('Erro ao excluir produto:', error);
       toast({
-        title: "Erro ao deletar",
-        description: "Não foi possível remover o produto. Tente novamente.",
-        variant: "destructive"
+        title: "Erro",
+        description: "Erro ao excluir produto.",
+        variant: "destructive",
       });
     }
   };
 
   const openNewProductDialog = () => {
     setEditingProduct(null);
-    setFormData({ categoria: "saber", status: "Em produção" });
+    setFormData({ categoria: "saber", status: "Em produção" } as any);
     setIsDialogOpen(true);
   };
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "Disponível":
+        return { label: "Disponível", color: "bg-green-500 text-white" };
+      case "Em produção":
+        return { label: "Em produção", color: "bg-yellow-500 text-black" };
+      case "Inativo":
+        return { label: "Inativo", color: "bg-gray-500 text-white" };
+      default:
+        return { label: status, color: "bg-gray-500 text-white" };
+    }
+  };
+
+  const getCategoryColor = (categoria: string) => {
+    switch (categoria) {
+      case "saber":
+        return "saber";
+      case "ter":
+        return "ter";
+      case "executar":
+        return "executar";
+      case "potencializar":
+        return "potencializar";
+      default:
+        return "primary";
+    }
+  };
+
+  const StatusIcon = ({ value }: { value: boolean }) => (
+    value ? <Check className="h-4 w-4 text-green-500" /> : <X className="h-4 w-4 text-red-500" />
+  );
+
   const filterProducts = () => {
     let filtered = products;
-    
-    if (categoryFilter !== "all") {
+
+    if (categoryFilter !== "Todas") {
       filtered = filtered.filter(product => product.categoria === categoryFilter);
     }
-    
-    if (statusFilter !== "all") {
+
+    if (statusFilter !== "Todos") {
       filtered = filtered.filter(product => product.status === statusFilter);
     }
-    
+
     setFilteredProducts(filtered);
   };
 
@@ -338,169 +415,178 @@ const Admin = () => {
   }, [products, categoryFilter, statusFilter]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Painel Administrativo</h1>
-            <p className="text-muted-foreground">Gestão completa do portfólio de produtos</p>
+    <div className="p-6 space-y-6">
+      <Tabs defaultValue="products" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="products">Produtos</TabsTrigger>
+          <TabsTrigger value="settings">Configurações do Site</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="products" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Administração de Produtos</h1>
+            <Button onClick={openNewProductDialog} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Novo Produto
+            </Button>
           </div>
-          
-          <div className="flex flex-wrap items-center gap-4">
+
+          <div className="flex gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Filter className="h-4 w-4" />
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Categoria" />
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filtrar por categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
-                  <SelectItem value="saber">SABER</SelectItem>
-                  <SelectItem value="ter">TER</SelectItem>
-                  <SelectItem value="executar">EXECUTAR</SelectItem>
-                  <SelectItem value="potencializar">POTENCIALIZAR</SelectItem>
+                  <SelectItem value="Todas">Todas as categorias</SelectItem>
+                  <SelectItem value="saber">Saber</SelectItem>
+                  <SelectItem value="ter">Ter</SelectItem>
+                  <SelectItem value="executar">Executar</SelectItem>
+                  <SelectItem value="potencializar">Potencializar</SelectItem>
                 </SelectContent>
               </Select>
-              
+            </div>
+
+            <div className="flex items-center gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Status" />
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filtrar por status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="Todos">Todos os status</SelectItem>
                   <SelectItem value="Disponível">Disponível</SelectItem>
                   <SelectItem value="Em produção">Em produção</SelectItem>
-                  <SelectItem value="Em homologação">Em homologação</SelectItem>
+                  <SelectItem value="Inativo">Inativo</SelectItem>
                 </SelectContent>
               </Select>
-            </div></div>
-          
+            </div>
+          </div>
+
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openNewProductDialog} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Novo Produto
-              </Button>
-            </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {editingProduct ? "Editar Produto" : "Novo Produto"}
                 </DialogTitle>
                 <DialogDescription>
-                  Preencha as informações do produto para o portfólio STEP.
+                  Preencha as informações do produto
                 </DialogDescription>
               </DialogHeader>
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="produto">Nome do Produto</Label>
-                    <Input
-                      id="produto"
-                      value={formData.produto || ""}
-                      onChange={(e) => setFormData({...formData, produto: e.target.value})}
-                      required
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="produto">Nome do Produto *</Label>
+                      <Input
+                        id="produto"
+                        value={formData.produto}
+                        onChange={(e) => setFormData({...formData, produto: e.target.value})}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="categoria">Categoria *</Label>
+                      <Select value={formData.categoria} onValueChange={(value) => setFormData({...formData, categoria: value as any})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="saber">Saber</SelectItem>
+                          <SelectItem value="ter">Ter</SelectItem>
+                          <SelectItem value="executar">Executar</SelectItem>
+                          <SelectItem value="potencializar">Potencializar</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="duracao">Duração *</Label>
+                      <Input
+                        id="duracao"
+                        value={formData.duracao}
+                        onChange={(e) => setFormData({...formData, duracao: e.target.value})}
+                        placeholder="Ex: 3 meses"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="dono">Dono do Produto *</Label>
+                      <Input
+                        id="dono"
+                        value={formData.dono}
+                        onChange={(e) => setFormData({...formData, dono: e.target.value})}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="valor">Valor Base *</Label>
+                      <Input
+                        id="valor"
+                        value={formData.valor}
+                        onChange={(e) => setFormData({...formData, valor: e.target.value})}
+                        placeholder="Ex: R$ 10.000"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="status">Status *</Label>
+                      <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value as any})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Disponível">Disponível</SelectItem>
+                          <SelectItem value="Em produção">Em produção</SelectItem>
+                          <SelectItem value="Inativo">Inativo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="categoria">Categoria STEP</Label>
-                    <Select value={formData.categoria} onValueChange={(value) => setFormData({...formData, categoria: value as any})}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="saber">SABER</SelectItem>
-                        <SelectItem value="ter">TER</SelectItem>
-                        <SelectItem value="executar">EXECUTAR</SelectItem>
-                        <SelectItem value="potencializar">POTENCIALIZAR</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="duracao">Duração (dias)</Label>
-                    <Input
-                      id="duracao"
-                      value={formData.duracao || ""}
-                      onChange={(e) => setFormData({...formData, duracao: e.target.value})}
-                      placeholder="ex: 15-30"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="dono">Responsável</Label>
-                    <Input
-                      id="dono"
-                      value={formData.dono || ""}
-                      onChange={(e) => setFormData({...formData, dono: e.target.value})}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="valor">Valor Base</Label>
-                    <Input
-                      id="valor"
-                      value={formData.valor || ""}
-                      onChange={(e) => setFormData({...formData, valor: e.target.value})}
-                      placeholder="ex: R$ 5.000,00"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
-                    <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value as any})}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Disponível">Disponível</SelectItem>
-                        <SelectItem value="Em produção">Em produção</SelectItem>
-                        <SelectItem value="Em homologação">Em homologação</SelectItem>
-                      </SelectContent>
-                    </Select>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Descrição Breve *</Label>
+                      <Textarea
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        rows={3}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="detailedDescription">Descrição Detalhada *</Label>
+                      <Textarea
+                        id="detailedDescription"
+                        value={formData.detailedDescription}
+                        onChange={(e) => setFormData({...formData, detailedDescription: e.target.value})}
+                        rows={4}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="objetivos">Objetivos *</Label>
+                      <Textarea
+                        id="objetivos"
+                        value={formData.objetivos}
+                        onChange={(e) => setFormData({...formData, objetivos: e.target.value})}
+                        rows={3}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="description">O que é o produto?</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description || ""}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      placeholder="Descrição resumida para os cards do portfólio"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="detailedDescription">Pra quem é o produto?</Label>
-                    <Textarea
-                      id="detailedDescription"
-                      value={formData.detailedDescription || ""}
-                      onChange={(e) => setFormData({...formData, detailedDescription: e.target.value})}
-                      placeholder="Público-alvo e perfil do cliente ideal para o produto"
-                      rows={4}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="objetivos">Como vender o produto?</Label>
-                    <Textarea
-                      id="objetivos"
-                      value={formData.objetivos || ""}
-                      onChange={(e) => setFormData({...formData, objetivos: e.target.value})}
-                      placeholder="Estratégias e abordagens de vendas para o produto"
-                      rows={3}
-                    />
-                  </div>
-
-                  {/* Tabela SPICED */}
+                  <Label>Tabela SPICED</Label>
                   <SpicedTable
                     data={formData.spicedData || {
                       situation: { objetivo: "", perguntas: "", observar: "" },
@@ -511,115 +597,111 @@ const Admin = () => {
                     }}
                     onChange={(spicedData) => setFormData({...formData, spicedData})}
                   />
-                  
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="entregas">Como cobrar o produto?</Label>
+                    <Label htmlFor="entregas">Entregas *</Label>
                     <Textarea
                       id="entregas"
-                      value={formData.entregas || ""}
+                      value={formData.entregas}
                       onChange={(e) => setFormData({...formData, entregas: e.target.value})}
-                      placeholder="Modelo de precificação e formas de cobrança"
-                      rows={3}
+                      rows={4}
+                      required
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="prerequisitos">Pré-requisitos</Label>
+                    <Label htmlFor="prerequisitos">Pré-requisitos *</Label>
                     <Textarea
                       id="prerequisitos"
-                      value={formData.prerequisitos || ""}
+                      value={formData.prerequisitos}
                       onChange={(e) => setFormData({...formData, prerequisitos: e.target.value})}
-                      placeholder="Requisitos necessários para iniciar o projeto"
+                      rows={4}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="bonusKpi">Bônus KPI</Label>
+                    <Textarea
+                      id="bonusKpi"
+                      value={formData.bonusKpi || ""}
+                      onChange={(e) => setFormData({...formData, bonusKpi: e.target.value})}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="kpiPrincipal">KPI Principal</Label>
+                    <Select value={formData.kpiPrincipal || ""} onValueChange={(value) => setFormData({...formData, kpiPrincipal: value as any})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Receita">Receita</SelectItem>
+                        <SelectItem value="Leads">Leads</SelectItem>
+                        <SelectItem value="Conversão">Conversão</SelectItem>
+                        <SelectItem value="Satisfação">Satisfação</SelectItem>
+                        <SelectItem value="Retenção">Retenção</SelectItem>
+                        <SelectItem value="Eficiência">Eficiência</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="tempoMetaKpi">Tempo Meta KPI</Label>
+                    <Select value={formData.tempoMetaKpi || ""} onValueChange={(value) => setFormData({...formData, tempoMetaKpi: value as any})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1_mes">1 mês</SelectItem>
+                        <SelectItem value="3_meses">3 meses</SelectItem>
+                        <SelectItem value="6_meses">6 meses</SelectItem>
+                        <SelectItem value="1_ano">1 ano</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="garantiaEspecifica">Garantia Específica</Label>
+                    <Textarea
+                      id="garantiaEspecifica"
+                      value={formData.garantiaEspecifica || ""}
+                      onChange={(e) => setFormData({...formData, garantiaEspecifica: e.target.value})}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="stackDigital">Stack Digital</Label>
+                    <Textarea
+                      id="stackDigital"
+                      value={formData.stackDigital || ""}
+                      onChange={(e) => setFormData({...formData, stackDigital: e.target.value})}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="entregaveisRelacionados">Entregáveis Relacionados</Label>
+                    <Textarea
+                      id="entregaveisRelacionados"
+                      value={formData.entregaveisRelacionados || ""}
+                      onChange={(e) => setFormData({...formData, entregaveisRelacionados: e.target.value})}
                       rows={3}
                     />
                   </div>
                 </div>
 
-                {/* Novos campos de KPI e informações adicionais */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground">KPIs e Informações Adicionais</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="bonusKpi">Bônus KPI</Label>
-                      <Textarea
-                        id="bonusKpi"
-                        value={formData.bonusKpi || ""}
-                        onChange={(e) => setFormData({...formData, bonusKpi: e.target.value})}
-                        placeholder="Descreva o bônus relacionado ao KPI"
-                        rows={3}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="kpiPrincipal">KPI Principal</Label>
-                      <Select value={formData.kpiPrincipal || ""} onValueChange={(value) => setFormData({...formData, kpiPrincipal: value as any})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o KPI principal" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="CPL">CPL</SelectItem>
-                          <SelectItem value="CTR">CTR</SelectItem>
-                          <SelectItem value="CONVERSÃO">CONVERSÃO</SelectItem>
-                          <SelectItem value="ENGAJAMENTO">ENGAJAMENTO</SelectItem>
-                          <SelectItem value="TAXA DE ABERTURA">TAXA DE ABERTURA</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="tempoMetaKpi">Tempo Meta KPI</Label>
-                      <Select value={formData.tempoMetaKpi || ""} onValueChange={(value) => setFormData({...formData, tempoMetaKpi: value as any})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o prazo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="3 meses">3 meses</SelectItem>
-                          <SelectItem value="6 meses">6 meses</SelectItem>
-                          <SelectItem value="12 meses">12 meses</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="garantiaEspecifica">Garantia Específica do Produto</Label>
-                      <Textarea
-                        id="garantiaEspecifica"
-                        value={formData.garantiaEspecifica || ""}
-                        onChange={(e) => setFormData({...formData, garantiaEspecifica: e.target.value})}
-                        placeholder="Descreva as garantias específicas do produto"
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="stackDigital">Stack Digital Acoplada</Label>
-                      <Textarea
-                        id="stackDigital"
-                        value={formData.stackDigital || ""}
-                        onChange={(e) => setFormData({...formData, stackDigital: e.target.value})}
-                        placeholder="Descreva a stack digital utilizada"
-                        rows={3}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="entregaveisRelacionados">Entregáveis Relacionados</Label>
-                      <Textarea
-                        id="entregaveisRelacionados"
-                        value={formData.entregaveisRelacionados || ""}
-                        onChange={(e) => setFormData({...formData, entregaveisRelacionados: e.target.value})}
-                        placeholder="Liste os entregáveis relacionados ao produto"
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Label>Recursos Disponíveis</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                     {/* Pitch */}
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
@@ -771,77 +853,65 @@ const Admin = () => {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
 
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Carregando produtos...</p>
-          </div>
-        ) : (
-          <div className="grid gap-6">
-            {/* Cards de resumo dos produtos */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => (
-                <Card key={product.id} className="p-6 hover:shadow-lg transition-shadow">
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-card-foreground line-clamp-2">
-                          {product.produto}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge 
-                            variant="secondary"
-                            className="text-white text-xs"
-                            style={{backgroundColor: `hsl(var(--${getCategoryColor(product.categoria)}))`}}
-                          >
-                            {product.categoria.toUpperCase()}
-                          </Badge>
-                          <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(product.status).color}`}>
-                            {product.status}
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Carregando produtos...</p>
+            </div>
+          ) : (
+            <div className="grid gap-6">
+              {/* Cards de resumo dos produtos */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <Card key={product.id} className="p-6 hover:shadow-lg transition-shadow">
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg text-card-foreground line-clamp-2">
+                            {product.produto}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge 
+                              variant="secondary"
+                              className="text-white text-xs"
+                              style={{backgroundColor: `hsl(var(--${getCategoryColor(product.categoria)}))`}}
+                            >
+                              {product.categoria.toUpperCase()}
+                            </Badge>
+                            <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(product.status).color}`}>
+                              {getStatusBadge(product.status).label}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex gap-1 ml-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(product)}
-                          className="h-8 w-8"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(product.id)}
-                          className="h-8 w-8 text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="text-sm text-muted-foreground">
-                        <p className="line-clamp-3">{product.description}</p>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <span className="font-medium text-muted-foreground">Duração:</span>
-                          <p className="text-card-foreground">{product.duracao}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-muted-foreground">Valor:</span>
-                          <p className="text-card-foreground font-medium">{product.valor}</p>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="font-medium text-muted-foreground">Responsável:</span>
-                          <p className="text-card-foreground">{product.dono}</p>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => handleEdit(product)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => handleDelete(product.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
-                      
+
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {product.description}
+                      </p>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Dono:</span>
+                          <span className="font-medium">{product.dono}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Duração:</span>
+                          <span className="font-medium">{product.duracao}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Valor:</span>
+                          <span className="font-medium">{product.valor}</span>
+                        </div>
+                      </div>
+
                       <div className="flex flex-wrap gap-1">
                         {product.pitch && <Badge variant="outline" className="text-xs">Pitch</Badge>}
                         {product.bpmn && <Badge variant="outline" className="text-xs">BPMN</Badge>}
@@ -851,120 +921,128 @@ const Admin = () => {
                         {product.certificacao && <Badge variant="outline" className="text-xs">Certificação</Badge>}
                       </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-            
-            {/* Tabela detalhada (visível em telas maiores) */}
-            <Card className="overflow-hidden hidden xl:block">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Produto
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Categoria
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Duração
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Valor
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Responsável
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Entregas
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Ações
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-card divide-y divide-border">
-                    {filteredProducts.map((item) => (
-                      <tr key={item.id} className="hover:bg-muted/50">
-                        <td className="px-4 py-3">
-                          <div className="max-w-xs">
-                            <div className="text-sm font-medium text-card-foreground line-clamp-2">{item.produto}</div>
-                            <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge 
-                            variant="secondary"
-                            className="text-white text-xs"
-                            style={{backgroundColor: `hsl(var(--${getCategoryColor(item.categoria)}))`}}
-                          >
-                            {item.categoria.toUpperCase()}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-card-foreground">{item.duracao}</td>
-                        <td className="px-4 py-3 text-sm text-card-foreground font-medium">{item.valor}</td>
-                        <td className="px-4 py-3 text-sm text-card-foreground">{item.dono}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap gap-1 justify-center">
-                            {item.pitch && <Badge variant="outline" className="text-xs">P</Badge>}
-                            {item.bpmn && <Badge variant="outline" className="text-xs">B</Badge>}
-                            {item.playbook && <Badge variant="outline" className="text-xs">PB</Badge>}
-                            {item.icp && <Badge variant="outline" className="text-xs">I</Badge>}
-                            {item.pricing && <Badge variant="outline" className="text-xs">PR</Badge>}
-                            {item.certificacao && <Badge variant="outline" className="text-xs">C</Badge>}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(item.status).color}`}>
-                            {item.status}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEdit(item)}
-                              className="h-7 w-7"
-                            >
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDelete(item.id)}
-                              className="h-7 w-7 text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                  ))}
-                  </tbody>
-                </table>
+                  </Card>
+                ))}
               </div>
+
+              {/* Tabela detalhada para telas grandes */}
+              <Card className="overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left p-4 font-medium">Produto</th>
+                        <th className="text-left p-4 font-medium">Categoria</th>
+                        <th className="text-left p-4 font-medium">Status</th>
+                        <th className="text-left p-4 font-medium">Dono</th>
+                        <th className="text-left p-4 font-medium">Duração</th>
+                        <th className="text-left p-4 font-medium">Valor</th>
+                        <th className="text-center p-4 font-medium">Recursos</th>
+                        <th className="text-center p-4 font-medium">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredProducts.map((product) => (
+                        <tr key={product.id} className="border-t hover:bg-muted/25">
+                          <td className="p-4">
+                            <div>
+                              <div className="font-medium">{product.produto}</div>
+                              <div className="text-sm text-muted-foreground line-clamp-1">
+                                {product.description}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <Badge 
+                              variant="secondary"
+                              className="text-white"
+                              style={{backgroundColor: `hsl(var(--${getCategoryColor(product.categoria)}))`}}
+                            >
+                              {product.categoria.toUpperCase()}
+                            </Badge>
+                          </td>
+                          <td className="p-4">
+                            <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(product.status).color}`}>
+                              {getStatusBadge(product.status).label}
+                            </div>
+                          </td>
+                          <td className="p-4 text-sm">{product.dono}</td>
+                          <td className="p-4 text-sm">{product.duracao}</td>
+                          <td className="p-4 text-sm font-medium">{product.valor}</td>
+                          <td className="p-4">
+                            <div className="flex justify-center gap-2">
+                              <StatusIcon value={product.pitch} />
+                              <StatusIcon value={product.bpmn} />
+                              <StatusIcon value={product.playbook} />
+                              <StatusIcon value={product.icp} />
+                              <StatusIcon value={product.pricing} />
+                              <StatusIcon value={product.certificacao} />
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <div className="flex justify-center gap-2">
+                              <Button size="sm" variant="outline" onClick={() => handleEdit(product)}>
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => handleDelete(product.id)}>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {!loading && filteredProducts.length === 0 && products.length > 0 && (
+            <Card className="p-12 text-center">
+              <p className="text-muted-foreground">Nenhum produto encontrado com os filtros selecionados.</p>
             </Card>
+          )}
+
+          {!loading && products.length === 0 && (
+            <Card className="p-12 text-center">
+              <p className="text-muted-foreground">Nenhum produto cadastrado. Clique em "Novo Produto" para começar.</p>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold mb-6">Configurações do Site</h1>
+            
+            <div className="space-y-6">
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Textos da Página Principal</h3>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="stepTitle">Título da Seção STEP</Label>
+                    <Input
+                      id="stepTitle"
+                      defaultValue={siteSettings.find(s => s.setting_key === 'step_title')?.setting_value || 'Introdução ao modelo - STEP'}
+                      onBlur={(e) => updateSiteSetting('step_title', e.target.value)}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="stepDescription">Descrição da Seção STEP</Label>
+                    <Textarea
+                      id="stepDescription"
+                      rows={4}
+                      defaultValue={siteSettings.find(s => s.setting_key === 'step_description')?.setting_value || 'Toda empresa, independente do tamanho, passa por quatro momentos distintos em sua jornada de crescimento. Cada momento exige uma abordagem específica e uma solução certa. O objetivo é vender e servir o cliente certo, no momento certo, com a solução certa.\n\nO framework STEP identifica onde o cliente está e qual solução ele realmente precisa, categorizando nossos produtos em quatro etapas fundamentais para o sucesso empresarial.'}
+                      onBlur={(e) => updateSiteSetting('step_description', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
-        )}
-
-        {!loading && filteredProducts.length === 0 && products.length > 0 && (
-          <Card className="p-12 text-center">
-            <p className="text-muted-foreground">Nenhum produto encontrado com os filtros selecionados.</p>
-          </Card>
-        )}
-
-        {!loading && products.length === 0 && (
-          <Card className="p-12 text-center">
-            <p className="text-muted-foreground">Nenhum produto cadastrado. Clique em "Novo Produto" para começar.</p>
-          </Card>
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
