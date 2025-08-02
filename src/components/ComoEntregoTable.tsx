@@ -147,83 +147,89 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
             Clique em "Adicionar Etapa" para começar a definir as etapas de entrega.
           </p>
         ) : (
-          <div className="space-y-4">
-            {data.map((row, index) => (
-              <Card key={index} className="p-4">
-                <div className="flex items-start justify-between mb-4">
-                  <h5 className="font-medium">Etapa {index + 1}</h5>
-                  <Button
-                    type="button"
-                    onClick={() => handleRemoveRow(index)}
-                    variant="outline"
-                    size="sm"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Etapa</label>
-                    <Input
-                      value={row.etapa}
-                      onChange={(e) => handleUpdateRow(index, 'etapa', e.target.value)}
-                      placeholder="Nome da etapa"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Tarefa</label>
-                    <Input
-                      value={row.tarefa}
-                      onChange={(e) => handleUpdateRow(index, 'tarefa', e.target.value)}
-                      placeholder="Descrição da tarefa"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">DRI (Responsável)</label>
-                    <Select 
-                      value={row.dri} 
-                      onValueChange={(value) => handleUpdateRow(index, 'dri', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o responsável" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {driOptions.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Estimativa de Horas</label>
-                    <Input
-                      type="number"
-                      value={row.estimativaHoras}
-                      onChange={(e) => handleUpdateRow(index, 'estimativaHoras', e.target.value)}
-                      placeholder="Ex: 8"
-                      min="0"
-                      step="0.5"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <label className="text-sm font-medium">Como Executar (POP) - URL</label>
-                  <Input
-                    type="url"
-                    value={row.comoExecutar}
-                    onChange={(e) => handleUpdateRow(index, 'comoExecutar', e.target.value)}
-                    placeholder="https://exemplo.com/procedimento-operacional-padrao"
-                  />
-                </div>
-              </Card>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-border">
+              <thead>
+                <tr className="bg-muted">
+                  <th className="border border-border p-3 text-left font-semibold">ETAPA</th>
+                  <th className="border border-border p-3 text-left font-semibold">TAREFA</th>
+                  <th className="border border-border p-3 text-left font-semibold">DRI</th>
+                  <th className="border border-border p-3 text-left font-semibold">HORAS</th>
+                  <th className="border border-border p-3 text-left font-semibold">POP</th>
+                  <th className="border border-border p-3 text-center font-semibold">AÇÕES</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((row, index) => (
+                  <tr key={index} className="hover:bg-muted/50">
+                    <td className="border border-border p-2">
+                      <Input
+                        value={row.etapa}
+                        onChange={(e) => handleUpdateRow(index, 'etapa', e.target.value)}
+                        placeholder="Nome da etapa"
+                        className="border-0 p-1 h-8 text-sm"
+                      />
+                    </td>
+                    <td className="border border-border p-2">
+                      <Input
+                        value={row.tarefa}
+                        onChange={(e) => handleUpdateRow(index, 'tarefa', e.target.value)}
+                        placeholder="Descrição da tarefa"
+                        className="border-0 p-1 h-8 text-sm"
+                      />
+                    </td>
+                    <td className="border border-border p-2">
+                      <Select 
+                        value={row.dri} 
+                        onValueChange={(value) => handleUpdateRow(index, 'dri', value)}
+                      >
+                        <SelectTrigger className="border-0 h-8 text-sm">
+                          <SelectValue placeholder="Responsável" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {driOptions.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="border border-border p-2">
+                      <Input
+                        type="number"
+                        value={row.estimativaHoras}
+                        onChange={(e) => handleUpdateRow(index, 'estimativaHoras', e.target.value)}
+                        placeholder="8"
+                        min="0"
+                        step="0.5"
+                        className="border-0 p-1 h-8 text-sm text-center"
+                      />
+                    </td>
+                    <td className="border border-border p-2">
+                      <Input
+                        type="url"
+                        value={row.comoExecutar}
+                        onChange={(e) => handleUpdateRow(index, 'comoExecutar', e.target.value)}
+                        placeholder="URL do POP"
+                        className="border-0 p-1 h-8 text-sm"
+                      />
+                    </td>
+                    <td className="border border-border p-2 text-center">
+                      <Button
+                        type="button"
+                        onClick={() => handleRemoveRow(index)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
