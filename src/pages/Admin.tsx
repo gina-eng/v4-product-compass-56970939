@@ -1565,7 +1565,13 @@ const Admin = () => {
                         id="positionInvestimento"
                         value={positionForm.investimento_total}
                         onValueChange={(values) => {
-                          setPositionForm({ ...positionForm, investimento_total: values.value || '' });
+                          const investimentoValue = values.value || '';
+                          const cphCalculado = investimentoValue ? (parseFloat(investimentoValue) / 168).toString() : '';
+                          setPositionForm({ 
+                            ...positionForm, 
+                            investimento_total: investimentoValue,
+                            cph: cphCalculado
+                          });
                         }}
                         thousandSeparator="."
                         decimalSeparator=","
@@ -1578,20 +1584,18 @@ const Admin = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="positionCph">CPH - Custo por Hora (R$)</Label>
+                      <Label htmlFor="positionCph">CPH - Custo por Hora (R$) - Calculado Automaticamente</Label>
                       <NumericFormat
                         id="positionCph"
                         value={positionForm.cph}
-                        onValueChange={(values) => {
-                          setPositionForm({ ...positionForm, cph: values.value || '' });
-                        }}
                         thousandSeparator="."
                         decimalSeparator=","
                         decimalScale={2}
                         fixedDecimalScale={true}
                         allowNegative={false}
                         placeholder="119,05"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={true}
+                        className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       />
                     </div>
                   </div>
