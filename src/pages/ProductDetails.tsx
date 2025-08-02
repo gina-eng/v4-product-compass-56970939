@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ExternalLink, User, Clock, CheckCircle, XCircle } from "lucide-react";
 import SpicedTable from "@/components/SpicedTable";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCurrency } from "@/lib/formatters";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -129,6 +130,22 @@ const ProductDetails = () => {
     );
   }
 
+  // Block access to "Em produção" products
+  if (product.status === "Em produção") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-4">Produto em Produção</h1>
+          <p className="text-muted-foreground mb-6">Este produto ainda está em desenvolvimento e não pode ser visualizado.</p>
+          <Button onClick={() => navigate("/")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar ao Portfólio
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const categoryLabels = {
     saber: "SABER",
     ter: "TER", 
@@ -193,7 +210,7 @@ const ProductDetails = () => {
                   <span>{product.duracao} dias</span>
                 </div>
                 <div className="text-lg font-semibold text-foreground">
-                  {product.valor}
+                  {formatCurrency(product.valor)}
                 </div>
               </div>
             </div>

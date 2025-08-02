@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
 
 interface ProductCardProps {
   id: string;
@@ -40,7 +41,7 @@ const ProductCard = ({ id, name, description, category, valorBase, onViewDetails
       
       <div className="mb-6">
         <span className="text-xs text-gray-500 uppercase tracking-wide">Valor Base</span>
-        <p className="text-lg font-semibold text-gray-900">{valorBase}</p>
+        <p className="text-lg font-semibold text-gray-900">{formatCurrency(valorBase)}</p>
       </div>
       
       <Button 
