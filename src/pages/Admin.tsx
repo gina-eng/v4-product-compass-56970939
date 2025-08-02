@@ -536,11 +536,6 @@ const Admin = () => {
 
         <Tabs defaultValue="products" className="space-y-6">
           <TabsList>
-            <Link to="/" className="flex items-center">
-              <TabsTrigger value="main" asChild>
-                <span>Página Principal</span>
-              </TabsTrigger>
-            </Link>
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="settings">Informações Gerais</TabsTrigger>
           </TabsList>
