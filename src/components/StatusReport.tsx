@@ -1,56 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const StatusReport = () => {
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [statusData, setStatusData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const statusData = [
-    {
-      id: "1",
-      produto: "Diagnóstico de Mídia Paga (Meta e Google Ads)",
-      categoria: "saber",
-      duracao: "15-30",
-      dono: "Paulo Barros",
-      pitch: true,
-      bpmn: true,
-      playbook: false,
-      icp: true,
-      pricing: false,
-      certificacao: false,
-      status: "Em produção"
-    },
-    {
-      id: "2", 
-      produto: "E-commerce",
-      categoria: "ter",
-      duracao: "45-60",
-      dono: "Oriana Finta",
-      pitch: false,
-      bpmn: false,
-      playbook: true,
-      icp: false,
-      certificacao: true,
-      pricing: true,
-      status: "Disponível"
-    },
-    {
-      id: "3",
-      produto: "Profissional de Google Ads",
-      categoria: "executar",
-      duracao: "30-45",
-      dono: "Maria Silva",
-      pitch: true,
-      bpmn: true,
-      playbook: true,
-      icp: true,
-      pricing: false,
-      certificacao: false,
-      status: "Em homologação"
-    }
-  ];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+        
+        if (error) {
+          console.error('Error fetching products:', error);
+          return;
+        }
+
+        const formattedData = data?.map(product => ({
+          id: product.id,
+          produto: product.produto,
+          categoria: product.categoria,
+          duracao: product.duracao,
+          dono: product.dono,
+          pitch: product.pitch,
+          bpmn: product.bpmn,
+          playbook: product.playbook,
+          icp: product.icp,
+          pricing: product.pricing,
+          certificacao: product.certificacao,
+          status: product.status
+        })) || [];
+        
+        setStatusData(formattedData);
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filters = [
     { key: "all", label: "Todos", color: "default" },
@@ -125,98 +121,104 @@ const StatusReport = () => {
           </div>
         </div>
 
-        <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Produto
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Categoria
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Duração (dias)
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Dono
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Pitch
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    BPMN
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Playbook
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ICP
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Pricing
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Certificação
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredData.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="max-w-xs">
-                        <div className="text-sm font-semibold text-foreground leading-5 break-words">
-                          {item.produto}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge 
-                        variant="secondary"
-                        className="text-white"
-                        style={{backgroundColor: `hsl(var(--${getCategoryColor(item.categoria)}))`}}
-                      >
-                        {getCategoryLabel(item.categoria)}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-foreground">{item.duracao}</td>
-                    <td className="px-6 py-4 text-sm text-foreground">{item.dono}</td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.pitch} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.bpmn} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.playbook} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.icp} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.pricing} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.certificacao} />
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(item.status).color}`}>
-                        {item.status}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Carregando dados...</p>
           </div>
-        </Card>
+        ) : (
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Produto
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Categoria
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Duração (dias)
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Dono
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Pitch
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      BPMN
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Playbook
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ICP
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Pricing
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Certificação
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredData.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs">
+                          <div className="text-sm font-semibold text-foreground leading-5 break-words">
+                            {item.produto}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge 
+                          variant="secondary"
+                          className="text-white"
+                          style={{backgroundColor: `hsl(var(--${getCategoryColor(item.categoria)}))`}}
+                        >
+                          {getCategoryLabel(item.categoria)}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-foreground">{item.duracao}</td>
+                      <td className="px-6 py-4 text-sm text-foreground">{item.dono}</td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.pitch} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.bpmn} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.playbook} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.icp} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.pricing} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.certificacao} />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(item.status).color}`}>
+                          {item.status}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
 
-        {filteredData.length === 0 && (
+        {!loading && filteredData.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Nenhum produto encontrado para esta categoria.</p>
           </div>

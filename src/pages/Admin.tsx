@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Check, X, Plus, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import SpicedTable from "@/components/SpicedTable";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -52,94 +53,74 @@ const Admin = () => {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: "1",
-      produto: "Diagnóstico de Mídia Paga (Meta e Google Ads)",
-      categoria: "saber",
-      duracao: "15-30",
-      dono: "Paulo Barros",
-      valor: "R$ 2.500,00",
-      pitch: true,
-      bpmn: true,
-      playbook: false,
-      icp: true,
-      pricing: false,
-      certificacao: false,
-      status: "Em produção",
-      description: "Diagnóstico estratégico de performance em mídia paga para negócios que investem de forma consistente e desejam maximizar resultados.",
-      detailedDescription: "Análise completa das campanhas de mídia paga nas principais plataformas digitais, incluindo Meta Ads e Google Ads. O diagnóstico identifica oportunidades de otimização, gaps estratégicos e recomendações específicas para maximizar o ROI dos investimentos em publicidade digital.",
-      objetivos: "Identificar oportunidades de melhoria; Otimizar performance das campanhas; Aumentar ROI dos investimentos; Definir estratégias de crescimento",
-      spicedData: {
-        situation: { objetivo: "Entender situação atual", perguntas: "Como está o desempenho atual?", observar: "Resultados das campanhas" },
-        pain: { objetivo: "Identificar dores", perguntas: "Quais são os principais problemas?", observar: "Indicadores de performance baixa" },
-        impact: { objetivo: "Medir impacto", perguntas: "Qual o impacto financeiro?", observar: "ROI atual vs potencial" },
-        criticalEvent: { objetivo: "Definir urgência", perguntas: "Quando precisa de resultados?", observar: "Pressão de mercado/concorrência" },
-        decision: { objetivo: "Facilitar decisão", perguntas: "O que precisa para decidir?", observar: "Critérios de decisão do cliente" }
-      },
-      entregas: "Relatório executivo com diagnóstico completo; Planilha com análise detalhada das campanhas; Apresentação com recomendações estratégicas; Plano de ação para otimização",
-      prerequisitos: "Acesso às contas de anúncios; Histórico de pelo menos 3 meses de campanhas; Dados de conversão configurados"
-    },
-    {
-      id: "2", 
-      produto: "E-commerce",
-      categoria: "ter",
-      duracao: "45-60",
-      dono: "Oriana Finta",
-      valor: "R$ 15.000,00",
-      pitch: false,
-      bpmn: false,
-      playbook: true,
-      icp: false,
-      certificacao: true,
-      pricing: true,
-      status: "Disponível",
-      description: "Implementação completa de plataforma de e-commerce com foco em conversão e experiência do usuário.",
-      detailedDescription: "Desenvolvimento e implementação de loja virtual completa, incluindo design responsivo, integração com gateways de pagamento, sistema de gestão de produtos, relatórios analíticos e otimização para conversão.",
-      objetivos: "Criar presença digital forte; Aumentar vendas online; Melhorar experiência do cliente; Automatizar processos de venda",
-      spicedData: {
-        situation: { objetivo: "Avaliar presença digital", perguntas: "Como vendem atualmente?", observar: "Canais de venda existentes" },
-        pain: { objetivo: "Identificar limitações", perguntas: "Quais dificuldades têm?", observar: "Perda de vendas por falta de plataforma" },
-        impact: { objetivo: "Calcular potencial", perguntas: "Quanto poderiam vender online?", observar: "Volume de vendas atual vs mercado" },
-        criticalEvent: { objetivo: "Definir prazo", perguntas: "Quando querem lançar?", observar: "Sazonalidade/datas importantes" },
-        decision: { objetivo: "Alinhar expectativas", perguntas: "Qual o investimento disponível?", observar: "Budget e recursos técnicos" }
-      },
-      entregas: "Plataforma e-commerce completa; Design responsivo e otimizado; Integração com pagamentos; Sistema de gestão de produtos; Relatórios e analytics",
-      prerequisitos: "Catálogo de produtos definido; Identidade visual da marca; Conta nos gateways de pagamento"
-    },
-    {
-      id: "3",
-      produto: "Profissional de Google Ads",
-      categoria: "executar",
-      duracao: "30-45",
-      dono: "Maria Silva",
-      valor: "R$ 8.000,00",
-      pitch: true,
-      bpmn: true,
-      playbook: true,
-      icp: true,
-      pricing: false,
-      certificacao: false,
-      status: "Em homologação",
-      description: "Serviço especializado de gestão e otimização de campanhas Google Ads para maximizar resultados.",
-      detailedDescription: "Gestão completa de campanhas Google Ads por profissional certificado, incluindo criação de campanhas, otimização contínua, relatórios detalhados e estratégias avançadas de bidding e segmentação.",
-      objetivos: "Maximizar performance das campanhas; Reduzir custo por aquisição; Aumentar volume de conversões; Melhorar qualidade do tráfego",
-      spicedData: {
-        situation: { objetivo: "Entender cenário atual", perguntas: "Como está o Google Ads hoje?", observar: "Performance atual das campanhas" },
-        pain: { objetivo: "Mapear problemas", perguntas: "Quais são os maiores desafios?", observar: "CPA alto, baixa conversão" },
-        impact: { objetivo: "Quantificar oportunidade", perguntas: "Quanto podem economizar/ganhar?", observar: "Potencial de melhoria do ROAS" },
-        criticalEvent: { objetivo: "Criar urgência", perguntas: "Quando precisam de resultados?", observar: "Metas de crescimento/budget" },
-        decision: { objetivo: "Facilitar aprovação", perguntas: "Quem decide sobre investimentos?", observar: "Processo de aprovação interno" }
-      },
-      entregas: "Gestão completa das campanhas; Relatórios semanais de performance; Otimizações contínuas; Consultoria estratégica mensal",
-      prerequisitos: "Conta Google Ads ativa; Budget mínimo definido; Pixel de conversão instalado"
-    }
-  ]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState<Partial<Product>>({
     categoria: "saber",
     status: "Em produção"
   });
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*');
+      
+      if (error) {
+        console.error('Error fetching products:', error);
+        toast({
+          title: "Erro ao carregar produtos",
+          description: "Não foi possível carregar os produtos do banco de dados.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const formattedProducts = data?.map(product => ({
+        id: product.id,
+        produto: product.produto,
+        categoria: product.categoria,
+        duracao: product.duracao,
+        dono: product.dono,
+        valor: product.valor,
+        pitch: product.pitch,
+        bpmn: product.bpmn,
+        playbook: product.playbook,
+        icp: product.icp,
+        pricing: product.pricing,
+        certificacao: product.certificacao,
+        pitchUrl: product.pitch_url,
+        bpmnUrl: product.bpmn_url,
+        playbookUrl: product.playbook_url,
+        icpUrl: product.icp_url,
+        pricingUrl: product.pricing_url,
+        certificacaoUrl: product.certificacao_url,
+        status: product.status,
+        description: product.description,
+        detailedDescription: product.detailed_description,
+        objetivos: product.objetivos,
+        spicedData: (product.spiced_data as unknown) as SpicedData,
+        entregas: product.entregas,
+        prerequisitos: product.prerequisitos
+      })) || [];
+      
+      setProducts(formattedProducts);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Erro inesperado",
+        description: "Ocorreu um erro ao conectar com o banco de dados.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -169,31 +150,107 @@ const Admin = () => {
     )
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (editingProduct) {
-      setProducts(products.map(p => p.id === editingProduct.id ? { ...formData as Product } : p));
-      toast({
-        title: "Produto atualizado",
-        description: "As informações do produto foram atualizadas com sucesso.",
-      });
-    } else {
-      const newProduct = {
-        ...formData,
-        id: Date.now().toString(),
-      } as Product;
+    try {
+      if (editingProduct) {
+        // Atualizar produto existente
+        const { error } = await supabase
+          .from('products')
+          .update({
+            produto: formData.produto,
+            categoria: formData.categoria,
+            duracao: formData.duracao,
+            dono: formData.dono,
+            valor: formData.valor,
+            pitch: formData.pitch,
+            bpmn: formData.bpmn,
+            playbook: formData.playbook,
+            icp: formData.icp,
+            pricing: formData.pricing,
+            certificacao: formData.certificacao,
+            pitch_url: formData.pitchUrl,
+            bpmn_url: formData.bpmnUrl,
+            playbook_url: formData.playbookUrl,
+            icp_url: formData.icpUrl,
+            pricing_url: formData.pricingUrl,
+            certificacao_url: formData.certificacaoUrl,
+            status: formData.status,
+            description: formData.description,
+            detailed_description: formData.detailedDescription,
+            objetivos: formData.objetivos,
+            spiced_data: formData.spicedData as any,
+            entregas: formData.entregas,
+            prerequisitos: formData.prerequisitos,
+          })
+          .eq('id', editingProduct.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Produto atualizado",
+          description: "As informações do produto foram atualizadas com sucesso.",
+        });
+      } else {
+        // Criar novo produto
+        const { error } = await supabase
+          .from('products')
+          .insert({
+            produto: formData.produto,
+            categoria: formData.categoria,
+            duracao: formData.duracao,
+            dono: formData.dono,
+            valor: formData.valor,
+            pitch: formData.pitch || false,
+            bpmn: formData.bpmn || false,
+            playbook: formData.playbook || false,
+            icp: formData.icp || false,
+            pricing: formData.pricing || false,
+            certificacao: formData.certificacao || false,
+            pitch_url: formData.pitchUrl,
+            bpmn_url: formData.bpmnUrl,
+            playbook_url: formData.playbookUrl,
+            icp_url: formData.icpUrl,
+            pricing_url: formData.pricingUrl,
+            certificacao_url: formData.certificacaoUrl,
+            status: formData.status,
+            description: formData.description,
+            detailed_description: formData.detailedDescription,
+            objetivos: formData.objetivos,
+            spiced_data: (formData.spicedData || {
+              situation: { objetivo: "", perguntas: "", observar: "" },
+              pain: { objetivo: "", perguntas: "", observar: "" },
+              impact: { objetivo: "", perguntas: "", observar: "" },
+              criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+              decision: { objetivo: "", perguntas: "", observar: "" }
+            }) as any,
+            entregas: formData.entregas,
+            prerequisitos: formData.prerequisitos,
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Produto criado",
+          description: "Novo produto adicionado ao portfólio com sucesso.",
+        });
+      }
       
-      setProducts([...products, newProduct]);
+      // Recarregar a lista de produtos
+      await fetchProducts();
+      
+      setIsDialogOpen(false);
+      setEditingProduct(null);
+      setFormData({ categoria: "saber", status: "Em produção" });
+    } catch (error) {
+      console.error('Error saving product:', error);
       toast({
-        title: "Produto criado",
-        description: "Novo produto adicionado ao portfólio com sucesso.",
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar o produto. Tente novamente.",
+        variant: "destructive"
       });
     }
-    
-    setIsDialogOpen(false);
-    setEditingProduct(null);
-    setFormData({ categoria: "saber", status: "Em produção" });
   };
 
   const handleEdit = (product: Product) => {
@@ -202,12 +259,30 @@ const Admin = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    setProducts(products.filter(p => p.id !== id));
-    toast({
-      title: "Produto removido",
-      description: "O produto foi removido do portfólio.",
-    });
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Produto removido",
+        description: "O produto foi removido do portfólio.",
+      });
+      
+      // Recarregar a lista de produtos
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      toast({
+        title: "Erro ao deletar",
+        description: "Não foi possível remover o produto. Tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
 
   const openNewProductDialog = () => {
@@ -540,119 +615,131 @@ const Admin = () => {
           </Dialog>
         </div>
 
-        <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Produto
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Categoria
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Duração (dias)
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Valor Base
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Dono
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Pitch
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    BPMN
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Playbook
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    ICP
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Pricing
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Certificação
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-card divide-y divide-border">
-                {products.map((item) => (
-                  <tr key={item.id} className="hover:bg-muted/50">
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-card-foreground">{item.produto}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Badge 
-                        variant="secondary"
-                        className="text-white"
-                        style={{backgroundColor: `hsl(var(--${getCategoryColor(item.categoria)}))`}}
-                      >
-                        {item.categoria.toUpperCase()}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-card-foreground">{item.duracao}</td>
-                    <td className="px-6 py-4 text-sm text-card-foreground font-medium">{item.valor}</td>
-                    <td className="px-6 py-4 text-sm text-card-foreground">{item.dono}</td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.pitch} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.bpmn} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.playbook} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.icp} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.pricing} />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <StatusIcon value={item.certificacao} />
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(item.status).color}`}>
-                        {item.status}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(item)}
-                          className="h-8 w-8"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(item.id)}
-                          className="h-8 w-8 text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Carregando produtos...</p>
           </div>
-        </Card>
+        ) : (
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Produto
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Categoria
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Duração (dias)
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Valor Base
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Dono
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Pitch
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      BPMN
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Playbook
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      ICP
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Pricing
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Certificação
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Ações
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-card divide-y divide-border">
+                  {products.map((item) => (
+                    <tr key={item.id} className="hover:bg-muted/50">
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-medium text-card-foreground">{item.produto}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge 
+                          variant="secondary"
+                          className="text-white"
+                          style={{backgroundColor: `hsl(var(--${getCategoryColor(item.categoria)}))`}}
+                        >
+                          {item.categoria.toUpperCase()}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-card-foreground">{item.duracao}</td>
+                      <td className="px-6 py-4 text-sm text-card-foreground font-medium">{item.valor}</td>
+                      <td className="px-6 py-4 text-sm text-card-foreground">{item.dono}</td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.pitch} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.bpmn} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.playbook} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.icp} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.pricing} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <StatusIcon value={item.certificacao} />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(item.status).color}`}>
+                          {item.status}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(item)}
+                            className="h-8 w-8"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(item.id)}
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
+        {!loading && products.length === 0 && (
+          <Card className="p-12 text-center">
+            <p className="text-muted-foreground">Nenhum produto cadastrado. Clique em "Novo Produto" para começar.</p>
+          </Card>
+        )}
       </div>
     </div>
   );
