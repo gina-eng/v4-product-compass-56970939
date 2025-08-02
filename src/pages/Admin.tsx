@@ -51,6 +51,8 @@ interface Product {
   spicedData: SpicedData;
   entregas: string;
   prerequisitos: string;
+  paraQuemServe?: string;
+  comoEntregaValor?: string;
   bonusKpi?: string;
   kpiPrincipal?: string;
   tempoMetaKpi?: string;
@@ -113,6 +115,8 @@ const Admin = () => {
     } as SpicedData,
     entregas: "",
     prerequisitos: "",
+    paraQuemServe: "",
+    comoEntregaValor: "",
     bonusKpi: "",
     kpiPrincipal: "",
     tempoMetaKpi: "",
@@ -272,6 +276,8 @@ const Admin = () => {
         },
         entregas: product.entregas,
         prerequisitos: product.prerequisitos,
+        paraQuemServe: product.para_quem_serve,
+        comoEntregaValor: product.como_entrega_valor,
         bonusKpi: product.bonus_kpi,
         kpiPrincipal: product.kpi_principal,
         tempoMetaKpi: product.tempo_meta_kpi,
@@ -326,6 +332,8 @@ const Admin = () => {
             spiced_data: formData.spicedData as any,
             entregas: formData.entregas,
             prerequisitos: formData.prerequisitos,
+            para_quem_serve: formData.paraQuemServe || null,
+            como_entrega_valor: formData.comoEntregaValor || null,
             bonus_kpi: formData.bonusKpi || null,
             kpi_principal: (formData.kpiPrincipal && formData.kpiPrincipal.trim() !== "") ? formData.kpiPrincipal as any : null,
             tempo_meta_kpi: (formData.tempoMetaKpi && formData.tempoMetaKpi.trim() !== "") ? formData.tempoMetaKpi as any : null,
@@ -376,6 +384,8 @@ const Admin = () => {
             }) as any,
             entregas: formData.entregas,
             prerequisitos: formData.prerequisitos,
+            para_quem_serve: formData.paraQuemServe || null,
+            como_entrega_valor: formData.comoEntregaValor || null,
             bonus_kpi: formData.bonusKpi || null,
             kpi_principal: (formData.kpiPrincipal && formData.kpiPrincipal.trim() !== "") ? formData.kpiPrincipal as any : null,
             tempo_meta_kpi: (formData.tempoMetaKpi && formData.tempoMetaKpi.trim() !== "") ? formData.tempoMetaKpi as any : null,
@@ -394,7 +404,46 @@ const Admin = () => {
 
       setIsDialogOpen(false);
       setEditingProduct(null);
-      setFormData({ categoria: "saber", status: "Em produção" } as any);
+      setFormData({ 
+        categoria: "saber", 
+        status: "Em produção",
+        produto: "",
+        duracao: "",
+        dono: "",
+        valor: "",
+        pitch: false,
+        bpmn: false,
+        playbook: false,
+        icp: false,
+        pricing: false,
+        certificacao: false,
+        pitchUrl: "",
+        bpmnUrl: "",
+        playbookUrl: "",
+        icpUrl: "",
+        pricingUrl: "",
+        certificacaoUrl: "",
+        description: "",
+        detailedDescription: "",
+        objetivos: "",
+        spicedData: {
+          situation: { objetivo: "", perguntas: "", observar: "" },
+          pain: { objetivo: "", perguntas: "", observar: "" },
+          impact: { objetivo: "", perguntas: "", observar: "" },
+          criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+          decision: { objetivo: "", perguntas: "", observar: "" }
+        },
+        entregas: "",
+        prerequisitos: "",
+        paraQuemServe: "",
+        comoEntregaValor: "",
+        bonusKpi: "",
+        kpiPrincipal: "",
+        tempoMetaKpi: "",
+        garantiaEspecifica: "",
+        stackDigital: "",
+        entregaveisRelacionados: ""
+      });
       await fetchProducts();
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
@@ -433,6 +482,8 @@ const Admin = () => {
       spicedData: product.spicedData,
       entregas: product.entregas,
       prerequisitos: product.prerequisitos,
+      paraQuemServe: product.paraQuemServe || "",
+      comoEntregaValor: product.comoEntregaValor || "",
       bonusKpi: product.bonusKpi || "",
       kpiPrincipal: product.kpiPrincipal || "",
       tempoMetaKpi: product.tempoMetaKpi || "",
@@ -472,7 +523,46 @@ const Admin = () => {
 
   const openNewProductDialog = () => {
     setEditingProduct(null);
-    setFormData({ categoria: "saber", status: "Em produção" } as any);
+    setFormData({ 
+      categoria: "saber", 
+      status: "Em produção",
+      produto: "",
+      duracao: "",
+      dono: "",
+      valor: "",
+      pitch: false,
+      bpmn: false,
+      playbook: false,
+      icp: false,
+      pricing: false,
+      certificacao: false,
+      pitchUrl: "",
+      bpmnUrl: "",
+      playbookUrl: "",
+      icpUrl: "",
+      pricingUrl: "",
+      certificacaoUrl: "",
+      description: "",
+      detailedDescription: "",
+      objetivos: "",
+      spicedData: {
+        situation: { objetivo: "", perguntas: "", observar: "" },
+        pain: { objetivo: "", perguntas: "", observar: "" },
+        impact: { objetivo: "", perguntas: "", observar: "" },
+        criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+        decision: { objetivo: "", perguntas: "", observar: "" }
+      },
+      entregas: "",
+      prerequisitos: "",
+      paraQuemServe: "",
+      comoEntregaValor: "",
+      bonusKpi: "",
+      kpiPrincipal: "",
+      tempoMetaKpi: "",
+      garantiaEspecifica: "",
+      stackDigital: "",
+      entregaveisRelacionados: ""
+    });
     setIsDialogOpen(true);
   };
 
@@ -802,7 +892,7 @@ const Admin = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="detailedDescription">Descrição Detalhada</Label>
+                          <Label htmlFor="detailedDescription">O que é o produto?</Label>
                           <Textarea
                             id="detailedDescription"
                             value={formData.detailedDescription}
@@ -812,7 +902,7 @@ const Admin = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="objetivos">Objetivos</Label>
+                          <Label htmlFor="objetivos">Como eu vendo?</Label>
                           <Textarea
                             id="objetivos"
                             value={formData.objetivos}
@@ -822,7 +912,7 @@ const Admin = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="entregas">Entregas</Label>
+                          <Label htmlFor="entregas">O que eu entrego?</Label>
                           <Textarea
                             id="entregas"
                             value={formData.entregas}
@@ -832,12 +922,22 @@ const Admin = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="prerequisitos">Pré-requisitos</Label>
+                          <Label htmlFor="paraQuemServe">Pra quem ele serve?</Label>
                           <Textarea
-                            id="prerequisitos"
-                            value={formData.prerequisitos}
-                            onChange={(e) => setFormData({...formData, prerequisitos: e.target.value})}
-                            rows={3}
+                            id="paraQuemServe"
+                            value={formData.paraQuemServe || ""}
+                            onChange={(e) => setFormData({...formData, paraQuemServe: e.target.value})}
+                            rows={4}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="comoEntregaValor">Como ele entrega valor?</Label>
+                          <Textarea
+                            id="comoEntregaValor"
+                            value={formData.comoEntregaValor || ""}
+                            onChange={(e) => setFormData({...formData, comoEntregaValor: e.target.value})}
+                            rows={4}
                           />
                         </div>
                       </div>

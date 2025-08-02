@@ -10,18 +10,27 @@ interface SpicedData {
 }
 
 interface SpicedTableProps {
-  data: SpicedData;
+  data?: SpicedData;
   onChange?: (data: SpicedData) => void;
   readOnly?: boolean;
 }
 
 const SpicedTable = ({ data, onChange, readOnly = false }: SpicedTableProps) => {
+  // Ensure data is properly initialized with default values if undefined or incomplete
+  const safeData: SpicedData = {
+    situation: data?.situation || { objetivo: "", perguntas: "", observar: "" },
+    pain: data?.pain || { objetivo: "", perguntas: "", observar: "" },
+    impact: data?.impact || { objetivo: "", perguntas: "", observar: "" },
+    criticalEvent: data?.criticalEvent || { objetivo: "", perguntas: "", observar: "" },
+    decision: data?.decision || { objetivo: "", perguntas: "", observar: "" }
+  };
+
   const handleChange = (section: keyof SpicedData, field: string, value: string) => {
     if (onChange) {
       onChange({
-        ...data,
+        ...safeData,
         [section]: {
-          ...data[section],
+          ...safeData[section],
           [field]: value
         }
       });
@@ -54,9 +63,9 @@ const SpicedTable = ({ data, onChange, readOnly = false }: SpicedTableProps) => 
               {rows.map((row, index) => (
                 <tr key={row.key} className={index % 2 === 1 ? "border-t bg-muted/30" : "border-t"}>
                   <td className="p-4 font-medium text-foreground">{row.label}</td>
-                  <td className="p-4 text-muted-foreground">{data[row.key].objetivo}</td>
-                  <td className="p-4 text-muted-foreground">{data[row.key].perguntas}</td>
-                  <td className="p-4 text-muted-foreground">{data[row.key].observar}</td>
+                  <td className="p-4 text-muted-foreground">{safeData[row.key].objetivo}</td>
+                  <td className="p-4 text-muted-foreground">{safeData[row.key].perguntas}</td>
+                  <td className="p-4 text-muted-foreground">{safeData[row.key].observar}</td>
                 </tr>
               ))}
             </tbody>
@@ -85,21 +94,21 @@ const SpicedTable = ({ data, onChange, readOnly = false }: SpicedTableProps) => 
                 <td className="p-3 font-medium">{row.label}</td>
                 <td className="p-3">
                   <Input
-                    value={data[row.key].objetivo}
+                    value={safeData[row.key].objetivo}
                     onChange={(e) => handleChange(row.key, 'objetivo', e.target.value)}
                     placeholder={`Objetivo da ${row.label.split(' – ')[1].toLowerCase()}`}
                   />
                 </td>
                 <td className="p-3">
                   <Input
-                    value={data[row.key].perguntas}
+                    value={safeData[row.key].perguntas}
                     onChange={(e) => handleChange(row.key, 'perguntas', e.target.value)}
                     placeholder="Perguntas-chave"
                   />
                 </td>
                 <td className="p-3">
                   <Input
-                    value={data[row.key].observar}
+                    value={safeData[row.key].observar}
                     onChange={(e) => handleChange(row.key, 'observar', e.target.value)}
                     placeholder="O que observar"
                   />
