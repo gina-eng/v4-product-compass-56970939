@@ -126,34 +126,52 @@ const Admin = () => {
 
   const handleSettingChange = (key: string, value: string) => {
     setLocalSettings(prev => ({ ...prev, [key]: value }));
-    setSettingsChanged(
-      value !== settings[key as keyof typeof settings]
-    );
+    
+    // Forçar verificação se há mudanças
+    const hasChanges = value !== settings[key as keyof typeof settings] || 
+                      localSettings.step_title !== settings.step_title ||
+                      localSettings.step_description !== settings.step_description;
+    
+    console.log('Mudança detectada:', { key, value, hasChanges, settings });
+    setSettingsChanged(hasChanges);
   };
 
   const handleSaveSettings = async () => {
     setSavingSettings(true);
+    console.log('Iniciando salvamento das configurações...', { localSettings, isTableAvailable });
+    
     try {
-      // Salvar todas as configurações que foram alteradas
-      const promises = [];
+      let hasChanges = false;
       
       if (localSettings.step_title !== settings.step_title) {
-        promises.push(updateSetting('step_title', localSettings.step_title));
+        console.log('Salvando step_title:', localSettings.step_title);
+        const result = await updateSetting('step_title', localSettings.step_title);
+        console.log('Resultado step_title:', result);
+        hasChanges = true;
       }
       
       if (localSettings.step_description !== settings.step_description) {
-        promises.push(updateSetting('step_description', localSettings.step_description));
+        console.log('Salvando step_description:', localSettings.step_description);
+        const result = await updateSetting('step_description', localSettings.step_description);
+        console.log('Resultado step_description:', result);
+        hasChanges = true;
       }
 
-      await Promise.all(promises);
+      if (hasChanges) {
+        toast({
+          title: "Configurações salvas",
+          description: "As configurações do site foram atualizadas com sucesso.",
+        });
+        setSettingsChanged(false);
+      } else {
+        toast({
+          title: "Nenhuma alteração",
+          description: "Não há alterações para salvar.",
+        });
+      }
       
-      toast({
-        title: "Configurações salvas",
-        description: "As configurações do site foram atualizadas com sucesso.",
-      });
-      
-      setSettingsChanged(false);
     } catch (error) {
+      console.error('Erro ao salvar configurações:', error);
       toast({
         title: "Erro",
         description: "Erro ao salvar configurações.",
