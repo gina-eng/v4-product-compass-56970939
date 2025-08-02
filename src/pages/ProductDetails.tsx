@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ExternalLink, User, Clock, CheckCircle, XCircle } from "lucide-react";
 import SpicedTable from "@/components/SpicedTable";
+import ComoEntregoTable from "@/components/ComoEntregoTable";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import { formatCurrency } from "@/lib/formatters";
@@ -15,6 +16,14 @@ interface SpicedData {
   impact: { objetivo: string; perguntas: string; observar: string };
   criticalEvent: { objetivo: string; perguntas: string; observar: string };
   decision: { objetivo: string; perguntas: string; observar: string };
+}
+
+interface ComoEntregoItem {
+  etapa: string;
+  tarefa: string;
+  dri: string;
+  estimativaHoras: string;
+  comoExecutar: string;
 }
 
 interface Product {
@@ -40,6 +49,7 @@ interface Product {
   description: string;
   comoVendo: string;
   spicedData: SpicedData;
+  comoEntregoDados: ComoEntregoItem[];
   oQueEntrego: string;
   paraQuemServe?: string;
   comoEntregaValor?: string;
@@ -97,6 +107,7 @@ const ProductDetails = () => {
             description: data.description,
             comoVendo: data.como_vendo,
             spicedData: (data.spiced_data as unknown) as SpicedData,
+            comoEntregoDados: (data.como_entrego_dados as unknown as ComoEntregoItem[]) || [],
             oQueEntrego: data.o_que_entrego,
             paraQuemServe: data.para_quem_serve,
             comoEntregaValor: data.como_entrega_valor,
@@ -267,6 +278,12 @@ const ProductDetails = () => {
             
             {/* Tabela SPICED */}
             <SpicedTable data={product.spicedData} readOnly />
+          </Card>
+
+          {/* Como eu entrego */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu entrego?</h2>
+            <ComoEntregoTable data={product.comoEntregoDados} readOnly />
           </Card>
 
           {/* Recursos disponíveis */}

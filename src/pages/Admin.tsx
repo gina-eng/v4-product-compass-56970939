@@ -12,6 +12,7 @@ import { Check, X, Plus, Edit, Trash2, Filter } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import SpicedTable from "@/components/SpicedTable";
+import ComoEntregoTable from "@/components/ComoEntregoTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Header from "@/components/Header";
@@ -23,6 +24,14 @@ interface SpicedData {
   impact: { objetivo: string; perguntas: string; observar: string };
   criticalEvent: { objetivo: string; perguntas: string; observar: string };
   decision: { objetivo: string; perguntas: string; observar: string };
+}
+
+interface ComoEntregoItem {
+  etapa: string;
+  tarefa: string;
+  dri: string;
+  estimativaHoras: string;
+  comoExecutar: string;
 }
 
 interface Product {
@@ -48,6 +57,7 @@ interface Product {
   description: string;
   comoVendo: string;
   spicedData: SpicedData;
+  comoEntregoDados: ComoEntregoItem[];
   oQueEntrego: string;
   paraQuemServe?: string;
   comoEntregaValor?: string;
@@ -110,6 +120,7 @@ const Admin = () => {
       criticalEvent: { objetivo: "", perguntas: "", observar: "" },
       decision: { objetivo: "", perguntas: "", observar: "" }
     } as SpicedData,
+    comoEntregoDados: [] as ComoEntregoItem[],
     oQueEntrego: "",
     paraQuemServe: "",
     comoEntregaValor: "",
@@ -261,7 +272,6 @@ const Admin = () => {
         certificacaoUrl: product.certificacao_url,
         status: product.status,
         description: product.description,
-        
         comoVendo: product.como_vendo,
         spicedData: (product.spiced_data as unknown as SpicedData) || {
           situation: { objetivo: "", perguntas: "", observar: "" },
@@ -270,6 +280,7 @@ const Admin = () => {
           criticalEvent: { objetivo: "", perguntas: "", observar: "" },
           decision: { objetivo: "", perguntas: "", observar: "" }
         },
+        comoEntregoDados: (product.como_entrego_dados as unknown as ComoEntregoItem[]) || [],
         oQueEntrego: product.o_que_entrego,
         paraQuemServe: product.para_quem_serve,
         comoEntregaValor: product.como_entrega_valor,
@@ -324,6 +335,7 @@ const Admin = () => {
             description: formData.description,
             como_vendo: formData.comoVendo,
             spiced_data: formData.spicedData as any,
+            como_entrego_dados: formData.comoEntregoDados as any,
             o_que_entrego: formData.oQueEntrego,
             para_quem_serve: formData.paraQuemServe || null,
             como_entrega_valor: formData.comoEntregaValor || null,
@@ -374,6 +386,7 @@ const Admin = () => {
               criticalEvent: { objetivo: "", perguntas: "", observar: "" },
               decision: { objetivo: "", perguntas: "", observar: "" }
             }) as any,
+            como_entrego_dados: (formData.comoEntregoDados || []) as any,
             o_que_entrego: formData.oQueEntrego,
             para_quem_serve: formData.paraQuemServe || null,
             como_entrega_valor: formData.comoEntregaValor || null,
@@ -423,6 +436,7 @@ const Admin = () => {
           criticalEvent: { objetivo: "", perguntas: "", observar: "" },
           decision: { objetivo: "", perguntas: "", observar: "" }
         },
+        comoEntregoDados: [],
         oQueEntrego: "",
         paraQuemServe: "",
         comoEntregaValor: "",
@@ -468,6 +482,7 @@ const Admin = () => {
       description: product.description,
       comoVendo: product.comoVendo,
       spicedData: product.spicedData,
+      comoEntregoDados: product.comoEntregoDados,
       oQueEntrego: product.oQueEntrego,
       paraQuemServe: product.paraQuemServe || "",
       comoEntregaValor: product.comoEntregaValor || "",
@@ -538,6 +553,7 @@ const Admin = () => {
         criticalEvent: { objetivo: "", perguntas: "", observar: "" },
         decision: { objetivo: "", perguntas: "", observar: "" }
       },
+      comoEntregoDados: [],
       oQueEntrego: "",
       paraQuemServe: "",
       comoEntregaValor: "",
@@ -922,6 +938,13 @@ const Admin = () => {
                         <SpicedTable 
                           data={formData.spicedData}
                           onChange={(data) => setFormData({...formData, spicedData: data})}
+                        />
+                      </div>
+
+                      <div className="space-y-4">
+                        <ComoEntregoTable 
+                          data={formData.comoEntregoDados}
+                          onChange={(data) => setFormData({...formData, comoEntregoDados: data})}
                         />
                       </div>
 

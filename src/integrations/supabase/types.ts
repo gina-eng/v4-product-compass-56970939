@@ -23,6 +23,7 @@ export type Database = {
           certificacao: boolean
           certificacao_url: string | null
           como_entrega_valor: string | null
+          como_entrego_dados: Json | null
           como_vendo: string
           created_at: string
           description: string
@@ -58,6 +59,7 @@ export type Database = {
           certificacao?: boolean
           certificacao_url?: string | null
           como_entrega_valor?: string | null
+          como_entrego_dados?: Json | null
           como_vendo: string
           created_at?: string
           description: string
@@ -93,6 +95,7 @@ export type Database = {
           certificacao?: boolean
           certificacao_url?: string | null
           como_entrega_valor?: string | null
+          como_entrego_dados?: Json | null
           como_vendo?: string
           created_at?: string
           description?: string
