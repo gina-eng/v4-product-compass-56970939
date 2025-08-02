@@ -42,6 +42,12 @@ interface Product {
   spicedData: SpicedData;
   entregas: string;
   prerequisitos: string;
+  bonusKpi?: string;
+  kpiPrincipal?: "CPL" | "CTR" | "CONVERSÃO" | "ENGAJAMENTO" | "TAXA DE ABERTURA";
+  tempoMetaKpi?: "3 meses" | "6 meses" | "12 meses";
+  garantiaEspecifica?: string;
+  stackDigital?: string;
+  entregaveisRelacionados?: string;
 }
 
 const ProductDetails = () => {
@@ -92,7 +98,13 @@ const ProductDetails = () => {
             objetivos: data.objetivos,
             spicedData: (data.spiced_data as unknown) as SpicedData,
             entregas: data.entregas,
-            prerequisitos: data.prerequisitos
+            prerequisitos: data.prerequisitos,
+            bonusKpi: data.bonus_kpi,
+            kpiPrincipal: data.kpi_principal,
+            tempoMetaKpi: data.tempo_meta_kpi,
+            garantiaEspecifica: data.garantia_especifica,
+            stackDigital: data.stack_digital,
+            entregaveisRelacionados: data.entregaveis_relacionados
           };
           setProduct(formattedProduct);
         }
@@ -282,6 +294,54 @@ const ProductDetails = () => {
                   </div>
                 );
               })}
+            </div>
+          </Card>
+
+          {/* KPIs e Informações Adicionais */}
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">KPIs e Informações Adicionais</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {product.kpiPrincipal && (
+                <div>
+                  <h3 className="font-medium text-foreground mb-2">KPI Principal</h3>
+                  <p className="text-muted-foreground">{product.kpiPrincipal}</p>
+                </div>
+              )}
+              
+              {product.tempoMetaKpi && (
+                <div>
+                  <h3 className="font-medium text-foreground mb-2">Tempo Meta KPI</h3>
+                  <p className="text-muted-foreground">{product.tempoMetaKpi}</p>
+                </div>
+              )}
+              
+              {product.bonusKpi && (
+                <div className="md:col-span-2">
+                  <h3 className="font-medium text-foreground mb-2">Bônus KPI</h3>
+                  <p className="text-muted-foreground leading-relaxed">{product.bonusKpi}</p>
+                </div>
+              )}
+              
+              {product.garantiaEspecifica && (
+                <div className="md:col-span-2">
+                  <h3 className="font-medium text-foreground mb-2">Garantia Específica do Produto</h3>
+                  <p className="text-muted-foreground leading-relaxed">{product.garantiaEspecifica}</p>
+                </div>
+              )}
+              
+              {product.stackDigital && (
+                <div className="md:col-span-2">
+                  <h3 className="font-medium text-foreground mb-2">Stack Digital Acoplada</h3>
+                  <p className="text-muted-foreground leading-relaxed">{product.stackDigital}</p>
+                </div>
+              )}
+              
+              {product.entregaveisRelacionados && (
+                <div className="md:col-span-2">
+                  <h3 className="font-medium text-foreground mb-2">Entregáveis Relacionados</h3>
+                  <p className="text-muted-foreground leading-relaxed">{product.entregaveisRelacionados}</p>
+                </div>
+              )}
             </div>
           </Card>
         </div>

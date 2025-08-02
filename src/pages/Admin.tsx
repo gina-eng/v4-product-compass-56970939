@@ -47,6 +47,12 @@ interface Product {
   spicedData: SpicedData;
   entregas: string;
   prerequisitos: string;
+  bonusKpi?: string;
+  kpiPrincipal?: "CPL" | "CTR" | "CONVERSÃO" | "ENGAJAMENTO" | "TAXA DE ABERTURA";
+  tempoMetaKpi?: "3 meses" | "6 meses" | "12 meses";
+  garantiaEspecifica?: string;
+  stackDigital?: string;
+  entregaveisRelacionados?: string;
 }
 
 const Admin = () => {
@@ -106,7 +112,13 @@ const Admin = () => {
         objetivos: product.objetivos,
         spicedData: (product.spiced_data as unknown) as SpicedData,
         entregas: product.entregas,
-        prerequisitos: product.prerequisitos
+        prerequisitos: product.prerequisitos,
+        bonusKpi: product.bonus_kpi,
+        kpiPrincipal: product.kpi_principal,
+        tempoMetaKpi: product.tempo_meta_kpi,
+        garantiaEspecifica: product.garantia_especifica,
+        stackDigital: product.stack_digital,
+        entregaveisRelacionados: product.entregaveis_relacionados
       })) || [];
       
       setProducts(formattedProducts);
@@ -183,6 +195,12 @@ const Admin = () => {
             spiced_data: formData.spicedData as any,
             entregas: formData.entregas,
             prerequisitos: formData.prerequisitos,
+            bonus_kpi: formData.bonusKpi,
+            kpi_principal: formData.kpiPrincipal,
+            tempo_meta_kpi: formData.tempoMetaKpi,
+            garantia_especifica: formData.garantiaEspecifica,
+            stack_digital: formData.stackDigital,
+            entregaveis_relacionados: formData.entregaveisRelacionados,
           })
           .eq('id', editingProduct.id);
 
@@ -227,6 +245,12 @@ const Admin = () => {
             }) as any,
             entregas: formData.entregas,
             prerequisitos: formData.prerequisitos,
+            bonus_kpi: formData.bonusKpi,
+            kpi_principal: formData.kpiPrincipal,
+            tempo_meta_kpi: formData.tempoMetaKpi,
+            garantia_especifica: formData.garantiaEspecifica,
+            stack_digital: formData.stackDigital,
+            entregaveis_relacionados: formData.entregaveisRelacionados,
           });
 
         if (error) throw error;
@@ -457,6 +481,89 @@ const Admin = () => {
                       placeholder="Requisitos necessários para iniciar o projeto"
                       rows={3}
                     />
+                  </div>
+                </div>
+
+                {/* Novos campos de KPI e informações adicionais */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-foreground">KPIs e Informações Adicionais</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="bonusKpi">Bônus KPI</Label>
+                      <Textarea
+                        id="bonusKpi"
+                        value={formData.bonusKpi || ""}
+                        onChange={(e) => setFormData({...formData, bonusKpi: e.target.value})}
+                        placeholder="Descreva o bônus relacionado ao KPI"
+                        rows={3}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="kpiPrincipal">KPI Principal</Label>
+                      <Select value={formData.kpiPrincipal || ""} onValueChange={(value) => setFormData({...formData, kpiPrincipal: value as any})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o KPI principal" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="CPL">CPL</SelectItem>
+                          <SelectItem value="CTR">CTR</SelectItem>
+                          <SelectItem value="CONVERSÃO">CONVERSÃO</SelectItem>
+                          <SelectItem value="ENGAJAMENTO">ENGAJAMENTO</SelectItem>
+                          <SelectItem value="TAXA DE ABERTURA">TAXA DE ABERTURA</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="tempoMetaKpi">Tempo Meta KPI</Label>
+                      <Select value={formData.tempoMetaKpi || ""} onValueChange={(value) => setFormData({...formData, tempoMetaKpi: value as any})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o prazo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="3 meses">3 meses</SelectItem>
+                          <SelectItem value="6 meses">6 meses</SelectItem>
+                          <SelectItem value="12 meses">12 meses</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="garantiaEspecifica">Garantia Específica do Produto</Label>
+                      <Textarea
+                        id="garantiaEspecifica"
+                        value={formData.garantiaEspecifica || ""}
+                        onChange={(e) => setFormData({...formData, garantiaEspecifica: e.target.value})}
+                        placeholder="Descreva as garantias específicas do produto"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="stackDigital">Stack Digital Acoplada</Label>
+                      <Textarea
+                        id="stackDigital"
+                        value={formData.stackDigital || ""}
+                        onChange={(e) => setFormData({...formData, stackDigital: e.target.value})}
+                        placeholder="Descreva a stack digital utilizada"
+                        rows={3}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="entregaveisRelacionados">Entregáveis Relacionados</Label>
+                      <Textarea
+                        id="entregaveisRelacionados"
+                        value={formData.entregaveisRelacionados || ""}
+                        onChange={(e) => setFormData({...formData, entregaveisRelacionados: e.target.value})}
+                        placeholder="Liste os entregáveis relacionados ao produto"
+                        rows={3}
+                      />
+                    </div>
                   </div>
                 </div>
 
