@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      positions: {
+        Row: {
+          cph: number
+          created_at: string
+          id: string
+          investimento_total: number
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          cph: number
+          created_at?: string
+          id?: string
+          investimento_total: number
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          cph?: number
+          created_at?: string
+          id?: string
+          investimento_total?: number
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           bonus_kpi: string | null
