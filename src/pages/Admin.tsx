@@ -15,6 +15,7 @@ import SpicedTable from "@/components/SpicedTable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Header from "@/components/Header";
+import { Link } from "react-router-dom";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -533,16 +534,20 @@ const Admin = () => {
       <div className="max-w-7xl mx-auto p-8 space-y-8">
         <h1 className="text-3xl font-bold text-foreground mb-8">Administração</h1>
 
-        <Tabs defaultValue="main" className="space-y-6">
+        <Tabs defaultValue="products" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="main">Página Principal</TabsTrigger>
+            <Link to="/" className="flex items-center">
+              <TabsTrigger value="main" asChild>
+                <span>Página Principal</span>
+              </TabsTrigger>
+            </Link>
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="settings">Informações Gerais</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="main" className="space-y-6">
+          <TabsContent value="settings" className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-6">Configurações do Site</h1>
+              <h1 className="text-2xl font-bold mb-6">Informações Gerais do Site</h1>
               
               <div className="space-y-6">
                 <Card className="p-6">
@@ -1256,10 +1261,10 @@ const Admin = () => {
 
           <TabsContent value="settings">
             <Card className="p-6">
-              <h2 className="text-2xl font-semibold mb-6">Informações Gerais</h2>
+              <h2 className="text-2xl font-semibold mb-6">Outras Configurações</h2>
               <div className="space-y-4">
                 <p className="text-muted-foreground">
-                  Configurações gerais do sistema serão implementadas aqui.
+                  Outras configurações do sistema serão implementadas aqui no futuro.
                 </p>
               </div>
             </Card>
