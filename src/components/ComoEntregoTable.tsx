@@ -13,29 +13,26 @@ interface ComoEntregoItem {
   comoExecutar: string; // URL do POP
 }
 
+interface Position {
+  id: string;
+  nome: string;
+  investimento_total: number;
+  cph: number;
+}
+
 interface ComoEntregoTableProps {
   data: ComoEntregoItem[];
   onChange?: (data: ComoEntregoItem[]) => void;
   readOnly?: boolean;
+  positions?: Position[];
 }
 
-const driOptions = [
-  "Gestor de Projetos",
-  "Designer",
-  "Desenvolvedor Frontend",
-  "Desenvolvedor Backend",
-  "Analista de Marketing", 
-  "Copywriter",
-  "Social Media",
-  "Especialista em SEO",
-  "Consultor de Negócios",
-  "Analista de Dados"
-];
 
 const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({ 
   data = [], 
   onChange, 
-  readOnly = false 
+  readOnly = false,
+  positions = []
 }) => {
   const handleAddRow = () => {
     if (!onChange) return;
@@ -187,9 +184,9 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
                           <SelectValue placeholder="Responsável" />
                         </SelectTrigger>
                         <SelectContent>
-                          {driOptions.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
+                          {positions.map((position) => (
+                            <SelectItem key={position.id} value={position.nome}>
+                              {position.nome}
                             </SelectItem>
                           ))}
                         </SelectContent>

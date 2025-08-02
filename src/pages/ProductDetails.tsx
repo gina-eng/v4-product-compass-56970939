@@ -26,6 +26,13 @@ interface ComoEntregoItem {
   comoExecutar: string;
 }
 
+interface Position {
+  id: string;
+  nome: string;
+  investimento_total: number;
+  cph: number;
+}
+
 interface Product {
   id: string;
   produto: string;
@@ -65,7 +72,22 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
+  const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const fetchPositions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('positions' as any)
+        .select('*')
+        .order('nome');
+      
+      if (error) throw error;
+      setPositions((data as unknown as Position[]) || []);
+    } catch (error) {
+      console.error('Erro ao buscar posições:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -128,6 +150,7 @@ const ProductDetails = () => {
     };
 
     fetchProduct();
+    fetchPositions();
   }, [id]);
 
   if (loading) {
@@ -283,7 +306,7 @@ const ProductDetails = () => {
           {/* Como eu entrego */}
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu entrego?</h2>
-            <ComoEntregoTable data={product.comoEntregoDados} readOnly />
+            <ComoEntregoTable data={product.comoEntregoDados} readOnly positions={positions} />
           </Card>
 
           {/* Recursos disponíveis */}

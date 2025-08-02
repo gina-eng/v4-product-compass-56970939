@@ -1073,6 +1073,7 @@ const Admin = () => {
                         <ComoEntregoTable 
                           data={formData.comoEntregoDados}
                           onChange={(data) => setFormData({...formData, comoEntregoDados: data})}
+                          positions={positions}
                         />
                       </div>
 
