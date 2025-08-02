@@ -55,6 +55,8 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
     }
 
     try {
+      console.log('Tentando salvar no banco:', { key, value });
+      
       const { error } = await supabase
         .from('site_settings')
         .upsert({ 
@@ -63,7 +65,16 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
           description: getDescriptionForKey(key)
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro Supabase:', error);
+        throw error;
+      }
+      
+      console.log('Salvamento no banco realizado com sucesso');
+      
+      // Forçar atualização dos dados após salvar
+      await fetchSettings();
+      
       return true;
       
     } catch (error) {
