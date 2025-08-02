@@ -51,7 +51,7 @@ const ProductPortfolio = () => {
   ];
 
   const filteredProducts = products
-    .filter(product => product.status === "Disponível")
+    .filter(product => product.status === "Disponível" || product.status === "Em produção")
     .filter(product => activeFilter === "all" || product.category === activeFilter);
 
   const handleViewDetails = (productId: string) => {
