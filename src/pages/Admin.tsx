@@ -1995,6 +1995,106 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="materials">
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Materiais de Apoio</h2>
+                <Button onClick={openNewMaterialDialog}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Novo Material
+                </Button>
+              </div>
+
+              {supportMaterials.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground mb-4">Nenhum material de apoio cadastrado.</p>
+                  <Button onClick={openNewMaterialDialog}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Criar Primeiro Material
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {supportMaterials.map((material) => (
+                    <Card key={material.id} className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold text-sm">{material.nome_arquivo}</h3>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditMaterial(material)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteMaterial(material.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {material.url_direcionamento}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Criado em {new Date(material.created_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              <Dialog open={isMaterialDialogOpen} onOpenChange={setIsMaterialDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingMaterial ? "Editar Material" : "Novo Material de Apoio"}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {editingMaterial ? "Atualize as informações do material" : "Preencha os dados do novo material"}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="materialNome">Nome do Arquivo</Label>
+                      <Input
+                        id="materialNome"
+                        value={materialForm.nome_arquivo}
+                        onChange={(e) => setMaterialForm({ ...materialForm, nome_arquivo: e.target.value })}
+                        placeholder="Ex: Modelo de Proposta V2"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="materialUrl">URL de Direcionamento</Label>
+                      <Input
+                        id="materialUrl"
+                        value={materialForm.url_direcionamento}
+                        onChange={(e) => setMaterialForm({ ...materialForm, url_direcionamento: e.target.value })}
+                        placeholder="https://exemplo.com/documento"
+                      />
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsMaterialDialogOpen(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button onClick={handleMaterialSubmit}>
+                      {editingMaterial ? "Atualizar" : "Criar"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="settings">
             <Card className="p-6">
