@@ -555,6 +555,7 @@ const Admin = () => {
   // Função para buscar todas as posições de todos os produtos
   const fetchAllProductPositions = async () => {
     try {
+      console.log('Buscando todas as posições dos produtos...');
       const { data, error } = await supabase
         .from('product_positions')
         .select(`
@@ -566,6 +567,7 @@ const Admin = () => {
         `);
 
       if (error) throw error;
+      console.log('Posições carregadas:', data);
 
       // Agrupar por product_id
       const groupedPositions: {[key: string]: any[]} = {};
@@ -576,6 +578,7 @@ const Admin = () => {
         groupedPositions[position.product_id].push(position);
       });
 
+      console.log('Posições agrupadas:', groupedPositions);
       setAllProductPositions(groupedPositions);
     } catch (error) {
       console.error('Erro ao carregar todas as posições:', error);
@@ -852,6 +855,7 @@ const Admin = () => {
         case2DocumentoUrl: ""
       });
       await fetchProducts();
+      await fetchAllProductPositions();
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
       toast({
@@ -1889,12 +1893,16 @@ const Admin = () => {
                               <span className="text-muted-foreground">Valor:</span>
                               <span className="font-medium">
                                 {(() => {
+                                  console.log('Calculando valor para produto:', product.id);
+                                  console.log('AllProductPositions:', allProductPositions);
                                   const positions = allProductPositions[product.id];
+                                  console.log('Posições deste produto:', positions);
                                   if (!positions || positions.length === 0) {
                                     return "A definir";
                                   }
                                   const totalCSP = positions.reduce((total, pp) => total + (pp.horas_alocadas * pp.positions.cph), 0);
                                   const valorCalculado = totalCSP * (product.markup || 1);
+                                  console.log('Valor calculado:', valorCalculado);
                                   return `R$ ${valorCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
                                 })()}
                               </span>
@@ -1959,12 +1967,15 @@ const Admin = () => {
                               <td className="p-4 text-sm">{product.duracao}</td>
                               <td className="p-4 text-sm font-medium">
                                 {(() => {
+                                  console.log('Calculando valor da tabela para produto:', product.id);
                                   const positions = allProductPositions[product.id];
+                                  console.log('Posições deste produto (tabela):', positions);
                                   if (!positions || positions.length === 0) {
                                     return "A definir";
                                   }
                                   const totalCSP = positions.reduce((total, pp) => total + (pp.horas_alocadas * pp.positions.cph), 0);
                                   const valorCalculado = totalCSP * (product.markup || 1);
+                                  console.log('Valor calculado (tabela):', valorCalculado);
                                   return `R$ ${valorCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
                                 })()}
                               </td>
