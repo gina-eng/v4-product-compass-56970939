@@ -23,16 +23,65 @@ const ProductPortfolio = () => {
           return;
         }
 
-        const formattedProducts = data?.map(product => ({
-          id: product.id,
-          name: product.produto,
-          description: product.description,
-          category: product.categoria,
-          status: product.status,
-          valorBase: product.valor
-        })) || [];
+        if (!data) {
+          setProducts([]);
+          return;
+        }
+
+        // Buscar posições para cada produto
+        const productsWithMargin = await Promise.all(
+          data.map(async (product) => {
+            const { data: positions, error: positionsError } = await supabase
+              .from('product_positions')
+              .select(`
+                *,
+                positions (*)
+              `)
+              .eq('product_id', product.id);
+
+            if (positionsError) {
+              console.error('Error fetching positions:', positionsError);
+            }
+
+            // Calcular margem operacional
+            let margemOperacional = 0;
+            if (positions && positions.length > 0) {
+              const markup = product.markup || 1;
+              const totalCSP = positions.reduce((total: number, pp: any) => {
+                return total + (pp.horas_alocadas * pp.positions.cph);
+              }, 0);
+
+              if (totalCSP > 0) {
+                const faturamentoSemDesconto = totalCSP * markup;
+                const descontoPagamento = faturamentoSemDesconto * 0.17;
+                const descontoCupom = faturamentoSemDesconto * 0.20;
+                const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
+                const royalties = faturamentoComDesconto * 0.17;
+                const taxaPagamento = faturamentoComDesconto * 0.03;
+                const taxaAntecipacao = faturamentoComDesconto * 0.10;
+                const receitaBruta = faturamentoComDesconto - royalties - taxaPagamento - taxaAntecipacao;
+                const impostosReceita = receitaBruta * 0.074;
+                const receitaLiquida = receitaBruta - impostosReceita;
+                const custosDiretos = totalCSP;
+                const margemOperacionalValor = receitaLiquida - custosDiretos;
+                
+                margemOperacional = receitaLiquida > 0 ? (margemOperacionalValor / receitaLiquida) * 100 : 0;
+              }
+            }
+
+            return {
+              id: product.id,
+              name: product.produto,
+              description: product.description,
+              category: product.categoria,
+              status: product.status,
+              valorBase: product.valor,
+              margemOperacional: margemOperacional
+            };
+          })
+        );
         
-        setProducts(formattedProducts);
+        setProducts(productsWithMargin);
       } catch (error) {
         console.error('Error:', error);
       } finally {
@@ -127,6 +176,7 @@ const ProductPortfolio = () => {
                 category={product.category}
                 status={product.status}
                 valorBase={product.valorBase}
+                margemOperacional={product.margemOperacional}
                 onViewDetails={handleViewDetails}
               />
             ))}
