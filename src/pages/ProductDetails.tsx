@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ExternalLink, User, Clock, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, ExternalLink, User, Clock, CheckCircle, XCircle, List, ChevronUp } from "lucide-react";
 import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
 import { supabase } from "@/integrations/supabase/client";
@@ -83,6 +83,37 @@ const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showQuickNav, setShowQuickNav] = useState(false);
+
+  // Detectar scroll para mostrar/ocultar navegação rápida
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowQuickNav(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const tableOfContents = [
+    { id: 'descricao', label: 'Descrição' },
+    { id: 'para-quem-serve', label: 'Pra quem ele serve' },
+    { id: 'como-entrega-valor', label: 'Como ele entrega valor' },
+    { id: 'o-que-entrego', label: 'O que eu entrego' },
+    { id: 'como-vendo', label: 'Como eu vendo' },
+    { id: 'como-entrego', label: 'Como eu entrego' },
+    { id: 'posicoes-alocadas', label: 'Posições Alocadas' },
+    { id: 'recursos-disponiveis', label: 'Recursos Disponíveis' },
+    { id: 'cases', label: 'Cases' },
+    { id: 'kpis', label: 'KPIs e Informações' }
+  ];
 
   const fetchPositions = async () => {
     try {
@@ -282,15 +313,64 @@ const ProductDetails = () => {
           </div>
         </div>
 
+        {/* Sumário/Índice */}
+        <Card className="p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 text-foreground flex items-center gap-2">
+            <List className="h-5 w-5" />
+            Sumário
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {tableOfContents.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className="text-left text-primary hover:text-primary/80 hover:underline transition-colors p-2 rounded hover:bg-muted/50"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </Card>
+
+        {/* Botão de Navegação Rápida */}
+        {showQuickNav && (
+          <div className="fixed bottom-6 right-6 z-50">
+            <div className="bg-background border rounded-lg shadow-lg p-2 max-w-xs">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-foreground">Navegação Rápida</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="h-6 w-6 p-0"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {tableOfContents.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => scrollToSection(item.id)}
+                    className="text-xs text-left text-muted-foreground hover:text-primary block w-full p-1 rounded hover:bg-muted/50 transition-colors"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid gap-6">
           {/* Descrição - O que é o Produto? */}
-          <Card className="p-6">
+          <Card className="p-6" id="descricao">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Descrição - O que é o Produto?</h2>
             <p className="text-muted-foreground leading-relaxed text-justify">{product.description}</p>
           </Card>
 
           {/* Pra quem ele serve */}
-          <Card className="p-6">
+          <Card className="p-6" id="para-quem-serve">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Pra quem ele serve?</h2>
             <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">
               {product.paraQuemServe || "Informação a ser definida para este produto."}
@@ -298,7 +378,7 @@ const ProductDetails = () => {
           </Card>
 
           {/* Como ele entrega valor */}
-          <Card className="p-6">
+          <Card className="p-6" id="como-entrega-valor">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como ele entrega valor?</h2>
             <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">
               {product.comoEntregaValor || "Informação a ser definida para este produto."}
@@ -306,13 +386,13 @@ const ProductDetails = () => {
           </Card>
 
           {/* O que eu entrego */}
-          <Card className="p-6">
+          <Card className="p-6" id="o-que-entrego">
             <h2 className="text-xl font-semibold mb-4 text-foreground">O que eu entrego?</h2>
             <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">{product.oQueEntrego}</div>
           </Card>
 
           {/* Como eu vendo */}
-          <Card className="p-6">
+          <Card className="p-6" id="como-vendo">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu vendo?</h2>
             <div className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line text-justify">{product.comoVendo}</div>
             
@@ -321,13 +401,15 @@ const ProductDetails = () => {
           </Card>
 
           {/* Como eu entrego */}
-          <Card className="p-6">
+          <Card className="p-6" id="como-entrego">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu entrego?</h2>
             <ComoEntregoTable data={product.comoEntregoDados} readOnly positions={positions} />
           </Card>
 
           {/* Posições Alocadas */}
-          <ProductPositions productId={product.id} readOnly />
+          <div id="posicoes-alocadas">
+            <ProductPositions productId={product.id} readOnly />
+          </div>
 
           {/* Botão Playbook */}
           <div className="flex justify-center">
@@ -341,7 +423,7 @@ const ProductDetails = () => {
           </div>
 
           {/* Recursos disponíveis */}
-          <Card className="p-6">
+          <Card className="p-6" id="recursos-disponiveis">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Recursos Disponíveis</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {checkboxItems.map(item => {
@@ -376,7 +458,7 @@ const ProductDetails = () => {
 
           {/* Cases */}
           {(product.case1UnidadeResponsavel || product.case2UnidadeResponsavel) && (
-            <Card className="p-6">
+            <Card className="p-6" id="cases">
               <h2 className="text-xl font-semibold mb-4 text-foreground">Cases</h2>
               <div className="grid gap-6">
                 {product.case1UnidadeResponsavel && (
@@ -439,7 +521,7 @@ const ProductDetails = () => {
           )}
 
           {/* KPIs e Informações Adicionais */}
-          <Card className="p-6">
+          <Card className="p-6" id="kpis">
             <h2 className="text-xl font-semibold mb-4 text-foreground">KPIs e Informações Adicionais</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {product.kpiPrincipal && (
