@@ -169,6 +169,12 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
     return investimento / (horasAlocadas * 168);
   };
 
+  // Calcular totais
+  const totalHoras = productPositions.reduce((total, pp) => total + pp.horas_alocadas, 0);
+  const totalCSP = productPositions.reduce((total, pp) => {
+    return total + calculateCSP(pp.positions.investimento_total, pp.horas_alocadas);
+  }, 0);
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -231,54 +237,63 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
             Nenhuma posição alocada para este produto.
           </p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>POSIÇÃO</TableHead>
-                <TableHead>HORAS ALOCADAS</TableHead>
-                <TableHead>CSP</TableHead>
-                {!readOnly && <TableHead>AÇÕES</TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {productPositions.map((productPosition) => (
-                <TableRow key={productPosition.id}>
-                  <TableCell className="font-medium">
-                    {productPosition.positions.nome}
-                  </TableCell>
-                  <TableCell>{productPosition.horas_alocadas}</TableCell>
-                  <TableCell>
-                    {formatCurrency(
-                      calculateCSP(
-                        productPosition.positions.investimento_total,
-                        productPosition.horas_alocadas
-                      )
-                    )}
-                  </TableCell>
-                  {!readOnly && (
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEdit(productPosition)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(productPosition.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  )}
+          <>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>POSIÇÃO</TableHead>
+                  <TableHead>HORAS ALOCADAS</TableHead>
+                  <TableHead>CSP</TableHead>
+                  {!readOnly && <TableHead>AÇÕES</TableHead>}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {productPositions.map((productPosition) => (
+                  <TableRow key={productPosition.id}>
+                    <TableCell className="font-medium">
+                      {productPosition.positions.nome}
+                    </TableCell>
+                    <TableCell>{productPosition.horas_alocadas}</TableCell>
+                    <TableCell>
+                      {formatCurrency(
+                        calculateCSP(
+                          productPosition.positions.investimento_total,
+                          productPosition.horas_alocadas
+                        )
+                      )}
+                    </TableCell>
+                    {!readOnly && (
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEdit(productPosition)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(productPosition.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+                {/* Linha de total */}
+                <TableRow className="border-t-2 border-border bg-muted/50">
+                  <TableCell className="font-bold">TOTAL</TableCell>
+                  <TableCell className="font-bold">{totalHoras}</TableCell>
+                  <TableCell className="font-bold">{formatCurrency(totalCSP)}</TableCell>
+                  {!readOnly && <TableCell></TableCell>}
+                </TableRow>
+              </TableBody>
+            </Table>
+          </>
         )}
       </CardContent>
     </Card>

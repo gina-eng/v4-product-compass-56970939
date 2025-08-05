@@ -1657,7 +1657,15 @@ const Admin = () => {
                         </div>
                       </div>
 
-                      <DialogFooter>
+                      {/* Posições Alocadas - só aparece na edição */}
+                      {editingProduct && (
+                        <div className="border-t pt-6 mt-6">
+                          <h3 className="text-lg font-semibold mb-4">Posições Alocadas</h3>
+                          <ProductPositions productId={editingProduct.id} />
+                        </div>
+                      )}
+
+                      <DialogFooter className="mt-6">
                         <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                           Cancelar
                         </Button>
@@ -1666,14 +1674,6 @@ const Admin = () => {
                         </Button>
                       </DialogFooter>
                     </form>
-                    
-                    {/* Posições Alocadas - só aparece na edição */}
-                    {editingProduct && (
-                      <div className="border-t pt-6 mt-6">
-                        <h3 className="text-lg font-semibold mb-4">Posições Alocadas</h3>
-                        <ProductPositions productId={editingProduct.id} />
-                      </div>
-                    )}
                   </DialogContent>
                 </Dialog>
               </div>
