@@ -112,6 +112,7 @@ export type Database = {
           icp_url: string | null
           id: string
           kpi_principal: Database["public"]["Enums"]["kpi_tipo"] | null
+          markup: number | null
           o_que_entrego: string
           para_quem_serve: string | null
           pitch: boolean
@@ -156,6 +157,7 @@ export type Database = {
           icp_url?: string | null
           id?: string
           kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
+          markup?: number | null
           o_que_entrego: string
           para_quem_serve?: string | null
           pitch?: boolean
@@ -200,6 +202,7 @@ export type Database = {
           icp_url?: string | null
           id?: string
           kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
+          markup?: number | null
           o_que_entrego?: string
           para_quem_serve?: string | null
           pitch?: boolean

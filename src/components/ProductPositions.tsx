@@ -29,9 +29,11 @@ interface ProductPosition {
 interface ProductPositionsProps {
   productId: string;
   readOnly?: boolean;
+  initialMarkup?: number;
+  onMarkupChange?: (markup: number) => void;
 }
 
-const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps) => {
+const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMarkupChange }: ProductPositionsProps) => {
   const [productPositions, setProductPositions] = useState<ProductPosition[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -40,12 +42,64 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
     position_id: '',
     horas_alocadas: ''
   });
-  const [markup, setMarkup] = useState<number>(1);
+  const [markup, setMarkup] = useState<number>(initialMarkup);
 
   useEffect(() => {
     fetchProductPositions();
     fetchPositions();
+    fetchProductMarkup();
   }, [productId]);
+
+  const fetchProductMarkup = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('markup')
+        .eq('id', productId)
+        .single();
+      
+      if (error) throw error;
+      if (data && data.markup) {
+        setMarkup(data.markup);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar markup do produto:', error);
+    }
+  };
+
+  const updateProductMarkup = async (newMarkup: number) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ markup: newMarkup })
+        .eq('id', productId);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Sucesso",
+        description: "Markup atualizado com sucesso!",
+      });
+      
+      if (onMarkupChange) {
+        onMarkupChange(newMarkup);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar markup:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o markup.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMarkupChange = (newMarkup: number) => {
+    setMarkup(newMarkup);
+    if (!readOnly) {
+      updateProductMarkup(newMarkup);
+    }
+  };
 
   const fetchProductPositions = async () => {
     try {
@@ -324,7 +378,7 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
                   type="number"
                   step="0.1"
                   value={markup}
-                  onChange={(e) => setMarkup(parseFloat(e.target.value) || 1)}
+                  onChange={(e) => handleMarkupChange(parseFloat(e.target.value) || 1)}
                   className="w-32"
                   placeholder="Ex: 1.5"
                 />

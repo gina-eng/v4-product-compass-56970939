@@ -75,6 +75,7 @@ interface Product {
   case2UnidadeResponsavel?: string;
   case2ResponsavelProjeto?: string;
   case2DocumentoUrl?: string;
+  markup?: number;
 }
 
 const ProductDetails = () => {
@@ -83,6 +84,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
+  const [markup, setMarkup] = useState<number>(1);
   const [showQuickNav, setShowQuickNav] = useState(false);
 
   // Detectar scroll para mostrar/ocultar navegação rápida
@@ -186,9 +188,11 @@ const ProductDetails = () => {
             case2Name: data.case_2_name,
             case2UnidadeResponsavel: data.case_2_unidade_responsavel,
             case2ResponsavelProjeto: data.case_2_responsavel_projeto,
-            case2DocumentoUrl: data.case_2_documento_url
+            case2DocumentoUrl: data.case_2_documento_url,
+            markup: data.markup || 1
           };
           setProduct(formattedProduct);
+          setMarkup(data.markup || 1);
         }
       } catch (error) {
         console.error('Error:', error);

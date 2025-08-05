@@ -91,6 +91,7 @@ interface Product {
   case2UnidadeResponsavel?: string;
   case2ResponsavelProjeto?: string;
   case2DocumentoUrl?: string;
+  markup?: number;
 }
 
 const Admin = () => {
@@ -135,6 +136,7 @@ const Admin = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>("Todas");
   const [statusFilter, setStatusFilter] = useState<string>("Todos");
   const [loading, setLoading] = useState(true);
+  const [currentMarkup, setCurrentMarkup] = useState<number>(1);
   const [formData, setFormData] = useState({
     produto: "",
     categoria: "saber",
@@ -565,6 +567,7 @@ const Admin = () => {
         case2UnidadeResponsavel: product.case_2_unidade_responsavel,
         case2ResponsavelProjeto: product.case_2_responsavel_projeto,
         case2DocumentoUrl: product.case_2_documento_url,
+        markup: product.markup || 1,
       }));
 
       setProducts(formattedProducts);
@@ -1661,7 +1664,11 @@ const Admin = () => {
                       {editingProduct && (
                         <div className="border-t pt-6 mt-6">
                           <h3 className="text-lg font-semibold mb-4">Posições Alocadas</h3>
-                          <ProductPositions productId={editingProduct.id} />
+                          <ProductPositions 
+                            productId={editingProduct.id} 
+                            initialMarkup={editingProduct.markup || 1}
+                            onMarkupChange={(markup) => setCurrentMarkup(markup)}
+                          />
                         </div>
                       )}
 
