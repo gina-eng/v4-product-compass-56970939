@@ -137,6 +137,7 @@ const Admin = () => {
   const [statusFilter, setStatusFilter] = useState<string>("Todos");
   const [loading, setLoading] = useState(true);
   const [currentMarkup, setCurrentMarkup] = useState<number>(1);
+  const [productPositions, setProductPositions] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     produto: "",
     categoria: "saber",
@@ -190,6 +191,41 @@ const Admin = () => {
     fetchPositions();
     fetchSupportMaterials();
   }, []);
+
+  // Buscar posições do produto quando estiver editando
+  useEffect(() => {
+    if (editingProduct) {
+      fetchProductPositions(editingProduct.id);
+      setCurrentMarkup(editingProduct.markup || 1);
+    } else {
+      setProductPositions([]);
+    }
+  }, [editingProduct]);
+
+  const fetchProductPositions = async (productId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('product_positions')
+        .select(`
+          id,
+          product_id,
+          position_id,
+          horas_alocadas,
+          positions (
+            id,
+            nome,
+            investimento_total,
+            cph
+          )
+        `)
+        .eq('product_id', productId);
+
+      if (error) throw error;
+      setProductPositions(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar posições do produto:', error);
+    }
+  };
 
   // Funções para gerenciar posições
   const fetchPositions = async () => {
@@ -1276,14 +1312,19 @@ const Admin = () => {
                           />
                         </div>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="valor">Valor</Label>
-                          <Input
-                            id="valor"
-                            value={formData.valor}
-                            onChange={(e) => setFormData({...formData, valor: e.target.value})}
-                            required
-                          />
+        <div className="space-y-2">
+                          <Label htmlFor="valor">Valor Base (Faturamento MRR - Sem Desconto)</Label>
+                          <div className="p-3 bg-muted rounded-md">
+                            <span className="text-lg font-semibold">
+                              {editingProduct && productPositions.length > 0 
+                                ? `R$ ${(productPositions.reduce((total, pp) => total + (pp.horas_alocadas * pp.positions.cph), 0) * currentMarkup).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                                : "A definir"
+                              }
+                            </span>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Calculado automaticamente baseado nas posições alocadas e markup
+                            </p>
+                          </div>
                         </div>
 
                         <div className="space-y-2">
