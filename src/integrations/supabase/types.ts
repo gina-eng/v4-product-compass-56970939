@@ -203,6 +203,30 @@ export type Database = {
         }
         Relationships: []
       }
+      support_materials: {
+        Row: {
+          created_at: string
+          id: string
+          nome_arquivo: string
+          updated_at: string
+          url_direcionamento: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome_arquivo: string
+          updated_at?: string
+          url_direcionamento: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome_arquivo?: string
+          updated_at?: string
+          url_direcionamento?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

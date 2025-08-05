@@ -1,6 +1,12 @@
-import { Building2, Settings, Home } from "lucide-react";
+import { Building2, Settings, Home, Menu, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   return (
@@ -24,6 +30,22 @@ const Header = () => {
                 Home
               </Button>
             </Link>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-header-foreground hover:bg-white/10">
+                  <Menu className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/materiais-apoio" className="flex items-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Materiais de Apoio
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

@@ -42,6 +42,13 @@ interface ComoEntregoItem {
   comoExecutar: string;
 }
 
+interface SupportMaterial {
+  id: string;
+  nome_arquivo: string;
+  url_direcionamento: string;
+  created_at: string;
+}
+
 interface Product {
   id: string;
   produto: string;
@@ -96,6 +103,15 @@ const Admin = () => {
     nome: '',
     investimento_total: '',
     cph: ''
+  });
+
+  // Estados para gerenciar materiais de apoio
+  const [supportMaterials, setSupportMaterials] = useState<SupportMaterial[]>([]);
+  const [isMaterialDialogOpen, setIsMaterialDialogOpen] = useState(false);
+  const [editingMaterial, setEditingMaterial] = useState<SupportMaterial | null>(null);
+  const [materialForm, setMaterialForm] = useState({
+    nome_arquivo: '',
+    url_direcionamento: ''
   });
   const [localSettings, setLocalSettings] = useState({
     step_title: '',
@@ -169,6 +185,7 @@ const Admin = () => {
   useEffect(() => {
     fetchProducts();
     fetchPositions();
+    fetchSupportMaterials();
   }, []);
 
   // Funções para gerenciar posições
@@ -277,6 +294,112 @@ const Admin = () => {
     setEditingPosition(null);
     setPositionForm({ nome: '', investimento_total: '', cph: '' });
     setIsPositionDialogOpen(true);
+  };
+
+  // Funções para gerenciar materiais de apoio
+  const fetchSupportMaterials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('support_materials')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setSupportMaterials(data || []);
+    } catch (error) {
+      console.error('Erro ao buscar materiais:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os materiais de apoio.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMaterialSubmit = async () => {
+    try {
+      const materialData = {
+        nome_arquivo: materialForm.nome_arquivo,
+        url_direcionamento: materialForm.url_direcionamento
+      };
+
+      if (editingMaterial) {
+        const { error } = await supabase
+          .from('support_materials')
+          .update(materialData)
+          .eq('id', editingMaterial.id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Material atualizado com sucesso!",
+        });
+      } else {
+        const { error } = await supabase
+          .from('support_materials')
+          .insert([materialData]);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Material criado com sucesso!",
+        });
+      }
+
+      setIsMaterialDialogOpen(false);
+      setEditingMaterial(null);
+      setMaterialForm({ nome_arquivo: '', url_direcionamento: '' });
+      fetchSupportMaterials();
+    } catch (error) {
+      console.error('Erro ao salvar material:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar o material.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditMaterial = (material: SupportMaterial) => {
+    setEditingMaterial(material);
+    setMaterialForm({
+      nome_arquivo: material.nome_arquivo,
+      url_direcionamento: material.url_direcionamento
+    });
+    setIsMaterialDialogOpen(true);
+  };
+
+  const handleDeleteMaterial = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('support_materials')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Sucesso",
+        description: "Material excluído com sucesso!",
+      });
+      
+      fetchSupportMaterials();
+    } catch (error) {
+      console.error('Erro ao excluir material:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir o material.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openNewMaterialDialog = () => {
+    setEditingMaterial(null);
+    setMaterialForm({ nome_arquivo: '', url_direcionamento: '' });
+    setIsMaterialDialogOpen(true);
   };
 
   // Sincronizar configurações locais com as globais
@@ -820,8 +943,110 @@ const Admin = () => {
           <TabsList>
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="positions">Posições & Custos</TabsTrigger>
+            <TabsTrigger value="materials">Materiais de Apoio</TabsTrigger>
             <TabsTrigger value="settings">Informações Gerais</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="materials">
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Materiais de Apoio</h2>
+                <Button onClick={openNewMaterialDialog}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Novo Material
+                </Button>
+              </div>
+
+              {supportMaterials.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground mb-4">Nenhum material de apoio cadastrado.</p>
+                  <Button onClick={openNewMaterialDialog}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Criar Primeiro Material
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {supportMaterials.map((material) => (
+                    <Card key={material.id} className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold text-sm">{material.nome_arquivo}</h3>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditMaterial(material)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteMaterial(material.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {material.url_direcionamento}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Criado em {new Date(material.created_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              <Dialog open={isMaterialDialogOpen} onOpenChange={setIsMaterialDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingMaterial ? "Editar Material" : "Novo Material de Apoio"}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {editingMaterial ? "Atualize as informações do material" : "Preencha os dados do novo material"}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="materialNome">Nome do Arquivo</Label>
+                      <Input
+                        id="materialNome"
+                        value={materialForm.nome_arquivo}
+                        onChange={(e) => setMaterialForm({ ...materialForm, nome_arquivo: e.target.value })}
+                        placeholder="Ex: Modelo de Proposta V2"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="materialUrl">URL de Direcionamento</Label>
+                      <Input
+                        id="materialUrl"
+                        value={materialForm.url_direcionamento}
+                        onChange={(e) => setMaterialForm({ ...materialForm, url_direcionamento: e.target.value })}
+                        placeholder="https://exemplo.com/documento"
+                      />
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsMaterialDialogOpen(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button onClick={handleMaterialSubmit}>
+                      {editingMaterial ? "Atualizar" : "Criar"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
             <div>
@@ -1763,6 +1988,107 @@ const Admin = () => {
                     </Button>
                     <Button onClick={handlePositionSubmit}>
                       {editingPosition ? "Atualizar" : "Criar"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="materials">
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Materiais de Apoio</h2>
+                <Button onClick={openNewMaterialDialog}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Novo Material
+                </Button>
+              </div>
+
+              {supportMaterials.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground mb-4">Nenhum material de apoio cadastrado.</p>
+                  <Button onClick={openNewMaterialDialog}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Criar Primeiro Material
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {supportMaterials.map((material) => (
+                    <Card key={material.id} className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold text-sm">{material.nome_arquivo}</h3>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditMaterial(material)}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteMaterial(material.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {material.url_direcionamento}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Criado em {new Date(material.created_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              <Dialog open={isMaterialDialogOpen} onOpenChange={setIsMaterialDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {editingMaterial ? "Editar Material" : "Novo Material de Apoio"}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {editingMaterial ? "Atualize as informações do material" : "Preencha os dados do novo material"}
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="materialNome">Nome do Arquivo</Label>
+                      <Input
+                        id="materialNome"
+                        value={materialForm.nome_arquivo}
+                        onChange={(e) => setMaterialForm({ ...materialForm, nome_arquivo: e.target.value })}
+                        placeholder="Ex: Modelo de Proposta V2"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="materialUrl">URL de Direcionamento</Label>
+                      <Input
+                        id="materialUrl"
+                        value={materialForm.url_direcionamento}
+                        onChange={(e) => setMaterialForm({ ...materialForm, url_direcionamento: e.target.value })}
+                        placeholder="https://exemplo.com/documento"
+                      />
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsMaterialDialogOpen(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button onClick={handleMaterialSubmit}>
+                      {editingMaterial ? "Atualizar" : "Criar"}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
