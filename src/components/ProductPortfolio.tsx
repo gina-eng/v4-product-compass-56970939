@@ -43,8 +43,10 @@ const ProductPortfolio = () => {
               console.error('Error fetching positions:', positionsError);
             }
 
-            // Calcular margem operacional
+            // Calcular valores DRE
             let margemOperacional = 0;
+            let faturamentoSemDesconto = 0;
+            
             if (positions && positions.length > 0) {
               const markup = product.markup || 1;
               const totalCSP = positions.reduce((total: number, pp: any) => {
@@ -52,7 +54,10 @@ const ProductPortfolio = () => {
               }, 0);
 
               if (totalCSP > 0) {
-                const faturamentoSemDesconto = totalCSP * markup;
+                // Faturamento (MRR) - Sem Desconto
+                faturamentoSemDesconto = totalCSP * markup;
+                
+                // Continuando os cálculos para margem operacional
                 const descontoPagamento = faturamentoSemDesconto * 0.17;
                 const descontoCupom = faturamentoSemDesconto * 0.20;
                 const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
@@ -75,7 +80,7 @@ const ProductPortfolio = () => {
               description: product.description,
               category: product.categoria,
               status: product.status,
-              valorBase: product.valor,
+              valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : product.valor,
               margemOperacional: margemOperacional
             };
           })
