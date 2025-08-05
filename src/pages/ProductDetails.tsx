@@ -227,8 +227,8 @@ const ProductDetails = () => {
     fetchProductPositions();
   }, [id]);
 
-  // Calcular margem operacional
-  const calculateOperationalMargin = () => {
+  // Calcular margem operacional em percentual
+  const calculateOperationalMarginPercentage = () => {
     if (!productPositions.length) return 0;
     
     const totalCSP = productPositions.reduce((total, pp) => {
@@ -248,7 +248,8 @@ const ProductDetails = () => {
     const custosDiretos = totalCSP;
     const margemOperacional = receitaLiquida - custosDiretos;
     
-    return margemOperacional;
+    const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
+    return margemPercentual;
   };
 
   if (loading) {
@@ -364,7 +365,7 @@ const ProductDetails = () => {
                   </div>
                   {productPositions.length > 0 && (
                     <div className="text-sm text-muted-foreground mt-1">
-                      Margem Operacional: {formatCurrency(calculateOperationalMargin())}
+                      Margem Operacional: {calculateOperationalMarginPercentage().toFixed(2)}%
                     </div>
                   )}
                 </div>
