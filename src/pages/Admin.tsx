@@ -188,9 +188,11 @@ const Admin = () => {
   });
 
   useEffect(() => {
+    console.log('useEffect iniciado - carregando dados do admin...');
     fetchProducts();
     fetchPositions();
     fetchSupportMaterials();
+    fetchAllProductPositions();
   }, []);
 
   // Buscar posições do produto quando estiver editando
@@ -566,22 +568,33 @@ const Admin = () => {
           )
         `);
 
-      if (error) throw error;
-      console.log('Posições carregadas:', data);
+      if (error) {
+        console.error('Erro ao carregar posições:', error);
+        throw error;
+      }
+      
+      console.log('Dados brutos das posições:', data);
+
+      if (!data || data.length === 0) {
+        console.log('Nenhuma posição encontrada');
+        setAllProductPositions({});
+        return;
+      }
 
       // Agrupar por product_id
       const groupedPositions: {[key: string]: any[]} = {};
-      data?.forEach(position => {
+      data.forEach(position => {
         if (!groupedPositions[position.product_id]) {
           groupedPositions[position.product_id] = [];
         }
         groupedPositions[position.product_id].push(position);
       });
 
-      console.log('Posições agrupadas:', groupedPositions);
+      console.log('Posições agrupadas por produto:', groupedPositions);
       setAllProductPositions(groupedPositions);
     } catch (error) {
       console.error('Erro ao carregar todas as posições:', error);
+      setAllProductPositions({});
     }
   };
 
