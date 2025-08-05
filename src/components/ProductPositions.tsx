@@ -40,6 +40,7 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
     position_id: '',
     horas_alocadas: ''
   });
+  const [markup, setMarkup] = useState<number>(1);
 
   useEffect(() => {
     fetchProductPositions();
@@ -174,6 +175,23 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
     return total + calculateCSP(pp.positions.cph, pp.horas_alocadas);
   }, 0);
 
+  // Cálculos DRE
+  const faturamentoSemDesconto = totalCSP * markup;
+  const descontoPagamento = faturamentoSemDesconto * 0.17;
+  const descontoCupom = faturamentoSemDesconto * 0.20;
+  const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
+  const royalties = faturamentoComDesconto * 0.17;
+  const taxaPagamento = faturamentoComDesconto * 0.03;
+  const taxaAntecipacao = faturamentoComDesconto * 0.10;
+  const receitaBruta = faturamentoComDesconto - royalties - taxaPagamento - taxaAntecipacao;
+  const impostosReceita = receitaBruta * 0.074;
+  const receitaLiquida = receitaBruta - impostosReceita;
+  const custosGestao = totalCSP; // CSP Gestão = total CSP
+  const custosOps = totalCSP * 11.9; // CSP Ops baseado no exemplo
+  const custosDiretos = custosGestao + custosOps;
+  const margemOperacional = receitaLiquida - custosDiretos;
+  const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -293,6 +311,118 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
               </TableBody>
             </Table>
           </>
+        )}
+
+        {/* Campo de Markup e DRE */}
+        {productPositions.length > 0 && (
+          <div className="mt-6 space-y-6">
+            {/* Campo de Markup */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="markup" className="min-w-fit">Markup:</Label>
+              <Input
+                id="markup"
+                type="number"
+                step="0.1"
+                value={markup}
+                onChange={(e) => setMarkup(parseFloat(e.target.value) || 1)}
+                className="w-32"
+                placeholder="Ex: 1.5"
+              />
+            </div>
+
+            {/* Tabela DRE */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-right bg-muted p-2 rounded">DRE FINAL</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="font-medium">(=) Faturamento (MRR) - Sem Desconto</TableCell>
+                      <TableCell className="text-center">R$</TableCell>
+                      <TableCell className="text-right font-medium">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600">(-) Desconto de Pagamento (-17%)</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(descontoPagamento).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600">(-) Desconto de Cupom (-20%)</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(descontoCupom).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow className="bg-muted/50">
+                      <TableCell className="font-medium">(=) Faturamento (MRR) - Com Desconto</TableCell>
+                      <TableCell className="text-center">R$</TableCell>
+                      <TableCell className="text-right font-medium">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600">(-) Royalties (-17%)</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(royalties).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600">(-) Taxa de Pagamento (-3%)</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaPagamento).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600">(-) Taxa de Antecipação (-10%)</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaAntecipacao).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow className="bg-muted/50">
+                      <TableCell className="font-medium">(=) Receita Bruta (MRR)</TableCell>
+                      <TableCell className="text-center">R$</TableCell>
+                      <TableCell className="text-right font-medium">{formatCurrency(receitaBruta).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600">(-) Impostos sobre Receita</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(impostosReceita).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow className="bg-muted/50">
+                      <TableCell className="font-medium">(=) Receita Líquida</TableCell>
+                      <TableCell className="text-center">R$</TableCell>
+                      <TableCell className="text-right font-medium">{formatCurrency(receitaLiquida).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600">(-) Custos diretos</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosDiretos).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow className="pl-6">
+                      <TableCell className="font-medium text-red-600 pl-8">(-) CSP Gestão</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosGestao).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600 pl-8">(-) CSP Ops</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosOps).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium text-red-600 pl-8">(-) Auxílio</TableCell>
+                      <TableCell className="text-center text-red-600">R$</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">-</TableCell>
+                    </TableRow>
+                    <TableRow className="bg-muted/50 border-t-2">
+                      <TableCell className="font-bold">(=) Margem operacional</TableCell>
+                      <TableCell className="text-center font-bold">R$</TableCell>
+                      <TableCell className="text-right font-bold">{formatCurrency(margemOperacional).replace('R$ ', '')}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell className="text-right font-bold text-sm">{margemPercentual.toFixed(2)}%</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </CardContent>
     </Card>
