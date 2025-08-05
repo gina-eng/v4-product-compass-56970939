@@ -129,7 +129,6 @@ const ProductDetails = () => {
     { id: 'descricao', label: 'Descrição' },
     { id: 'para-quem-serve', label: 'Pra quem ele serve' },
     { id: 'como-entrega-valor', label: 'Como ele entrega valor' },
-    { id: 'o-que-entrego', label: 'O que eu entrego' },
     { id: 'como-vendo', label: 'Como eu vendo' },
     { id: 'como-entrego', label: 'Como eu entrego' },
     { id: 'posicoes-alocadas', label: 'Posições Alocadas' },
@@ -461,12 +460,6 @@ const ProductDetails = () => {
             </div>
           </Card>
 
-          {/* O que eu entrego */}
-          <Card className="p-6" id="o-que-entrego">
-            <h2 className="text-xl font-semibold mb-4 text-foreground">O que eu entrego?</h2>
-            <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify">{product.oQueEntrego}</div>
-          </Card>
-
           {/* Como eu vendo */}
           <Card className="p-6" id="como-vendo">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu vendo?</h2>
@@ -479,6 +472,15 @@ const ProductDetails = () => {
           {/* Como eu entrego */}
           <Card className="p-6" id="como-entrego">
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu entrego?</h2>
+            
+            {/* O que eu entrego - Movido para dentro desta seção */}
+            <div className="mb-6">
+              <h3 className="text-lg font-medium mb-3 text-foreground">O que eu entrego?</h3>
+              <div className="text-muted-foreground leading-relaxed whitespace-pre-line text-justify bg-muted/30 p-4 rounded-lg">
+                {product.oQueEntrego}
+              </div>
+            </div>
+            
             <ComoEntregoTable data={product.comoEntregoDados} readOnly positions={positions} />
           </Card>
 

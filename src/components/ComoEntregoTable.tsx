@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, ExternalLink } from "lucide-react";
 
 interface ComoEntregoItem {
+  fase?: string;
   etapa: string;
   tarefa: string;
   dri: string;
@@ -38,6 +39,7 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
     if (!onChange) return;
     
     const newRow: ComoEntregoItem = {
+      fase: "",
       etapa: "",
       tarefa: "",
       dri: "",
@@ -64,60 +66,92 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
     onChange(newData);
   };
 
+  // Agrupar dados por fase para visualização
+  const groupedData = React.useMemo(() => {
+    if (!readOnly) return { ungrouped: data };
+    
+    const groups: { [key: string]: ComoEntregoItem[] } = {};
+    const ungrouped: ComoEntregoItem[] = [];
+    
+    data.forEach(item => {
+      if (item.fase && item.fase.trim()) {
+        if (!groups[item.fase]) {
+          groups[item.fase] = [];
+        }
+        groups[item.fase].push(item);
+      } else {
+        ungrouped.push(item);
+      }
+    });
+    
+    return { ...groups, ...(ungrouped.length > 0 ? { 'Outras Etapas': ungrouped } : {}) };
+  }, [data, readOnly]);
+
   if (readOnly) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-6">
         {data.length === 0 ? (
           <p className="text-muted-foreground text-center py-4">
             Nenhuma etapa de entrega foi definida ainda.
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-border">
-              <thead>
-                <tr className="bg-muted">
-                  <th className="border border-border p-3 text-left font-semibold">ETAPA</th>
-                  <th className="border border-border p-3 text-left font-semibold">TAREFA</th>
-                  <th className="border border-border p-3 text-left font-semibold">DRI</th>
-                  <th className="border border-border p-3 text-left font-semibold">ESTIMATIVA DE HORAS</th>
-                  <th className="border border-border p-3 text-left font-semibold">COMO EXECUTAR (POP)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((row, index) => (
-                  <tr key={index} className="hover:bg-muted/50">
-                    <td className="border border-border p-3">
-                      <div className="font-medium">{row.etapa}</div>
-                    </td>
-                    <td className="border border-border p-3">
-                      <div>{row.tarefa}</div>
-                    </td>
-                    <td className="border border-border p-3">
-                      <div className="text-sm">{row.dri}</div>
-                    </td>
-                    <td className="border border-border p-3 text-center">
-                      <div className="font-mono">{row.estimativaHoras}h</div>
-                    </td>
-                    <td className="border border-border p-3">
-                      {row.comoExecutar ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.open(row.comoExecutar, '_blank')}
-                          className="h-8 px-2 text-primary hover:text-primary-foreground"
-                        >
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Ver POP
-                        </Button>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">Não definido</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          Object.entries(groupedData).map(([fase, items]) => (
+            <div key={fase} className="space-y-4">
+              {fase !== 'ungrouped' && (
+                <div className="mb-4">
+                  <h4 className="text-lg font-semibold text-foreground bg-primary/10 px-4 py-2 rounded-lg border-l-4 border-primary">
+                    {fase}
+                  </h4>
+                </div>
+              )}
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-border">
+                  <thead>
+                    <tr className="bg-muted">
+                      <th className="border border-border p-3 text-left font-semibold">ETAPA</th>
+                      <th className="border border-border p-3 text-left font-semibold">TAREFA</th>
+                      <th className="border border-border p-3 text-left font-semibold">DRI</th>
+                      <th className="border border-border p-3 text-left font-semibold">ESTIMATIVA DE HORAS</th>
+                      <th className="border border-border p-3 text-left font-semibold">COMO EXECUTAR (POP)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((row, index) => (
+                      <tr key={`${fase}-${index}`} className="hover:bg-muted/50">
+                        <td className="border border-border p-3">
+                          <div className="font-medium">{row.etapa}</div>
+                        </td>
+                        <td className="border border-border p-3">
+                          <div>{row.tarefa}</div>
+                        </td>
+                        <td className="border border-border p-3">
+                          <div className="text-sm">{row.dri}</div>
+                        </td>
+                        <td className="border border-border p-3 text-center">
+                          <div className="font-mono">{row.estimativaHoras}h</div>
+                        </td>
+                        <td className="border border-border p-3">
+                          {row.comoExecutar ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(row.comoExecutar, '_blank')}
+                              className="h-8 px-2 text-primary hover:text-primary-foreground"
+                            >
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Ver POP
+                            </Button>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">Não definido</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))
         )}
       </div>
     );
@@ -148,6 +182,7 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
             <table className="w-full border-collapse border border-border">
               <thead>
                 <tr className="bg-muted">
+                  <th className="border border-border p-3 text-left font-semibold">FASE</th>
                   <th className="border border-border p-3 text-left font-semibold">ETAPA</th>
                   <th className="border border-border p-3 text-left font-semibold">TAREFA</th>
                   <th className="border border-border p-3 text-left font-semibold">DRI</th>
@@ -159,6 +194,14 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
               <tbody>
                 {data.map((row, index) => (
                   <tr key={index} className="hover:bg-muted/50">
+                    <td className="border border-border p-2">
+                      <Input
+                        value={row.fase || ''}
+                        onChange={(e) => handleUpdateRow(index, 'fase', e.target.value)}
+                        placeholder="Ex: Preparação"
+                        className="border-0 p-1 h-8 text-sm"
+                      />
+                    </td>
                     <td className="border border-border p-2">
                       <Input
                         value={row.etapa}
