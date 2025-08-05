@@ -138,6 +138,7 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [currentMarkup, setCurrentMarkup] = useState<number>(1);
   const [productPositions, setProductPositions] = useState<any[]>([]);
+  const [allProductPositions, setAllProductPositions] = useState<{[key: string]: any[]}>({});
   const [formData, setFormData] = useState({
     produto: "",
     categoria: "saber",
@@ -427,7 +428,8 @@ const Admin = () => {
         description: "Material excluído com sucesso!",
       });
       
-      fetchSupportMaterials();
+    fetchSupportMaterials();
+    fetchAllProductPositions();
     } catch (error) {
       console.error('Erro ao excluir material:', error);
       toast({
@@ -548,6 +550,67 @@ const Admin = () => {
     } finally {
       setSavingSettings(false);
     }
+  };
+
+  // Função para buscar todas as posições de todos os produtos
+  const fetchAllProductPositions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('product_positions')
+        .select(`
+          product_id,
+          horas_alocadas,
+          positions (
+            cph
+          )
+        `);
+
+      if (error) throw error;
+
+      // Agrupar por product_id
+      const groupedPositions: {[key: string]: any[]} = {};
+      data?.forEach(position => {
+        if (!groupedPositions[position.product_id]) {
+          groupedPositions[position.product_id] = [];
+        }
+        groupedPositions[position.product_id].push(position);
+      });
+
+      setAllProductPositions(groupedPositions);
+    } catch (error) {
+      console.error('Erro ao carregar todas as posições:', error);
+    }
+  };
+
+  // Função para buscar markup de um produto
+  const fetchProductMarkup = async (productId: string): Promise<number> => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('markup')
+        .eq('id', productId)
+        .single();
+
+      if (error) throw error;
+      return data?.markup || 1;
+    } catch (error) {
+      console.error('Erro ao carregar markup:', error);
+      return 1;
+    }
+  };
+
+  // Função para calcular valor base de um produto
+  const calculateProductBaseValue = async (productId: string): Promise<string> => {
+    const positions = allProductPositions[productId];
+    if (!positions || positions.length === 0) {
+      return "A definir";
+    }
+
+    const markup = await fetchProductMarkup(productId);
+    const totalCSP = positions.reduce((total, pp) => total + (pp.horas_alocadas * pp.positions.cph), 0);
+    const valorCalculado = totalCSP * markup;
+    
+    return `R$ ${valorCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
   };
 
   const fetchProducts = async () => {
@@ -1824,7 +1887,17 @@ const Admin = () => {
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-muted-foreground">Valor:</span>
-                              <span className="font-medium">{product.valor}</span>
+                              <span className="font-medium">
+                                {(() => {
+                                  const positions = allProductPositions[product.id];
+                                  if (!positions || positions.length === 0) {
+                                    return "A definir";
+                                  }
+                                  const totalCSP = positions.reduce((total, pp) => total + (pp.horas_alocadas * pp.positions.cph), 0);
+                                  const valorCalculado = totalCSP * (product.markup || 1);
+                                  return `R$ ${valorCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                                })()}
+                              </span>
                             </div>
                           </div>
 
@@ -1884,7 +1957,17 @@ const Admin = () => {
                               </td>
                               <td className="p-4 text-sm">{product.dono}</td>
                               <td className="p-4 text-sm">{product.duracao}</td>
-                              <td className="p-4 text-sm font-medium">{product.valor}</td>
+                              <td className="p-4 text-sm font-medium">
+                                {(() => {
+                                  const positions = allProductPositions[product.id];
+                                  if (!positions || positions.length === 0) {
+                                    return "A definir";
+                                  }
+                                  const totalCSP = positions.reduce((total, pp) => total + (pp.horas_alocadas * pp.positions.cph), 0);
+                                  const valorCalculado = totalCSP * (product.markup || 1);
+                                  return `R$ ${valorCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                                })()}
+                              </td>
                               <td className="p-4">
                                 <div className="flex justify-center gap-2">
                                   <StatusIcon value={product.pitch} />
