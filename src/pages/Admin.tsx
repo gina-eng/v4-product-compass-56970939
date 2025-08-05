@@ -75,9 +75,11 @@ interface Product {
   garantiaEspecifica?: string;
   stackDigital?: string;
   entregaveisRelacionados?: string;
+  case1Name?: string;
   case1UnidadeResponsavel?: string;
   case1ResponsavelProjeto?: string;
   case1DocumentoUrl?: string;
+  case2Name?: string;
   case2UnidadeResponsavel?: string;
   case2ResponsavelProjeto?: string;
   case2DocumentoUrl?: string;
@@ -154,9 +156,11 @@ const Admin = () => {
     garantiaEspecifica: "",
     stackDigital: "",
     entregaveisRelacionados: "",
+    case1Name: "",
     case1UnidadeResponsavel: "",
     case1ResponsavelProjeto: "",
     case1DocumentoUrl: "",
+    case2Name: "",
     case2UnidadeResponsavel: "",
     case2ResponsavelProjeto: "",
     case2DocumentoUrl: ""
@@ -429,9 +433,11 @@ const Admin = () => {
         garantiaEspecifica: product.garantia_especifica,
         stackDigital: product.stack_digital,
         entregaveisRelacionados: product.entregaveis_relacionados,
+        case1Name: product.case_1_name,
         case1UnidadeResponsavel: product.case_1_unidade_responsavel,
         case1ResponsavelProjeto: product.case_1_responsavel_projeto,
         case1DocumentoUrl: product.case_1_documento_url,
+        case2Name: product.case_2_name,
         case2UnidadeResponsavel: product.case_2_unidade_responsavel,
         case2ResponsavelProjeto: product.case_2_responsavel_projeto,
         case2DocumentoUrl: product.case_2_documento_url,
@@ -490,9 +496,11 @@ const Admin = () => {
             garantia_especifica: formData.garantiaEspecifica || null,
             stack_digital: formData.stackDigital || null,
             entregaveis_relacionados: formData.entregaveisRelacionados || null,
+            case_1_name: formData.case1Name || null,
             case_1_unidade_responsavel: formData.case1UnidadeResponsavel || null,
             case_1_responsavel_projeto: formData.case1ResponsavelProjeto || null,
             case_1_documento_url: formData.case1DocumentoUrl || null,
+            case_2_name: formData.case2Name || null,
             case_2_unidade_responsavel: formData.case2UnidadeResponsavel || null,
             case_2_responsavel_projeto: formData.case2ResponsavelProjeto || null,
             case_2_documento_url: formData.case2DocumentoUrl || null,
@@ -547,9 +555,11 @@ const Admin = () => {
             garantia_especifica: formData.garantiaEspecifica || null,
             stack_digital: formData.stackDigital || null,
             entregaveis_relacionados: formData.entregaveisRelacionados || null,
+            case_1_name: formData.case1Name || null,
             case_1_unidade_responsavel: formData.case1UnidadeResponsavel || null,
             case_1_responsavel_projeto: formData.case1ResponsavelProjeto || null,
             case_1_documento_url: formData.case1DocumentoUrl || null,
+            case_2_name: formData.case2Name || null,
             case_2_unidade_responsavel: formData.case2UnidadeResponsavel || null,
             case_2_responsavel_projeto: formData.case2ResponsavelProjeto || null,
             case_2_documento_url: formData.case2DocumentoUrl || null,
@@ -603,9 +613,11 @@ const Admin = () => {
         garantiaEspecifica: "",
         stackDigital: "",
         entregaveisRelacionados: "",
+        case1Name: "",
         case1UnidadeResponsavel: "",
         case1ResponsavelProjeto: "",
         case1DocumentoUrl: "",
+        case2Name: "",
         case2UnidadeResponsavel: "",
         case2ResponsavelProjeto: "",
         case2DocumentoUrl: ""
@@ -655,9 +667,11 @@ const Admin = () => {
       garantiaEspecifica: product.garantiaEspecifica || "",
       stackDigital: product.stackDigital || "",
       entregaveisRelacionados: product.entregaveisRelacionados || "",
+      case1Name: product.case1Name || "",
       case1UnidadeResponsavel: product.case1UnidadeResponsavel || "",
       case1ResponsavelProjeto: product.case1ResponsavelProjeto || "",
       case1DocumentoUrl: product.case1DocumentoUrl || "",
+      case2Name: product.case2Name || "",
       case2UnidadeResponsavel: product.case2UnidadeResponsavel || "",
       case2ResponsavelProjeto: product.case2ResponsavelProjeto || "",
       case2DocumentoUrl: product.case2DocumentoUrl || "",
@@ -732,9 +746,11 @@ const Admin = () => {
       garantiaEspecifica: "",
       stackDigital: "",
       entregaveisRelacionados: "",
+      case1Name: "",
       case1UnidadeResponsavel: "",
       case1ResponsavelProjeto: "",
       case1DocumentoUrl: "",
+      case2Name: "",
       case2UnidadeResponsavel: "",
       case2ResponsavelProjeto: "",
       case2DocumentoUrl: ""
@@ -1332,7 +1348,15 @@ const Admin = () => {
                         
                         {/* Case 1 */}
                         <div className="border rounded-lg p-4 space-y-4">
-                          <h4 className="font-medium">Case 1</h4>
+                          <div className="space-y-2">
+                            <Label htmlFor="case1Name">Nome do Case 1</Label>
+                            <Input
+                              id="case1Name"
+                              value={formData.case1Name || ""}
+                              onChange={(e) => setFormData({...formData, case1Name: e.target.value})}
+                              placeholder="Ex: Case de Sucesso - Empresa XYZ"
+                            />
+                          </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label htmlFor="case1UnidadeResponsavel">Unidade Responsável</Label>
@@ -1366,7 +1390,15 @@ const Admin = () => {
 
                         {/* Case 2 */}
                         <div className="border rounded-lg p-4 space-y-4">
-                          <h4 className="font-medium">Case 2</h4>
+                          <div className="space-y-2">
+                            <Label htmlFor="case2Name">Nome do Case 2</Label>
+                            <Input
+                              id="case2Name"
+                              value={formData.case2Name || ""}
+                              onChange={(e) => setFormData({...formData, case2Name: e.target.value})}
+                              placeholder="Ex: Case de Sucesso - Empresa ABC"
+                            />
+                          </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <Label htmlFor="case2UnidadeResponsavel">Unidade Responsável</Label>

@@ -66,9 +66,11 @@ interface Product {
   garantiaEspecifica?: string;
   stackDigital?: string;
   entregaveisRelacionados?: string;
+  case1Name?: string;
   case1UnidadeResponsavel?: string;
   case1ResponsavelProjeto?: string;
   case1DocumentoUrl?: string;
+  case2Name?: string;
   case2UnidadeResponsavel?: string;
   case2ResponsavelProjeto?: string;
   case2DocumentoUrl?: string;
@@ -145,9 +147,11 @@ const ProductDetails = () => {
             garantiaEspecifica: data.garantia_especifica,
             stackDigital: data.stack_digital,
             entregaveisRelacionados: data.entregaveis_relacionados,
+            case1Name: data.case_1_name,
             case1UnidadeResponsavel: data.case_1_unidade_responsavel,
             case1ResponsavelProjeto: data.case_1_responsavel_projeto,
             case1DocumentoUrl: data.case_1_documento_url,
+            case2Name: data.case_2_name,
             case2UnidadeResponsavel: data.case_2_unidade_responsavel,
             case2ResponsavelProjeto: data.case_2_responsavel_projeto,
             case2DocumentoUrl: data.case_2_documento_url
@@ -373,7 +377,7 @@ const ProductDetails = () => {
               <div className="grid gap-6">
                 {product.case1UnidadeResponsavel && (
                   <div className="border rounded-lg p-4">
-                    <h3 className="font-medium text-foreground mb-3">Case 1</h3>
+                    <h3 className="font-medium text-foreground mb-3">{product.case1Name || 'Case 1'}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground mb-1">Unidade Responsável</p>
@@ -391,7 +395,7 @@ const ProductDetails = () => {
                             className="w-full"
                           >
                             <ExternalLink className="h-4 w-4 mr-2" />
-                            Acessar Documento do Case 1
+                            Acessar Documento do {product.case1Name || 'Case 1'}
                           </Button>
                         </div>
                       )}
@@ -401,7 +405,7 @@ const ProductDetails = () => {
                 
                 {product.case2UnidadeResponsavel && (
                   <div className="border rounded-lg p-4">
-                    <h3 className="font-medium text-foreground mb-3">Case 2</h3>
+                    <h3 className="font-medium text-foreground mb-3">{product.case2Name || 'Case 2'}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-muted-foreground mb-1">Unidade Responsável</p>
@@ -419,7 +423,7 @@ const ProductDetails = () => {
                             className="w-full"
                           >
                             <ExternalLink className="h-4 w-4 mr-2" />
-                            Acessar Documento do Case 2
+                            Acessar Documento do {product.case2Name || 'Case 2'}
                           </Button>
                         </div>
                       )}

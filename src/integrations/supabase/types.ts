@@ -47,9 +47,11 @@ export type Database = {
           bpmn: boolean
           bpmn_url: string | null
           case_1_documento_url: string | null
+          case_1_name: string | null
           case_1_responsavel_projeto: string | null
           case_1_unidade_responsavel: string | null
           case_2_documento_url: string | null
+          case_2_name: string | null
           case_2_responsavel_projeto: string | null
           case_2_unidade_responsavel: string | null
           categoria: Database["public"]["Enums"]["categoria_produto"]
@@ -89,9 +91,11 @@ export type Database = {
           bpmn?: boolean
           bpmn_url?: string | null
           case_1_documento_url?: string | null
+          case_1_name?: string | null
           case_1_responsavel_projeto?: string | null
           case_1_unidade_responsavel?: string | null
           case_2_documento_url?: string | null
+          case_2_name?: string | null
           case_2_responsavel_projeto?: string | null
           case_2_unidade_responsavel?: string | null
           categoria: Database["public"]["Enums"]["categoria_produto"]
@@ -131,9 +135,11 @@ export type Database = {
           bpmn?: boolean
           bpmn_url?: string | null
           case_1_documento_url?: string | null
+          case_1_name?: string | null
           case_1_responsavel_projeto?: string | null
           case_1_unidade_responsavel?: string | null
           case_2_documento_url?: string | null
+          case_2_name?: string | null
           case_2_responsavel_projeto?: string | null
           case_2_unidade_responsavel?: string | null
           categoria?: Database["public"]["Enums"]["categoria_produto"]
