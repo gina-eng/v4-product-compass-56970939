@@ -85,6 +85,27 @@ const ProductDetails = () => {
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
   const [markup, setMarkup] = useState<number>(1);
+  const [productPositions, setProductPositions] = useState<any[]>([]);
+
+  // Buscar posições do produto para calcular margem operacional
+  const fetchProductPositions = async () => {
+    if (!id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('product_positions')
+        .select(`
+          *,
+          positions (*)
+        `)
+        .eq('product_id', id);
+      
+      if (error) throw error;
+      setProductPositions(data || []);
+    } catch (error) {
+      console.error('Erro ao buscar posições do produto:', error);
+    }
+  };
   const [showQuickNav, setShowQuickNav] = useState(false);
 
   // Detectar scroll para mostrar/ocultar navegação rápida
@@ -203,7 +224,32 @@ const ProductDetails = () => {
 
     fetchProduct();
     fetchPositions();
+    fetchProductPositions();
   }, [id]);
+
+  // Calcular margem operacional
+  const calculateOperationalMargin = () => {
+    if (!productPositions.length) return 0;
+    
+    const totalCSP = productPositions.reduce((total, pp) => {
+      return total + (pp.horas_alocadas * pp.positions.cph);
+    }, 0);
+
+    const faturamentoSemDesconto = totalCSP * markup;
+    const descontoPagamento = faturamentoSemDesconto * 0.17;
+    const descontoCupom = faturamentoSemDesconto * 0.20;
+    const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
+    const royalties = faturamentoComDesconto * 0.17;
+    const taxaPagamento = faturamentoComDesconto * 0.03;
+    const taxaAntecipacao = faturamentoComDesconto * 0.10;
+    const receitaBruta = faturamentoComDesconto - royalties - taxaPagamento - taxaAntecipacao;
+    const impostosReceita = receitaBruta * 0.074;
+    const receitaLiquida = receitaBruta - impostosReceita;
+    const custosDiretos = totalCSP;
+    const margemOperacional = receitaLiquida - custosDiretos;
+    
+    return margemOperacional;
+  };
 
   if (loading) {
     return (
@@ -309,8 +355,18 @@ const ProductDetails = () => {
                   <Clock className="h-4 w-4" />
                   <span>{product.duracao} dias</span>
                 </div>
-                <div className="text-lg font-semibold text-foreground">
-                  {formatCurrency(product.valor)}
+                <div className="flex flex-col">
+                  <div className="text-lg font-semibold text-foreground">
+                    VALOR BASE
+                  </div>
+                  <div className="text-xl font-bold text-foreground">
+                    {formatCurrency(product.valor)}
+                  </div>
+                  {productPositions.length > 0 && (
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Margem Operacional: {formatCurrency(calculateOperationalMargin())}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
