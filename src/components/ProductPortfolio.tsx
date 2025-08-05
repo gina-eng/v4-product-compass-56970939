@@ -80,7 +80,7 @@ const ProductPortfolio = () => {
               description: product.description,
               category: product.categoria,
               status: product.status,
-              valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : product.valor,
+              valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
               margemOperacional: margemOperacional
             };
           })

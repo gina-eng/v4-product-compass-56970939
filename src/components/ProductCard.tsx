@@ -61,7 +61,9 @@ const ProductCard = ({ id, name, description, category, valorBase, status, marge
       <div className="mb-6 space-y-2">
         <div>
           <span className="text-xs text-gray-500 uppercase tracking-wide">Valor Base</span>
-          <p className="text-lg font-semibold text-gray-900">{formatCurrency(valorBase)}</p>
+          <p className="text-lg font-semibold text-gray-900">
+            {valorBase === "A definir" ? valorBase : formatCurrency(valorBase)}
+          </p>
         </div>
         {margemOperacional !== undefined && margemOperacional > 0 && (
           <div>
