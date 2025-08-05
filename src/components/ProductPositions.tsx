@@ -186,9 +186,8 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
   const receitaBruta = faturamentoComDesconto - royalties - taxaPagamento - taxaAntecipacao;
   const impostosReceita = receitaBruta * 0.074;
   const receitaLiquida = receitaBruta - impostosReceita;
-  const custosGestao = totalCSP; // CSP Gestão = total CSP
-  const custosOps = totalCSP * 11.9; // CSP Ops baseado no exemplo
-  const custosDiretos = custosGestao + custosOps;
+  const custosCSP = totalCSP; // CSP total
+  const custosDiretos = custosCSP;
   const margemOperacional = receitaLiquida - custosDiretos;
   const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
 
@@ -394,14 +393,9 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
                       <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosDiretos).replace('R$ ', '')}</TableCell>
                     </TableRow>
                     <TableRow className="pl-6">
-                      <TableCell className="font-medium text-red-600 pl-8">(-) CSP Gestão</TableCell>
+                      <TableCell className="font-medium text-red-600 pl-8">(-) CSP</TableCell>
                       <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosGestao).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600 pl-8">(-) CSP Ops</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosOps).replace('R$ ', '')}</TableCell>
+                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosCSP).replace('R$ ', '')}</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium text-red-600 pl-8">(-) Auxílio</TableCell>
