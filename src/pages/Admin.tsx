@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import Header from "@/components/Header";
 import { Link } from "react-router-dom";
+import ProductPositions from "@/components/ProductPositions";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -1215,7 +1216,7 @@ const Admin = () => {
                       Novo Produto
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+                  <DialogContent className="max-w-5xl max-h-[95vh] overflow-auto">
                     <DialogHeader>
                       <DialogTitle>
                         {editingProduct ? "Editar Produto" : "Novo Produto"}
@@ -1665,6 +1666,14 @@ const Admin = () => {
                         </Button>
                       </DialogFooter>
                     </form>
+                    
+                    {/* Posições Alocadas - só aparece na edição */}
+                    {editingProduct && (
+                      <div className="border-t pt-6 mt-6">
+                        <h3 className="text-lg font-semibold mb-4">Posições Alocadas</h3>
+                        <ProductPositions productId={editingProduct.id} />
+                      </div>
+                    )}
                   </DialogContent>
                 </Dialog>
               </div>

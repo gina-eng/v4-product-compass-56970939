@@ -41,6 +41,48 @@ export type Database = {
         }
         Relationships: []
       }
+      product_positions: {
+        Row: {
+          created_at: string
+          horas_alocadas: number
+          id: string
+          position_id: string
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          horas_alocadas?: number
+          id?: string
+          position_id: string
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          horas_alocadas?: number
+          id?: string
+          position_id?: string
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_positions_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_positions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           bonus_kpi: string | null

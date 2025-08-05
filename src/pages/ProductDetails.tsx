@@ -9,6 +9,7 @@ import ComoEntregoTable from "@/components/ComoEntregoTable";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import { formatCurrency } from "@/lib/formatters";
+import ProductPositions from "@/components/ProductPositions";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -324,6 +325,9 @@ const ProductDetails = () => {
             <h2 className="text-xl font-semibold mb-4 text-foreground">Como eu entrego?</h2>
             <ComoEntregoTable data={product.comoEntregoDados} readOnly positions={positions} />
           </Card>
+
+          {/* Posições Alocadas */}
+          <ProductPositions productId={product.id} readOnly />
 
           {/* Botão Playbook */}
           <div className="flex justify-center">
