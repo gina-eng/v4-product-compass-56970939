@@ -44,7 +44,7 @@ const ProductPortfolio = () => {
             }
 
             // Calcular valores DRE
-            let margemOperacional = 0;
+            let margemOperacional: number | string = "A definir";
             let faturamentoSemDesconto = 0;
             
             if (positions && positions.length > 0) {

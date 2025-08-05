@@ -11,7 +11,7 @@ interface ProductCardProps {
   category: "saber" | "ter" | "executar" | "potencializar";
   valorBase: string;
   status: "Disponível" | "Em produção" | "Em homologação";
-  margemOperacional?: number;
+  margemOperacional?: number | string;
   onViewDetails: (id: string) => void;
 }
 
@@ -65,10 +65,18 @@ const ProductCard = ({ id, name, description, category, valorBase, status, marge
             {valorBase === "A definir" ? valorBase : formatCurrency(valorBase)}
           </p>
         </div>
-        {margemOperacional !== undefined && margemOperacional > 0 && (
+        {margemOperacional !== undefined && margemOperacional !== "A definir" && (
           <div>
             <span className="text-xs text-gray-500 uppercase tracking-wide">Margem Operacional</span>
-            <p className="text-sm font-medium text-green-700">{margemOperacional.toFixed(2)}%</p>
+            <p className="text-sm font-medium text-green-700">
+              {typeof margemOperacional === "string" ? margemOperacional : `${margemOperacional.toFixed(2)}%`}
+            </p>
+          </div>
+        )}
+        {margemOperacional === "A definir" && (
+          <div>
+            <span className="text-xs text-gray-500 uppercase tracking-wide">Margem Operacional</span>
+            <p className="text-sm font-medium text-gray-500">A definir</p>
           </div>
         )}
       </div>
