@@ -227,6 +227,17 @@ const ProductDetails = () => {
     fetchProductPositions();
   }, [id]);
 
+  // Calcular faturamento sem desconto (valor base)
+  const calculateFaturamentoSemDesconto = () => {
+    if (!productPositions.length) return 0;
+    
+    const totalCSP = productPositions.reduce((total, pp) => {
+      return total + (pp.horas_alocadas * pp.positions.cph);
+    }, 0);
+
+    return totalCSP * markup;
+  };
+
   // Calcular margem operacional em percentual
   const calculateOperationalMarginPercentage = () => {
     if (!productPositions.length) return 0;
@@ -361,11 +372,15 @@ const ProductDetails = () => {
                     VALOR BASE
                   </div>
                   <div className="text-xl font-bold text-foreground">
-                    {formatCurrency(product.valor)}
+                    {productPositions.length > 0 ? formatCurrency(calculateFaturamentoSemDesconto()) : "A definir"}
                   </div>
-                  {productPositions.length > 0 && (
+                  {productPositions.length > 0 ? (
                     <div className="text-sm text-muted-foreground mt-1">
                       Margem Operacional: {calculateOperationalMarginPercentage().toFixed(2)}%
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Margem Operacional: A definir
                     </div>
                   )}
                 </div>
