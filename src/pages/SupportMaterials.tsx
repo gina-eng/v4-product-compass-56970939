@@ -86,7 +86,7 @@ const SupportMaterials = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
             {materials.map((material) => (
               <Card key={material.id} className="hover:shadow-md transition-shadow">
                 <CardHeader>
