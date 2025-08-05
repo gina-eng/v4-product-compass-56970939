@@ -66,6 +66,12 @@ interface Product {
   garantiaEspecifica?: string;
   stackDigital?: string;
   entregaveisRelacionados?: string;
+  case1UnidadeResponsavel?: string;
+  case1ResponsavelProjeto?: string;
+  case1DocumentoUrl?: string;
+  case2UnidadeResponsavel?: string;
+  case2ResponsavelProjeto?: string;
+  case2DocumentoUrl?: string;
 }
 
 const ProductDetails = () => {
@@ -138,7 +144,13 @@ const ProductDetails = () => {
             tempoMetaKpi: data.tempo_meta_kpi,
             garantiaEspecifica: data.garantia_especifica,
             stackDigital: data.stack_digital,
-            entregaveisRelacionados: data.entregaveis_relacionados
+            entregaveisRelacionados: data.entregaveis_relacionados,
+            case1UnidadeResponsavel: data.case_1_unidade_responsavel,
+            case1ResponsavelProjeto: data.case_1_responsavel_projeto,
+            case1DocumentoUrl: data.case_1_documento_url,
+            case2UnidadeResponsavel: data.case_2_unidade_responsavel,
+            case2ResponsavelProjeto: data.case_2_responsavel_projeto,
+            case2DocumentoUrl: data.case_2_documento_url
           };
           setProduct(formattedProduct);
         }
@@ -353,6 +365,70 @@ const ProductDetails = () => {
               })}
             </div>
           </Card>
+
+          {/* Cases */}
+          {(product.case1UnidadeResponsavel || product.case2UnidadeResponsavel) && (
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold mb-4 text-foreground">Cases</h2>
+              <div className="grid gap-6">
+                {product.case1UnidadeResponsavel && (
+                  <div className="border rounded-lg p-4">
+                    <h3 className="font-medium text-foreground mb-3">Case 1</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Unidade Responsável</p>
+                        <p className="text-foreground">{product.case1UnidadeResponsavel}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Responsável pelo Projeto</p>
+                        <p className="text-foreground">{product.case1ResponsavelProjeto}</p>
+                      </div>
+                      {product.case1DocumentoUrl && (
+                        <div className="md:col-span-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => window.open(product.case1DocumentoUrl, '_blank')}
+                            className="w-full"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Acessar Documento do Case 1
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {product.case2UnidadeResponsavel && (
+                  <div className="border rounded-lg p-4">
+                    <h3 className="font-medium text-foreground mb-3">Case 2</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Unidade Responsável</p>
+                        <p className="text-foreground">{product.case2UnidadeResponsavel}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Responsável pelo Projeto</p>
+                        <p className="text-foreground">{product.case2ResponsavelProjeto}</p>
+                      </div>
+                      {product.case2DocumentoUrl && (
+                        <div className="md:col-span-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => window.open(product.case2DocumentoUrl, '_blank')}
+                            className="w-full"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Acessar Documento do Case 2
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
 
           {/* KPIs e Informações Adicionais */}
           <Card className="p-6">

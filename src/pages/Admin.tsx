@@ -75,6 +75,12 @@ interface Product {
   garantiaEspecifica?: string;
   stackDigital?: string;
   entregaveisRelacionados?: string;
+  case1UnidadeResponsavel?: string;
+  case1ResponsavelProjeto?: string;
+  case1DocumentoUrl?: string;
+  case2UnidadeResponsavel?: string;
+  case2ResponsavelProjeto?: string;
+  case2DocumentoUrl?: string;
 }
 
 const Admin = () => {
@@ -147,7 +153,13 @@ const Admin = () => {
     tempoMetaKpi: "",
     garantiaEspecifica: "",
     stackDigital: "",
-    entregaveisRelacionados: ""
+    entregaveisRelacionados: "",
+    case1UnidadeResponsavel: "",
+    case1ResponsavelProjeto: "",
+    case1DocumentoUrl: "",
+    case2UnidadeResponsavel: "",
+    case2ResponsavelProjeto: "",
+    case2DocumentoUrl: ""
   });
 
   useEffect(() => {
@@ -417,6 +429,12 @@ const Admin = () => {
         garantiaEspecifica: product.garantia_especifica,
         stackDigital: product.stack_digital,
         entregaveisRelacionados: product.entregaveis_relacionados,
+        case1UnidadeResponsavel: product.case_1_unidade_responsavel,
+        case1ResponsavelProjeto: product.case_1_responsavel_projeto,
+        case1DocumentoUrl: product.case_1_documento_url,
+        case2UnidadeResponsavel: product.case_2_unidade_responsavel,
+        case2ResponsavelProjeto: product.case_2_responsavel_projeto,
+        case2DocumentoUrl: product.case_2_documento_url,
       }));
 
       setProducts(formattedProducts);
@@ -472,6 +490,12 @@ const Admin = () => {
             garantia_especifica: formData.garantiaEspecifica || null,
             stack_digital: formData.stackDigital || null,
             entregaveis_relacionados: formData.entregaveisRelacionados || null,
+            case_1_unidade_responsavel: formData.case1UnidadeResponsavel || null,
+            case_1_responsavel_projeto: formData.case1ResponsavelProjeto || null,
+            case_1_documento_url: formData.case1DocumentoUrl || null,
+            case_2_unidade_responsavel: formData.case2UnidadeResponsavel || null,
+            case_2_responsavel_projeto: formData.case2ResponsavelProjeto || null,
+            case_2_documento_url: formData.case2DocumentoUrl || null,
           })
           .eq('id', editingProduct.id);
 
@@ -523,6 +547,12 @@ const Admin = () => {
             garantia_especifica: formData.garantiaEspecifica || null,
             stack_digital: formData.stackDigital || null,
             entregaveis_relacionados: formData.entregaveisRelacionados || null,
+            case_1_unidade_responsavel: formData.case1UnidadeResponsavel || null,
+            case_1_responsavel_projeto: formData.case1ResponsavelProjeto || null,
+            case_1_documento_url: formData.case1DocumentoUrl || null,
+            case_2_unidade_responsavel: formData.case2UnidadeResponsavel || null,
+            case_2_responsavel_projeto: formData.case2ResponsavelProjeto || null,
+            case_2_documento_url: formData.case2DocumentoUrl || null,
           });
 
         if (error) throw error;
@@ -572,7 +602,13 @@ const Admin = () => {
         tempoMetaKpi: "",
         garantiaEspecifica: "",
         stackDigital: "",
-        entregaveisRelacionados: ""
+        entregaveisRelacionados: "",
+        case1UnidadeResponsavel: "",
+        case1ResponsavelProjeto: "",
+        case1DocumentoUrl: "",
+        case2UnidadeResponsavel: "",
+        case2ResponsavelProjeto: "",
+        case2DocumentoUrl: ""
       });
       await fetchProducts();
     } catch (error) {
@@ -619,6 +655,12 @@ const Admin = () => {
       garantiaEspecifica: product.garantiaEspecifica || "",
       stackDigital: product.stackDigital || "",
       entregaveisRelacionados: product.entregaveisRelacionados || "",
+      case1UnidadeResponsavel: product.case1UnidadeResponsavel || "",
+      case1ResponsavelProjeto: product.case1ResponsavelProjeto || "",
+      case1DocumentoUrl: product.case1DocumentoUrl || "",
+      case2UnidadeResponsavel: product.case2UnidadeResponsavel || "",
+      case2ResponsavelProjeto: product.case2ResponsavelProjeto || "",
+      case2DocumentoUrl: product.case2DocumentoUrl || "",
     });
     setIsDialogOpen(true);
   };
@@ -689,7 +731,13 @@ const Admin = () => {
       tempoMetaKpi: "",
       garantiaEspecifica: "",
       stackDigital: "",
-      entregaveisRelacionados: ""
+      entregaveisRelacionados: "",
+      case1UnidadeResponsavel: "",
+      case1ResponsavelProjeto: "",
+      case1DocumentoUrl: "",
+      case2UnidadeResponsavel: "",
+      case2ResponsavelProjeto: "",
+      case2DocumentoUrl: ""
     });
     setIsDialogOpen(true);
   };
@@ -1274,6 +1322,79 @@ const Admin = () => {
                                 />
                               </div>
                             )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Cases */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold">Cases</h3>
+                        
+                        {/* Case 1 */}
+                        <div className="border rounded-lg p-4 space-y-4">
+                          <h4 className="font-medium">Case 1</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="case1UnidadeResponsavel">Unidade Responsável</Label>
+                              <Input
+                                id="case1UnidadeResponsavel"
+                                value={formData.case1UnidadeResponsavel || ""}
+                                onChange={(e) => setFormData({...formData, case1UnidadeResponsavel: e.target.value})}
+                                placeholder="Ex: PEAG Comercial"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="case1ResponsavelProjeto">Responsável pelo Projeto</Label>
+                              <Input
+                                id="case1ResponsavelProjeto"
+                                value={formData.case1ResponsavelProjeto || ""}
+                                onChange={(e) => setFormData({...formData, case1ResponsavelProjeto: e.target.value})}
+                                placeholder="Ex: João Silva"
+                              />
+                            </div>
+                            <div className="md:col-span-2 space-y-2">
+                              <Label htmlFor="case1DocumentoUrl">URL do Documento</Label>
+                              <Input
+                                id="case1DocumentoUrl"
+                                value={formData.case1DocumentoUrl || ""}
+                                onChange={(e) => setFormData({...formData, case1DocumentoUrl: e.target.value})}
+                                placeholder="https://exemplo.com/case1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Case 2 */}
+                        <div className="border rounded-lg p-4 space-y-4">
+                          <h4 className="font-medium">Case 2</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="case2UnidadeResponsavel">Unidade Responsável</Label>
+                              <Input
+                                id="case2UnidadeResponsavel"
+                                value={formData.case2UnidadeResponsavel || ""}
+                                onChange={(e) => setFormData({...formData, case2UnidadeResponsavel: e.target.value})}
+                                placeholder="Ex: PEAG Marketing"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="case2ResponsavelProjeto">Responsável pelo Projeto</Label>
+                              <Input
+                                id="case2ResponsavelProjeto"
+                                value={formData.case2ResponsavelProjeto || ""}
+                                onChange={(e) => setFormData({...formData, case2ResponsavelProjeto: e.target.value})}
+                                placeholder="Ex: Maria Santos"
+                              />
+                            </div>
+                            <div className="md:col-span-2 space-y-2">
+                              <Label htmlFor="case2DocumentoUrl">URL do Documento</Label>
+                              <Input
+                                id="case2DocumentoUrl"
+                                value={formData.case2DocumentoUrl || ""}
+                                onChange={(e) => setFormData({...formData, case2DocumentoUrl: e.target.value})}
+                                placeholder="https://exemplo.com/case2"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
