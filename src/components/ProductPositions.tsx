@@ -315,19 +315,21 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
         {/* Campo de Markup e DRE */}
         {productPositions.length > 0 && (
           <div className="mt-6 space-y-6">
-            {/* Campo de Markup */}
-            <div className="flex items-center gap-4">
-              <Label htmlFor="markup" className="min-w-fit">Markup:</Label>
-              <Input
-                id="markup"
-                type="number"
-                step="0.1"
-                value={markup}
-                onChange={(e) => setMarkup(parseFloat(e.target.value) || 1)}
-                className="w-32"
-                placeholder="Ex: 1.5"
-              />
-            </div>
+            {/* Campo de Markup - apenas no modo de edição */}
+            {!readOnly && (
+              <div className="flex items-center gap-4">
+                <Label htmlFor="markup" className="min-w-fit">Markup:</Label>
+                <Input
+                  id="markup"
+                  type="number"
+                  step="0.1"
+                  value={markup}
+                  onChange={(e) => setMarkup(parseFloat(e.target.value) || 1)}
+                  className="w-32"
+                  placeholder="Ex: 1.5"
+                />
+              </div>
+            )}
 
             {/* Tabela DRE */}
             <Card>
