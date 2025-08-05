@@ -164,15 +164,14 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
     setIsDialogOpen(true);
   };
 
-  const calculateCSP = (investimento: number, horasAlocadas: number) => {
-    if (horasAlocadas === 0) return 0;
-    return investimento / (horasAlocadas * 168);
+  const calculateCSP = (cph: number, horasAlocadas: number) => {
+    return horasAlocadas * cph;
   };
 
   // Calcular totais
   const totalHoras = productPositions.reduce((total, pp) => total + pp.horas_alocadas, 0);
   const totalCSP = productPositions.reduce((total, pp) => {
-    return total + calculateCSP(pp.positions.investimento_total, pp.horas_alocadas);
+    return total + calculateCSP(pp.positions.cph, pp.horas_alocadas);
   }, 0);
 
   return (
@@ -257,7 +256,7 @@ const ProductPositions = ({ productId, readOnly = false }: ProductPositionsProps
                     <TableCell>
                       {formatCurrency(
                         calculateCSP(
-                          productPosition.positions.investimento_total,
+                          productPosition.positions.cph,
                           productPosition.horas_alocadas
                         )
                       )}
