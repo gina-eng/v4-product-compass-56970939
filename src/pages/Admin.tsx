@@ -195,6 +195,7 @@ const Admin = () => {
   // Buscar posições do produto quando estiver editando
   useEffect(() => {
     if (editingProduct) {
+      console.log('Carregando posições para produto:', editingProduct.id);
       fetchProductPositions(editingProduct.id);
       setCurrentMarkup(editingProduct.markup || 1);
     } else {
@@ -204,6 +205,7 @@ const Admin = () => {
 
   const fetchProductPositions = async (productId: string) => {
     try {
+      console.log('Buscando posições para produto:', productId);
       const { data, error } = await supabase
         .from('product_positions')
         .select(`
@@ -221,6 +223,7 @@ const Admin = () => {
         .eq('product_id', productId);
 
       if (error) throw error;
+      console.log('Posições carregadas:', data);
       setProductPositions(data || []);
     } catch (error) {
       console.error('Erro ao carregar posições do produto:', error);
@@ -1316,10 +1319,19 @@ const Admin = () => {
                           <Label htmlFor="valor">Valor Base (Faturamento MRR - Sem Desconto)</Label>
                           <div className="p-3 bg-muted rounded-md">
                             <span className="text-lg font-semibold">
-                              {editingProduct && productPositions.length > 0 
-                                ? `R$ ${(productPositions.reduce((total, pp) => total + (pp.horas_alocadas * pp.positions.cph), 0) * currentMarkup).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-                                : "A definir"
-                              }
+                              {(() => {
+                                console.log('Debug valor - editingProduct:', !!editingProduct);
+                                console.log('Debug valor - productPositions:', productPositions);
+                                console.log('Debug valor - currentMarkup:', currentMarkup);
+                                
+                                if (editingProduct && productPositions.length > 0) {
+                                  const totalCSP = productPositions.reduce((total, pp) => total + (pp.horas_alocadas * pp.positions.cph), 0);
+                                  const valorCalculado = totalCSP * currentMarkup;
+                                  console.log('Debug valor - totalCSP:', totalCSP, 'valorCalculado:', valorCalculado);
+                                  return `R$ ${valorCalculado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                                }
+                                return "A definir";
+                              })()}
                             </span>
                             <p className="text-sm text-muted-foreground mt-1">
                               Calculado automaticamente baseado nas posições alocadas e markup
