@@ -104,10 +104,14 @@ export type Database = {
           como_vendo: string
           created_at: string
           descricao_card: string | null
+          descricao_completa: string | null
           description: string
           dono: string
           duracao: string
+          duracao_media: string | null
           entregaveis_relacionados: string | null
+          escopo: string | null
+          formato_entrega: string | null
           garantia_especifica: string | null
           icp: boolean
           icp_url: string | null
@@ -127,6 +131,7 @@ export type Database = {
           stack_digital: string | null
           status: Database["public"]["Enums"]["status_produto"]
           tempo_meta_kpi: Database["public"]["Enums"]["tempo_meta"] | null
+          time_envolvido: string | null
           updated_at: string
           valor: string
         }
@@ -150,10 +155,14 @@ export type Database = {
           como_vendo: string
           created_at?: string
           descricao_card?: string | null
+          descricao_completa?: string | null
           description: string
           dono: string
           duracao: string
+          duracao_media?: string | null
           entregaveis_relacionados?: string | null
+          escopo?: string | null
+          formato_entrega?: string | null
           garantia_especifica?: string | null
           icp?: boolean
           icp_url?: string | null
@@ -173,6 +182,7 @@ export type Database = {
           stack_digital?: string | null
           status?: Database["public"]["Enums"]["status_produto"]
           tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
+          time_envolvido?: string | null
           updated_at?: string
           valor: string
         }
@@ -196,10 +206,14 @@ export type Database = {
           como_vendo?: string
           created_at?: string
           descricao_card?: string | null
+          descricao_completa?: string | null
           description?: string
           dono?: string
           duracao?: string
+          duracao_media?: string | null
           entregaveis_relacionados?: string | null
+          escopo?: string | null
+          formato_entrega?: string | null
           garantia_especifica?: string | null
           icp?: boolean
           icp_url?: string | null
@@ -219,6 +233,7 @@ export type Database = {
           stack_digital?: string | null
           status?: Database["public"]["Enums"]["status_produto"]
           tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
+          time_envolvido?: string | null
           updated_at?: string
           valor?: string
         }

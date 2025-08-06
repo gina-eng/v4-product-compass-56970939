@@ -60,13 +60,11 @@ interface Product {
   pitch: boolean;
   bpmn: boolean;
   playbook: boolean;
-  icp: boolean;
   pricing: boolean;
   certificacao: boolean;
   pitchUrl?: string;
   bpmnUrl?: string;
   playbookUrl?: string;
-  icpUrl?: string;
   pricingUrl?: string;
   certificacaoUrl?: string;
   status: string;
@@ -93,6 +91,13 @@ interface Product {
   case2ResponsavelProjeto?: string;
   case2DocumentoUrl?: string;
   markup?: number;
+  // Novos campos da estrutura expandida
+  icpText?: string; // Renomeado para evitar conflito
+  escopo?: string;
+  duracao_media?: string;
+  time_envolvido?: string;
+  formato_entrega?: string;
+  descricao_completa?: string;
 }
 
 const Admin = () => {
@@ -671,6 +676,14 @@ const Admin = () => {
           decision: { objetivo: "", perguntas: "", observar: "" }
         },
         comoEntregoDados: (product.como_entrego_dados as unknown as ComoEntregoItem[]) || [],
+        oQueEntrego: product.o_que_entrego,
+        // Novos campos
+        icpText: typeof product.icp === 'string' ? product.icp : undefined,
+        escopo: product.escopo,
+        duracao_media: product.duracao_media,
+        time_envolvido: product.time_envolvido,
+        formato_entrega: product.formato_entrega,
+        descricao_completa: product.descricao_completa,
         oQueEntrego: product.o_que_entrego,
         paraQuemServe: product.para_quem_serve,
         comoEntregaValor: product.como_entrega_valor,
