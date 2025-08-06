@@ -54,9 +54,11 @@ const ProductCard = ({ id, name, description, category, valorBase, status, marge
         {name}
       </h3>
       
-      <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-3 text-justify">
-        {description}
-      </p>
+      {description && (
+        <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-3 text-justify">
+          {description}
+        </p>
+      )}
       
       <div className="mb-6 space-y-2">
         <div>

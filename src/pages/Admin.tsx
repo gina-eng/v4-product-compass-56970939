@@ -1906,20 +1906,10 @@ const Admin = () => {
                           </div>
 
                           {(product as any).descricao_card && (
-                            <div className="mb-2">
-                              <span className="text-xs text-muted-foreground font-medium">Descrição do Card:</span>
-                              <p className="text-sm text-foreground line-clamp-2 mt-1">
-                                {(product as any).descricao_card}
-                              </p>
-                            </div>
-                          )}
-                          
-                          <div>
-                            <span className="text-xs text-muted-foreground font-medium">Descrição Completa:</span>
-                            <p className="text-sm text-muted-foreground line-clamp-3 mt-1">
-                              {product.description}
+                            <p className="text-sm text-foreground line-clamp-3">
+                              {(product as any).descricao_card}
                             </p>
-                          </div>
+                          )}
 
                           <div className="space-y-2">
                             <div className="flex justify-between text-sm">
@@ -1985,13 +1975,9 @@ const Admin = () => {
                               <td className="p-4">
                                 <div>
                                   <div className="font-medium">{product.produto}</div>
-                                  {(product as any).descricao_card ? (
+                                  {(product as any).descricao_card && (
                                     <div className="text-sm text-foreground line-clamp-1 font-medium">
                                       {(product as any).descricao_card}
-                                    </div>
-                                  ) : (
-                                    <div className="text-sm text-muted-foreground line-clamp-1">
-                                      {product.description}
                                     </div>
                                   )}
                                 </div>
