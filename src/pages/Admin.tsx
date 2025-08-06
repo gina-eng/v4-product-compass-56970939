@@ -905,7 +905,7 @@ const Admin = () => {
       certificacaoUrl: product.certificacaoUrl || "",
       status: product.status,
       description: product.description,
-      descricaoCard: (product as any).descricaoCard || "",
+      descricaoCard: (product as any).descricao_card || "",
       comoVendo: product.comoVendo,
       spicedData: product.spicedData,
       comoEntregoDados: product.comoEntregoDados,
