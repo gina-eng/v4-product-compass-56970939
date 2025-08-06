@@ -54,7 +54,7 @@ const ProductCard = ({ id, name, description, category, valorBase, status, marge
         {name}
       </h3>
       
-      {description && (
+      {description && description.trim() && (
         <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-3 text-justify">
           {description}
         </p>

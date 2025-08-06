@@ -730,7 +730,7 @@ const Admin = () => {
             certificacao_url: formData.certificacaoUrl || null,
             status: formData.status as any,
             description: formData.description,
-            descricao_card: formData.descricaoCard || null,
+            descricao_card: (formData.descricaoCard && formData.descricaoCard.trim()) ? formData.descricaoCard.trim() : null,
             como_vendo: formData.comoVendo,
             spiced_data: formData.spicedData as any,
             como_entrego_dados: formData.comoEntregoDados as any,
@@ -784,7 +784,7 @@ const Admin = () => {
             certificacao_url: formData.certificacaoUrl || null,
             status: formData.status as any,
             description: formData.description,
-            descricao_card: formData.descricaoCard || null,
+            descricao_card: (formData.descricaoCard && formData.descricaoCard.trim()) ? formData.descricaoCard.trim() : null,
             como_vendo: formData.comoVendo,
             spiced_data: (formData.spicedData || {
               situation: { objetivo: "", perguntas: "", observar: "" },
@@ -1905,7 +1905,7 @@ const Admin = () => {
                             </div>
                           </div>
 
-                          {(product as any).descricao_card && (
+                          {(product as any).descricao_card && (product as any).descricao_card.trim() && (
                             <p className="text-sm text-foreground line-clamp-3">
                               {(product as any).descricao_card}
                             </p>
@@ -1975,7 +1975,7 @@ const Admin = () => {
                               <td className="p-4">
                                 <div>
                                   <div className="font-medium">{product.produto}</div>
-                                  {(product as any).descricao_card && (
+                                  {(product as any).descricao_card && (product as any).descricao_card.trim() && (
                                     <div className="text-sm text-foreground line-clamp-1 font-medium">
                                       {(product as any).descricao_card}
                                     </div>

@@ -77,7 +77,7 @@ const ProductPortfolio = () => {
             return {
               id: product.id,
               name: product.produto,
-              description: product.descricao_card || "",
+              description: product.descricao_card && product.descricao_card.trim() ? product.descricao_card.trim() : "",
               category: product.categoria,
               status: product.status,
               valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
