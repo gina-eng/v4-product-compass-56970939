@@ -599,34 +599,74 @@ const Admin = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {products.map((product) => (
-                    <Card key={product.id} className="p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-semibold">{product.produto}</h3>
-                            <Badge variant="outline">{product.categoria.toUpperCase()}</Badge>
-                            <Badge variant="default">{product.status}</Badge>
+                    <Card key={product.id} className="relative hover:shadow-lg transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2 flex-1">
+                            <CardTitle className="text-lg leading-tight pr-2">{product.produto}</CardTitle>
+                            <div className="flex flex-wrap gap-1">
+                              <Badge variant={
+                                product.categoria === 'saber' ? 'default' :
+                                product.categoria === 'ter' ? 'secondary' :
+                                product.categoria === 'executar' ? 'outline' :
+                                'default'
+                              } className="text-xs">
+                                {product.categoria.toUpperCase()}
+                              </Badge>
+                              <Badge variant={
+                                product.status === 'Disponível' ? 'default' :
+                                product.status === 'Em produção' ? 'secondary' :
+                                'outline'
+                              } className="text-xs">
+                                {product.status}
+                              </Badge>
+                            </div>
                           </div>
+                          <div className="flex gap-1 ml-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditProduct(product)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-3">
                           {product.descricao_card && (
-                            <p className="text-sm text-muted-foreground mb-2">{product.descricao_card}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {product.descricao_card}
+                            </p>
                           )}
-                          <div className="text-sm text-muted-foreground">
-                            <span>Valor: {product.valor}</span> • 
-                            <span>Duração: {product.duracao}</span> • 
-                            <span>Dono: {product.dono}</span>
+                          <div className="space-y-1 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Valor:</span>
+                              <span className="font-medium">{product.valor}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Duração:</span>
+                              <span>{product.duracao}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Dono:</span>
+                              <span>{product.dono}</span>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleDeleteProduct(product.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
+                      </CardContent>
                     </Card>
                   ))}
                 </div>
