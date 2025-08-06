@@ -13,7 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { Plus, Edit, Trash2, Upload } from "lucide-react";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -62,8 +63,16 @@ interface Product {
   descricao_completa?: string;
 }
 
+interface SupportMaterial {
+  id: string;
+  nome_arquivo: string;
+  url_direcionamento: string;
+  created_at: string;
+}
+
 const Admin = () => {
   const { toast } = useToast();
+  const { settings, updateSetting, isTableAvailable } = useSiteSettings();
   
   // Estados para produtos
   const [products, setProducts] = useState<Product[]>([]);
@@ -75,6 +84,15 @@ const Admin = () => {
   const [positions, setPositions] = useState<Position[]>([]);
   const [isPositionDialogOpen, setIsPositionDialogOpen] = useState(false);
   const [editingPosition, setEditingPosition] = useState<Position | null>(null);
+  
+  // Estados para materiais de suporte
+  const [supportMaterials, setSupportMaterials] = useState<SupportMaterial[]>([]);
+  const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
+  const [editingSupportMaterial, setEditingSupportMaterial] = useState<SupportMaterial | null>(null);
+  const [supportForm, setSupportForm] = useState({
+    nome_arquivo: '',
+    url_direcionamento: ''
+  });
   
   // Form states
   const [productForm, setProductForm] = useState({
@@ -115,7 +133,22 @@ const Admin = () => {
   useEffect(() => {
     fetchProducts();
     fetchPositions();
+    fetchSupportMaterials();
   }, []);
+
+  const fetchSupportMaterials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('support_materials')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setSupportMaterials(data || []);
+    } catch (error) {
+      console.error('Erro ao buscar materiais de apoio:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -350,6 +383,8 @@ const Admin = () => {
           <TabsList>
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="positions">Posições</TabsTrigger>
+            <TabsTrigger value="support">Materiais de Apoio</TabsTrigger>
+            <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products">
@@ -602,10 +637,100 @@ const Admin = () => {
           <TabsContent value="positions">
             <Card>
               <CardHeader>
-                <CardTitle>Posições</CardTitle>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Posições</CardTitle>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nova Posição
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <p>Gestão de posições será implementada aqui.</p>
+                <div className="grid gap-4">
+                  {positions.map((position) => (
+                    <Card key={position.id} className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-semibold">{position.nome}</h3>
+                          <div className="text-sm text-muted-foreground">
+                            CPH: R$ {position.cph.toFixed(2)} • 
+                            Investimento Total: R$ {position.investimento_total.toFixed(2)}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="support">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Materiais de Apoio</CardTitle>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Material
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  {supportMaterials.map((material) => (
+                    <Card key={material.id} className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-semibold">{material.nome_arquivo}</h3>
+                          <p className="text-sm text-muted-foreground">{material.url_direcionamento}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <Card>
+              <CardHeader>
+                <CardTitle>Configurações Gerais</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isTableAvailable && settings && Object.entries(settings).map(([key, value]) => (
+                  <div key={key}>
+                    <Label htmlFor={key}>{key}</Label>
+                    <Textarea
+                      id={key}
+                      value={value}
+                      onChange={(e) => updateSetting(key, e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                ))}
+                {!isTableAvailable && (
+                  <p className="text-muted-foreground">
+                    Configurações não disponíveis no momento.
+                  </p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
