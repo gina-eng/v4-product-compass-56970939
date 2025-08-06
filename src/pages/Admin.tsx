@@ -57,16 +57,6 @@ interface Product {
   duracao: string;
   dono: string;
   valor: string;
-  pitch: boolean;
-  bpmn: boolean;
-  playbook: boolean;
-  pricing: boolean;
-  certificacao: boolean;
-  pitchUrl?: string;
-  bpmnUrl?: string;
-  playbookUrl?: string;
-  pricingUrl?: string;
-  certificacaoUrl?: string;
   status: string;
   description: string;
   descricaoCard?: string;
@@ -74,25 +64,9 @@ interface Product {
   spicedData: SpicedData;
   comoEntregoDados: ComoEntregoItem[];
   oQueEntrego: string;
-  paraQuemServe?: string;
-  comoEntregaValor?: string;
-  bonusKpi?: string;
-  kpiPrincipal?: string;
-  tempoMetaKpi?: string;
-  garantiaEspecifica?: string;
-  stackDigital?: string;
-  entregaveisRelacionados?: string;
-  case1Name?: string;
-  case1UnidadeResponsavel?: string;
-  case1ResponsavelProjeto?: string;
-  case1DocumentoUrl?: string;
-  case2Name?: string;
-  case2UnidadeResponsavel?: string;
-  case2ResponsavelProjeto?: string;
-  case2DocumentoUrl?: string;
   markup?: number;
   // Novos campos da estrutura expandida
-  icpText?: string; // Renomeado para evitar conflito
+  icpText?: string;
   escopo?: string;
   duracao_media?: string;
   time_envolvido?: string;
