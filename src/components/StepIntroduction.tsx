@@ -79,9 +79,15 @@ const StepIntroduction = () => {
                     <p className="text-sm font-medium text-foreground">
                       "{item.subtitle}"
                     </p>
-                    <p className="text-sm text-foreground/70 leading-relaxed text-justify">
-                      {item.description}
-                    </p>
+                    <div className="text-sm text-foreground/70 leading-relaxed text-justify">
+                      {item.description.split('→').map((part, index) => (
+                        <span key={index}>
+                          {index > 0 && <span className="font-medium">→ </span>}
+                          {part.trim()}
+                          {index < item.description.split('→').length - 1 && <span> </span>}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
