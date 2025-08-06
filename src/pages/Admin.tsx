@@ -44,23 +44,50 @@ interface Product {
   id: string;
   produto: string;
   categoria: string;
+  description: string;
+  descricao_card?: string;
+  como_vendo: string;
   duracao: string;
   dono: string;
   valor: string;
   status: string;
-  description: string;
-  descricao_card?: string;
-  como_vendo: string;
-  spiced_data: SpicedData;
-  como_entrego_dados: ComoEntregoItem[];
-  markup?: number;
-  // Novos campos da estrutura expandida
-  icp?: string;
+  o_que_entrego?: string;
   escopo?: string;
   duracao_media?: string;
   time_envolvido?: string;
   formato_entrega?: string;
   descricao_completa?: string;
+  para_quem_serve?: string;
+  como_entrega_valor?: string;
+  entregaveis_relacionados?: string;
+  stack_digital?: string;
+  bonus_kpi?: string;
+  garantia_especifica?: string;
+  kpi_principal?: string;
+  tempo_meta_kpi?: string;
+  pitch?: boolean;
+  bpmn?: boolean;
+  playbook?: boolean;
+  icp?: boolean;
+  pricing?: boolean;
+  certificacao?: boolean;
+  pitch_url?: string;
+  bpmn_url?: string;
+  playbook_url?: string;
+  icp_url?: string;
+  pricing_url?: string;
+  certificacao_url?: string;
+  case_1_name?: string;
+  case_1_unidade_responsavel?: string;
+  case_1_responsavel_projeto?: string;
+  case_1_documento_url?: string;
+  case_2_name?: string;
+  case_2_unidade_responsavel?: string;
+  case_2_responsavel_projeto?: string;
+  case_2_documento_url?: string;
+  spiced_data: SpicedData;
+  como_entrego_dados: ComoEntregoItem[];
+  markup?: number;
 }
 
 interface SupportMaterial {
@@ -98,19 +125,47 @@ const Admin = () => {
   const [productForm, setProductForm] = useState({
     produto: '',
     categoria: 'saber',
+    description: '',
+    descricao_card: '',
+    como_vendo: '',
     duracao: '',
     dono: '',
     valor: '',
     status: 'Disponível',
-    description: '',
-    descricao_card: '',
-    como_vendo: '',
-    icp: '',
+    o_que_entrego: '',
     escopo: '',
     duracao_media: '',
     time_envolvido: '',
     formato_entrega: '',
     descricao_completa: '',
+    para_quem_serve: '',
+    como_entrega_valor: '',
+    entregaveis_relacionados: '',
+    stack_digital: '',
+    bonus_kpi: '',
+    garantia_especifica: '',
+    kpi_principal: '',
+    tempo_meta_kpi: '',
+    pitch: false,
+    bpmn: false,
+    playbook: false,
+    icp: false,
+    pricing: false,
+    certificacao: false,
+    pitch_url: '',
+    bpmn_url: '',
+    playbook_url: '',
+    icp_url: '',
+    pricing_url: '',
+    certificacao_url: '',
+    case_1_name: '',
+    case_1_unidade_responsavel: '',
+    case_1_responsavel_projeto: '',
+    case_1_documento_url: '',
+    case_2_name: '',
+    case_2_unidade_responsavel: '',
+    case_2_responsavel_projeto: '',
+    case_2_documento_url: '',
     markup: 1
   });
 
@@ -163,13 +218,47 @@ const Admin = () => {
         id: product.id,
         produto: product.produto,
         categoria: product.categoria,
+        description: product.description,
+        descricao_card: product.descricao_card,
+        como_vendo: product.como_vendo,
         duracao: product.duracao,
         dono: product.dono,
         valor: product.valor,
         status: product.status,
-        description: product.description,
-        descricao_card: product.descricao_card,
-        como_vendo: product.como_vendo,
+        o_que_entrego: product.o_que_entrego,
+        escopo: product.escopo,
+        duracao_media: product.duracao_media,
+        time_envolvido: product.time_envolvido,
+        formato_entrega: product.formato_entrega,
+        descricao_completa: product.descricao_completa,
+        para_quem_serve: product.para_quem_serve,
+        como_entrega_valor: product.como_entrega_valor,
+        entregaveis_relacionados: product.entregaveis_relacionados,
+        stack_digital: product.stack_digital,
+        bonus_kpi: product.bonus_kpi,
+        garantia_especifica: product.garantia_especifica,
+        kpi_principal: product.kpi_principal,
+        tempo_meta_kpi: product.tempo_meta_kpi,
+        pitch: product.pitch,
+        bpmn: product.bpmn,
+        playbook: product.playbook,
+        icp: product.icp,
+        pricing: product.pricing,
+        certificacao: product.certificacao,
+        pitch_url: product.pitch_url,
+        bpmn_url: product.bpmn_url,
+        playbook_url: product.playbook_url,
+        icp_url: product.icp_url,
+        pricing_url: product.pricing_url,
+        certificacao_url: product.certificacao_url,
+        case_1_name: product.case_1_name,
+        case_1_unidade_responsavel: product.case_1_unidade_responsavel,
+        case_1_responsavel_projeto: product.case_1_responsavel_projeto,
+        case_1_documento_url: product.case_1_documento_url,
+        case_2_name: product.case_2_name,
+        case_2_unidade_responsavel: product.case_2_unidade_responsavel,
+        case_2_responsavel_projeto: product.case_2_responsavel_projeto,
+        case_2_documento_url: product.case_2_documento_url,
         spiced_data: (product.spiced_data as unknown as SpicedData) || {
           situation: { objetivo: "", perguntas: "", observar: "" },
           pain: { objetivo: "", perguntas: "", observar: "" },
@@ -178,13 +267,7 @@ const Admin = () => {
           decision: { objetivo: "", perguntas: "", observar: "" }
         },
         como_entrego_dados: (product.como_entrego_dados as unknown as ComoEntregoItem[]) || [],
-        markup: product.markup,
-        icp: typeof product.icp === 'string' ? product.icp : undefined,
-        escopo: product.escopo,
-        duracao_media: product.duracao_media,
-        time_envolvido: product.time_envolvido,
-        formato_entrega: product.formato_entrega,
-        descricao_completa: product.descricao_completa
+        markup: product.markup
       }));
       
       setProducts(formattedProducts);
@@ -219,23 +302,50 @@ const Admin = () => {
       const productData = {
         produto: productForm.produto,
         categoria: productForm.categoria as "saber" | "ter" | "executar" | "potencializar",
+        description: productForm.description,
+        descricao_card: productForm.descricao_card || null,
+        como_vendo: productForm.como_vendo,
         duracao: productForm.duracao,
         dono: productForm.dono,
         valor: productForm.valor,
         status: productForm.status as "Disponível" | "Em produção" | "Em homologação",
-        description: productForm.description,
-        descricao_card: productForm.descricao_card || null,
-        como_vendo: productForm.como_vendo,
-        o_que_entrego: productForm.description,
-        spiced_data: spicedData,
-        como_entrego_dados: comoEntregoDados,
-        markup: productForm.markup,
-        icp: productForm.icp || null,
+        o_que_entrego: productForm.o_que_entrego || null,
         escopo: productForm.escopo || null,
         duracao_media: productForm.duracao_media || null,
         time_envolvido: productForm.time_envolvido || null,
         formato_entrega: productForm.formato_entrega || null,
-        descricao_completa: productForm.descricao_completa || null
+        descricao_completa: productForm.descricao_completa || null,
+        para_quem_serve: productForm.para_quem_serve || null,
+        como_entrega_valor: productForm.como_entrega_valor || null,
+        entregaveis_relacionados: productForm.entregaveis_relacionados || null,
+        stack_digital: productForm.stack_digital || null,
+        bonus_kpi: productForm.bonus_kpi || null,
+        garantia_especifica: productForm.garantia_especifica || null,
+        kpi_principal: productForm.kpi_principal || null,
+        tempo_meta_kpi: productForm.tempo_meta_kpi || null,
+        pitch: productForm.pitch,
+        bpmn: productForm.bpmn,
+        playbook: productForm.playbook,
+        icp: productForm.icp,
+        pricing: productForm.pricing,
+        certificacao: productForm.certificacao,
+        pitch_url: productForm.pitch_url || null,
+        bpmn_url: productForm.bpmn_url || null,
+        playbook_url: productForm.playbook_url || null,
+        icp_url: productForm.icp_url || null,
+        pricing_url: productForm.pricing_url || null,
+        certificacao_url: productForm.certificacao_url || null,
+        case_1_name: productForm.case_1_name || null,
+        case_1_unidade_responsavel: productForm.case_1_unidade_responsavel || null,
+        case_1_responsavel_projeto: productForm.case_1_responsavel_projeto || null,
+        case_1_documento_url: productForm.case_1_documento_url || null,
+        case_2_name: productForm.case_2_name || null,
+        case_2_unidade_responsavel: productForm.case_2_unidade_responsavel || null,
+        case_2_responsavel_projeto: productForm.case_2_responsavel_projeto || null,
+        case_2_documento_url: productForm.case_2_documento_url || null,
+        spiced_data: spicedData,
+        como_entrego_dados: comoEntregoDados,
+        markup: productForm.markup
       } as any;
 
       let error;
@@ -277,19 +387,47 @@ const Admin = () => {
     setProductForm({
       produto: product.produto,
       categoria: product.categoria,
+      description: product.description,
+      descricao_card: product.descricao_card || '',
+      como_vendo: product.como_vendo,
       duracao: product.duracao,
       dono: product.dono,
       valor: product.valor,
       status: product.status,
-      description: product.description,
-      descricao_card: product.descricao_card || '',
-      como_vendo: product.como_vendo,
-      icp: product.icp || '',
+      o_que_entrego: (product as any).o_que_entrego || '',
       escopo: product.escopo || '',
       duracao_media: product.duracao_media || '',
       time_envolvido: product.time_envolvido || '',
       formato_entrega: product.formato_entrega || '',
       descricao_completa: product.descricao_completa || '',
+      para_quem_serve: (product as any).para_quem_serve || '',
+      como_entrega_valor: (product as any).como_entrega_valor || '',
+      entregaveis_relacionados: (product as any).entregaveis_relacionados || '',
+      stack_digital: (product as any).stack_digital || '',
+      bonus_kpi: (product as any).bonus_kpi || '',
+      garantia_especifica: (product as any).garantia_especifica || '',
+      kpi_principal: (product as any).kpi_principal || '',
+      tempo_meta_kpi: (product as any).tempo_meta_kpi || '',
+      pitch: (product as any).pitch || false,
+      bpmn: (product as any).bpmn || false,
+      playbook: (product as any).playbook || false,
+      icp: (product as any).icp || false,
+      pricing: (product as any).pricing || false,
+      certificacao: (product as any).certificacao || false,
+      pitch_url: (product as any).pitch_url || '',
+      bpmn_url: (product as any).bpmn_url || '',
+      playbook_url: (product as any).playbook_url || '',
+      icp_url: (product as any).icp_url || '',
+      pricing_url: (product as any).pricing_url || '',
+      certificacao_url: (product as any).certificacao_url || '',
+      case_1_name: (product as any).case_1_name || '',
+      case_1_unidade_responsavel: (product as any).case_1_unidade_responsavel || '',
+      case_1_responsavel_projeto: (product as any).case_1_responsavel_projeto || '',
+      case_1_documento_url: (product as any).case_1_documento_url || '',
+      case_2_name: (product as any).case_2_name || '',
+      case_2_unidade_responsavel: (product as any).case_2_unidade_responsavel || '',
+      case_2_responsavel_projeto: (product as any).case_2_responsavel_projeto || '',
+      case_2_documento_url: (product as any).case_2_documento_url || '',
       markup: product.markup || 1
     });
     setSpicedData(product.spiced_data || {
@@ -308,19 +446,47 @@ const Admin = () => {
     setProductForm({
       produto: '',
       categoria: 'saber',
+      description: '',
+      descricao_card: '',
+      como_vendo: '',
       duracao: '',
       dono: '',
       valor: '',
       status: 'Disponível',
-      description: '',
-      descricao_card: '',
-      como_vendo: '',
-      icp: '',
+      o_que_entrego: '',
       escopo: '',
       duracao_media: '',
       time_envolvido: '',
       formato_entrega: '',
       descricao_completa: '',
+      para_quem_serve: '',
+      como_entrega_valor: '',
+      entregaveis_relacionados: '',
+      stack_digital: '',
+      bonus_kpi: '',
+      garantia_especifica: '',
+      kpi_principal: '',
+      tempo_meta_kpi: '',
+      pitch: false,
+      bpmn: false,
+      playbook: false,
+      icp: false,
+      pricing: false,
+      certificacao: false,
+      pitch_url: '',
+      bpmn_url: '',
+      playbook_url: '',
+      icp_url: '',
+      pricing_url: '',
+      certificacao_url: '',
+      case_1_name: '',
+      case_1_unidade_responsavel: '',
+      case_1_responsavel_projeto: '',
+      case_1_documento_url: '',
+      case_2_name: '',
+      case_2_unidade_responsavel: '',
+      case_2_responsavel_projeto: '',
+      case_2_documento_url: '',
       markup: 1
     });
     setSpicedData({
@@ -478,11 +644,11 @@ const Admin = () => {
 
                         <TabsContent value="visao" className="space-y-4">
                           <div>
-                            <Label htmlFor="icp">ICP (Ideal Customer Profile)</Label>
-                            <Textarea
-                              id="icp"
-                              value={productForm.icp}
-                              onChange={(e) => setProductForm({...productForm, icp: e.target.value})}
+                            <Label htmlFor="icp_url">ICP URL</Label>
+                            <Input
+                              id="icp_url"
+                              value={productForm.icp_url}
+                              onChange={(e) => setProductForm({...productForm, icp_url: e.target.value})}
                             />
                           </div>
                           <div>
@@ -536,6 +702,74 @@ const Admin = () => {
                               rows={5}
                             />
                           </div>
+                          <div>
+                            <Label htmlFor="para_quem_serve">Para quem serve</Label>
+                            <Textarea
+                              id="para_quem_serve"
+                              value={productForm.para_quem_serve}
+                              onChange={(e) => setProductForm({...productForm, para_quem_serve: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="como_entrega_valor">Como entrega valor</Label>
+                            <Textarea
+                              id="como_entrega_valor"
+                              value={productForm.como_entrega_valor}
+                              onChange={(e) => setProductForm({...productForm, como_entrega_valor: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="entregaveis_relacionados">Entregáveis relacionados</Label>
+                            <Textarea
+                              id="entregaveis_relacionados"
+                              value={productForm.entregaveis_relacionados}
+                              onChange={(e) => setProductForm({...productForm, entregaveis_relacionados: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="stack_digital">Stack digital</Label>
+                            <Textarea
+                              id="stack_digital"
+                              value={productForm.stack_digital}
+                              onChange={(e) => setProductForm({...productForm, stack_digital: e.target.value})}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="bonus_kpi">Bônus KPI</Label>
+                              <Input
+                                id="bonus_kpi"
+                                value={productForm.bonus_kpi}
+                                onChange={(e) => setProductForm({...productForm, bonus_kpi: e.target.value})}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="garantia_especifica">Garantia específica</Label>
+                              <Input
+                                id="garantia_especifica"
+                                value={productForm.garantia_especifica}
+                                onChange={(e) => setProductForm({...productForm, garantia_especifica: e.target.value})}
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="kpi_principal">KPI Principal</Label>
+                              <Input
+                                id="kpi_principal"
+                                value={productForm.kpi_principal}
+                                onChange={(e) => setProductForm({...productForm, kpi_principal: e.target.value})}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="tempo_meta_kpi">Tempo meta KPI</Label>
+                              <Input
+                                id="tempo_meta_kpi"
+                                value={productForm.tempo_meta_kpi}
+                                onChange={(e) => setProductForm({...productForm, tempo_meta_kpi: e.target.value})}
+                              />
+                            </div>
+                          </div>
                         </TabsContent>
 
                         <TabsContent value="venda" className="space-y-4">
@@ -559,7 +793,16 @@ const Admin = () => {
 
                         <TabsContent value="entrega" className="space-y-4">
                           <div>
-                            <Label htmlFor="description">Como eu entrego?</Label>
+                            <Label htmlFor="o_que_entrego">O que entrego</Label>
+                            <Textarea
+                              id="o_que_entrego"
+                              value={productForm.o_que_entrego}
+                              onChange={(e) => setProductForm({...productForm, o_que_entrego: e.target.value})}
+                              rows={3}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="description">Como eu entrego</Label>
                             <Textarea
                               id="description"
                               value={productForm.description}
@@ -574,6 +817,128 @@ const Admin = () => {
                               onChange={(data) => setComoEntregoDados(data as any)}
                               positions={positions}
                             />
+                          </div>
+
+                          <div className="space-y-4 mt-6">
+                            <h4 className="font-semibold">URLs de Documentos</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="pitch_url">Pitch URL</Label>
+                                <Input
+                                  id="pitch_url"
+                                  value={productForm.pitch_url}
+                                  onChange={(e) => setProductForm({...productForm, pitch_url: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="bpmn_url">BPMN URL</Label>
+                                <Input
+                                  id="bpmn_url"
+                                  value={productForm.bpmn_url}
+                                  onChange={(e) => setProductForm({...productForm, bpmn_url: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="playbook_url">Playbook URL</Label>
+                                <Input
+                                  id="playbook_url"
+                                  value={productForm.playbook_url}
+                                  onChange={(e) => setProductForm({...productForm, playbook_url: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="pricing_url">Pricing URL</Label>
+                                <Input
+                                  id="pricing_url"
+                                  value={productForm.pricing_url}
+                                  onChange={(e) => setProductForm({...productForm, pricing_url: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="certificacao_url">Certificação URL</Label>
+                                <Input
+                                  id="certificacao_url"
+                                  value={productForm.certificacao_url}
+                                  onChange={(e) => setProductForm({...productForm, certificacao_url: e.target.value})}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4 mt-6">
+                            <h4 className="font-semibold">Case 1</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="case_1_name">Nome do Case 1</Label>
+                                <Input
+                                  id="case_1_name"
+                                  value={productForm.case_1_name}
+                                  onChange={(e) => setProductForm({...productForm, case_1_name: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="case_1_unidade_responsavel">Unidade Responsável</Label>
+                                <Input
+                                  id="case_1_unidade_responsavel"
+                                  value={productForm.case_1_unidade_responsavel}
+                                  onChange={(e) => setProductForm({...productForm, case_1_unidade_responsavel: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="case_1_responsavel_projeto">Responsável Projeto</Label>
+                                <Input
+                                  id="case_1_responsavel_projeto"
+                                  value={productForm.case_1_responsavel_projeto}
+                                  onChange={(e) => setProductForm({...productForm, case_1_responsavel_projeto: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="case_1_documento_url">URL do Documento</Label>
+                                <Input
+                                  id="case_1_documento_url"
+                                  value={productForm.case_1_documento_url}
+                                  onChange={(e) => setProductForm({...productForm, case_1_documento_url: e.target.value})}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4 mt-6">
+                            <h4 className="font-semibold">Case 2</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="case_2_name">Nome do Case 2</Label>
+                                <Input
+                                  id="case_2_name"
+                                  value={productForm.case_2_name}
+                                  onChange={(e) => setProductForm({...productForm, case_2_name: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="case_2_unidade_responsavel">Unidade Responsável</Label>
+                                <Input
+                                  id="case_2_unidade_responsavel"
+                                  value={productForm.case_2_unidade_responsavel}
+                                  onChange={(e) => setProductForm({...productForm, case_2_unidade_responsavel: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="case_2_responsavel_projeto">Responsável Projeto</Label>
+                                <Input
+                                  id="case_2_responsavel_projeto"
+                                  value={productForm.case_2_responsavel_projeto}
+                                  onChange={(e) => setProductForm({...productForm, case_2_responsavel_projeto: e.target.value})}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="case_2_documento_url">URL do Documento</Label>
+                                <Input
+                                  id="case_2_documento_url"
+                                  value={productForm.case_2_documento_url}
+                                  onChange={(e) => setProductForm({...productForm, case_2_documento_url: e.target.value})}
+                                />
+                              </div>
+                            </div>
                           </div>
                         </TabsContent>
                       </Tabs>
