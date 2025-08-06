@@ -442,27 +442,11 @@ const Admin = () => {
                               </Select>
                             </div>
                             <div>
-                              <Label htmlFor="duracao">Duração</Label>
-                              <Input
-                                id="duracao"
-                                value={productForm.duracao}
-                                onChange={(e) => setProductForm({...productForm, duracao: e.target.value})}
-                              />
-                            </div>
-                            <div>
                               <Label htmlFor="valor">Valor</Label>
                               <Input
                                 id="valor"
                                 value={productForm.valor}
                                 onChange={(e) => setProductForm({...productForm, valor: e.target.value})}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="dono">Dono</Label>
-                              <Input
-                                id="dono"
-                                value={productForm.dono}
-                                onChange={(e) => setProductForm({...productForm, dono: e.target.value})}
                               />
                             </div>
                             <div>
@@ -509,13 +493,21 @@ const Admin = () => {
                               onChange={(e) => setProductForm({...productForm, escopo: e.target.value})}
                             />
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-3 gap-4">
                             <div>
-                              <Label htmlFor="duracao_media">Duração Média</Label>
+                              <Label htmlFor="duracao">Duração</Label>
                               <Input
-                                id="duracao_media"
-                                value={productForm.duracao_media}
-                                onChange={(e) => setProductForm({...productForm, duracao_media: e.target.value})}
+                                id="duracao"
+                                value={productForm.duracao}
+                                onChange={(e) => setProductForm({...productForm, duracao: e.target.value})}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="dono">Dono</Label>
+                              <Input
+                                id="dono"
+                                value={productForm.dono}
+                                onChange={(e) => setProductForm({...productForm, dono: e.target.value})}
                               />
                             </div>
                             <div>
