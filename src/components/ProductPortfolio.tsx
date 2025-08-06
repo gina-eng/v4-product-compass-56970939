@@ -123,7 +123,7 @@ const ProductPortfolio = () => {
     <section className="py-16 px-4 bg-gray-50">
       <div className="container mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-8">Portfólio de Produtos</h2>
+          <h2 className="text-3xl font-bold mb-8">Portfólio de Produtos e Serviços V4</h2>
           
           {/* Filtros lado a lado */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
