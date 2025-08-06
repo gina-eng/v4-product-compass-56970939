@@ -74,7 +74,7 @@ const ProductPortfolio = () => {
               }
             }
 
-            return {
+            const productData = {
               id: product.id,
               name: product.produto,
               description: product.descricao_card && product.descricao_card.trim() ? product.descricao_card.trim() : "",
@@ -83,6 +83,16 @@ const ProductPortfolio = () => {
               valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
               margemOperacional: margemOperacional
             };
+            
+            console.log('Produto processado:', {
+              id: product.id,
+              nome: product.produto,
+              descricao_card_original: product.descricao_card,
+              descricao_final: productData.description,
+              tem_descricao: !!productData.description
+            });
+
+            return productData;
           })
         );
         
