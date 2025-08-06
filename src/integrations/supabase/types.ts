@@ -103,6 +103,7 @@ export type Database = {
           como_entrego_dados: Json | null
           como_vendo: string
           created_at: string
+          descricao_card: string | null
           description: string
           dono: string
           duracao: string
@@ -148,6 +149,7 @@ export type Database = {
           como_entrego_dados?: Json | null
           como_vendo: string
           created_at?: string
+          descricao_card?: string | null
           description: string
           dono: string
           duracao: string
@@ -193,6 +195,7 @@ export type Database = {
           como_entrego_dados?: Json | null
           como_vendo?: string
           created_at?: string
+          descricao_card?: string | null
           description?: string
           dono?: string
           duracao?: string

@@ -159,6 +159,7 @@ const Admin = () => {
     certificacaoUrl: "",
     status: "Em produção",
     description: "",
+    descricaoCard: "",
     comoVendo: "",
     spicedData: {
       situation: { objetivo: "", perguntas: "", observar: "" },
@@ -729,6 +730,7 @@ const Admin = () => {
             certificacao_url: formData.certificacaoUrl || null,
             status: formData.status as any,
             description: formData.description,
+            descricao_card: formData.descricaoCard || null,
             como_vendo: formData.comoVendo,
             spiced_data: formData.spicedData as any,
             como_entrego_dados: formData.comoEntregoDados as any,
@@ -782,6 +784,7 @@ const Admin = () => {
             certificacao_url: formData.certificacaoUrl || null,
             status: formData.status as any,
             description: formData.description,
+            descricao_card: formData.descricaoCard || null,
             como_vendo: formData.comoVendo,
             spiced_data: (formData.spicedData || {
               situation: { objetivo: "", perguntas: "", observar: "" },
@@ -840,6 +843,7 @@ const Admin = () => {
         pricingUrl: "",
         certificacaoUrl: "",
         description: "",
+        descricaoCard: "",
         comoVendo: "",
         spicedData: {
           situation: { objetivo: "", perguntas: "", observar: "" },
@@ -901,6 +905,7 @@ const Admin = () => {
       certificacaoUrl: product.certificacaoUrl || "",
       status: product.status,
       description: product.description,
+      descricaoCard: (product as any).descricaoCard || "",
       comoVendo: product.comoVendo,
       spicedData: product.spicedData,
       comoEntregoDados: product.comoEntregoDados,
@@ -974,6 +979,7 @@ const Admin = () => {
       pricingUrl: "",
       certificacaoUrl: "",
       description: "",
+      descricaoCard: "",
       comoVendo: "",
       spicedData: {
         situation: { objetivo: "", perguntas: "", observar: "" },
@@ -1436,7 +1442,17 @@ const Admin = () => {
 
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="description">Descrição Curta</Label>
+                          <Label htmlFor="descricaoCard">Descrição do Card</Label>
+                          <Textarea
+                            id="descricaoCard"
+                            value={formData.descricaoCard || ''}
+                            onChange={(e) => setFormData({...formData, descricaoCard: e.target.value})}
+                            rows={2}
+                            placeholder="Descrição sucinta para exibir no card"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="description">Descrição Completa</Label>
                           <Textarea
                             id="description"
                             value={formData.description}
