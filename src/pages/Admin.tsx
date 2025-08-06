@@ -71,6 +71,7 @@ interface Product {
   certificacaoUrl?: string;
   status: string;
   description: string;
+  descricaoCard?: string;
   comoVendo: string;
   spicedData: SpicedData;
   comoEntregoDados: ComoEntregoItem[];
@@ -660,6 +661,7 @@ const Admin = () => {
         certificacaoUrl: product.certificacao_url,
         status: product.status,
         description: product.description,
+        descricaoCard: product.descricao_card,
         comoVendo: product.como_vendo,
         spicedData: (product.spiced_data as unknown as SpicedData) || {
           situation: { objetivo: "", perguntas: "", observar: "" },
@@ -905,7 +907,7 @@ const Admin = () => {
       certificacaoUrl: product.certificacaoUrl || "",
       status: product.status,
       description: product.description,
-      descricaoCard: (product as any).descricao_card || "",
+      descricaoCard: product.descricaoCard || "",
       comoVendo: product.comoVendo,
       spicedData: product.spicedData,
       comoEntregoDados: product.comoEntregoDados,
@@ -1905,9 +1907,9 @@ const Admin = () => {
                             </div>
                           </div>
 
-                          {(product as any).descricao_card && (product as any).descricao_card.trim() && (
+                          {product.descricaoCard && product.descricaoCard.trim() && (
                             <p className="text-sm text-foreground line-clamp-3">
-                              {(product as any).descricao_card}
+                              {product.descricaoCard}
                             </p>
                           )}
 
@@ -1975,9 +1977,9 @@ const Admin = () => {
                               <td className="p-4">
                                 <div>
                                   <div className="font-medium">{product.produto}</div>
-                                  {(product as any).descricao_card && (product as any).descricao_card.trim() && (
+                                  {product.descricaoCard && product.descricaoCard.trim() && (
                                     <div className="text-sm text-foreground line-clamp-1 font-medium">
-                                      {(product as any).descricao_card}
+                                      {product.descricaoCard}
                                     </div>
                                   )}
                                 </div>
