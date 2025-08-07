@@ -306,19 +306,6 @@ const ProductDetails = () => {
                   <p className="text-sm text-content">{product.entregaveis_relacionados}</p>
                 </div>
               )}
-              {product.icp_url && (
-                <div>
-                  <span className="text-sm font-bold text-foreground">ICP:</span>
-                  <a 
-                    href={product.icp_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Documento ICP
-                  </a>
-                </div>
-              )}
               {product.escopo && (
                 <div>
                   <span className="text-sm font-bold text-foreground">Escopo:</span>
@@ -383,8 +370,10 @@ const ProductDetails = () => {
             {/* Seção específica para exibir o ICP (description) */}
             {product.description && (
               <div>
-                <span className="text-sm font-bold text-foreground">ICP (Ideal Customer Profile):</span>
-                <p className="text-sm text-justify leading-relaxed text-content">{product.description}</p>
+                <span className="text-sm font-bold text-foreground">ICP:</span>
+                <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mt-1 font-normal">
+                  {product.description}
+                </div>
               </div>
             )}
           </CardContent>
