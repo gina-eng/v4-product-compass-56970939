@@ -287,13 +287,13 @@ const ProductDetails = () => {
               {product.para_quem_serve && (
                 <div>
                   <span className="text-sm font-bold text-foreground">Para quem serve:</span>
-                  <p className="text-sm text-content">{product.para_quem_serve}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-1">{product.para_quem_serve}</p>
                 </div>
               )}
               {product.como_entrega_valor && (
                 <div>
                   <span className="text-sm font-bold text-foreground">Como entregar valor:</span>
-                  <p className="text-sm text-content">{product.como_entrega_valor}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-1">{product.como_entrega_valor}</p>
                 </div>
               )}
               {product.entregaveis_relacionados && (
