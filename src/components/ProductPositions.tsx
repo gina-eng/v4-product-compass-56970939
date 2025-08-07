@@ -31,9 +31,10 @@ interface ProductPositionsProps {
   readOnly?: boolean;
   initialMarkup?: number;
   onMarkupChange?: (markup: number) => void;
+  onPositionsChange?: () => void;
 }
 
-const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMarkupChange }: ProductPositionsProps) => {
+const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMarkupChange, onPositionsChange }: ProductPositionsProps) => {
   const [productPositions, setProductPositions] = useState<ProductPosition[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -169,6 +170,11 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
       setEditingPosition(null);
       setFormData({ position_id: '', horas_alocadas: '' });
       fetchProductPositions();
+      
+      // Notificar mudança nas posições
+      if (onPositionsChange) {
+        onPositionsChange();
+      }
     } catch (error) {
       console.error('Erro ao salvar posição:', error);
       toast({
@@ -203,6 +209,11 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
       });
       
       fetchProductPositions();
+      
+      // Notificar mudança nas posições
+      if (onPositionsChange) {
+        onPositionsChange();
+      }
     } catch (error) {
       console.error('Erro ao excluir posição:', error);
       toast({

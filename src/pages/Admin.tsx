@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
+import ProductPositions from "@/components/ProductPositions";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Plus, Edit, Trash2, Upload } from "lucide-react";
 
@@ -386,7 +387,7 @@ const Admin = () => {
     }
   };
 
-  const handleEditProduct = (product: Product) => {
+  const handleEditProduct = async (product: Product) => {
     setEditingProduct(product);
     setProductForm({
       produto: product.produto,
@@ -442,17 +443,47 @@ const Admin = () => {
       decision: { objetivo: "", perguntas: "", observar: "" }
     });
     setComoEntregoDados(product.como_entrego_dados || []);
+    
+    // Calcular e definir o time envolvido automaticamente
+    const timeEnvolvido = await calculateTimeEnvolvido(product.id);
+    setProductForm(prev => ({...prev, time_envolvido: timeEnvolvido}));
+    
     setIsProductDialogOpen(true);
   };
 
   // Função para calcular time envolvido automaticamente
-  const calculateTimeEnvolvido = (positions: Position[], allocations: any[]): string => {
-    const roleNames = allocations.map(allocation => {
-      const position = positions.find(pos => pos.id === allocation.position_id);
-      return position?.nome || '';
-    }).filter(name => name).join(', ');
-    
-    return roleNames;
+  const calculateTimeEnvolvido = async (productId: string): Promise<string> => {
+    try {
+      const { data, error } = await supabase
+        .from('product_positions')
+        .select(`
+          *,
+          positions (nome)
+        `)
+        .eq('product_id', productId);
+      
+      if (error) throw error;
+      
+      const roleNames = data?.map(allocation => allocation.positions?.nome || '').filter(name => name).join(', ') || '';
+      return roleNames;
+    } catch (error) {
+      console.error('Erro ao calcular time envolvido:', error);
+      return '';
+    }
+  };
+
+  // Função para atualizar o time envolvido quando as posições mudarem
+  const handlePositionsChange = async (productId: string) => {
+    if (editingProduct) {
+      const timeEnvolvido = await calculateTimeEnvolvido(productId);
+      setProductForm({...productForm, time_envolvido: timeEnvolvido});
+      
+      // Também atualizar no banco de dados
+      await supabase
+        .from('products')
+        .update({ time_envolvido: timeEnvolvido })
+        .eq('id', productId);
+    }
   };
 
   // Filtrar produtos
@@ -602,11 +633,12 @@ const Admin = () => {
                       </DialogHeader>
 
                       <Tabs defaultValue="basico" className="mt-4">
-                        <TabsList className="grid w-full grid-cols-4">
+                        <TabsList className="grid w-full grid-cols-5">
                           <TabsTrigger value="basico">Básico</TabsTrigger>
                           <TabsTrigger value="visao">Visão Geral</TabsTrigger>
                           <TabsTrigger value="venda">Como Vendo</TabsTrigger>
                           <TabsTrigger value="entrega">Como Entrego</TabsTrigger>
+                          <TabsTrigger value="posicoes">Posições e DRE</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="basico" className="space-y-4">
@@ -707,11 +739,13 @@ const Admin = () => {
                               />
                             </div>
                             <div>
-                              <Label htmlFor="time_envolvido">Time Envolvido</Label>
+                              <Label htmlFor="time_envolvido">Time Envolvido (Automático)</Label>
                               <Input
                                 id="time_envolvido"
                                 value={productForm.time_envolvido}
-                                onChange={(e) => setProductForm({...productForm, time_envolvido: e.target.value})}
+                                readOnly
+                                className="bg-muted"
+                                placeholder="Será preenchido automaticamente com base nas posições alocadas"
                               />
                             </div>
                           </div>
@@ -970,6 +1004,23 @@ const Admin = () => {
                               </div>
                             </div>
                           </div>
+                        </TabsContent>
+
+                        <TabsContent value="posicoes" className="space-y-4">
+                          {editingProduct ? (
+                            <ProductPositions 
+                              productId={editingProduct.id} 
+                              readOnly={false}
+                              initialMarkup={productForm.markup}
+                              onMarkupChange={(markup) => setProductForm({...productForm, markup})}
+                              onPositionsChange={() => handlePositionsChange(editingProduct.id)}
+                            />
+                          ) : (
+                            <div className="text-center p-8 text-muted-foreground">
+                              <p>As posições só podem ser configuradas após o produto ser criado.</p>
+                              <p>Salve o produto primeiro e depois edite-o para adicionar posições.</p>
+                            </div>
+                          )}
                         </TabsContent>
                       </Tabs>
 
