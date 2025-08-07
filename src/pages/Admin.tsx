@@ -704,11 +704,12 @@ const Admin = () => {
                       </DialogHeader>
 
                       <Tabs defaultValue="basico" className="mt-4">
-                        <TabsList className="grid w-full grid-cols-5">
+                        <TabsList className="grid w-full grid-cols-6">
                           <TabsTrigger value="basico">Básico</TabsTrigger>
                           <TabsTrigger value="visao">Visão Geral</TabsTrigger>
                           <TabsTrigger value="venda">Como Vendo</TabsTrigger>
                           <TabsTrigger value="entrega">Como Entrego</TabsTrigger>
+                          <TabsTrigger value="materiais">Materiais e Documentos</TabsTrigger>
                           <TabsTrigger value="posicoes">Posições e DRE</TabsTrigger>
                         </TabsList>
 
@@ -848,7 +849,7 @@ const Admin = () => {
                             />
                           </div>
                           <div>
-                            <Label htmlFor="como_entrega_valor">Como entrega valor</Label>
+                            <Label htmlFor="como_entrega_valor">Como entregar valor</Label>
                             <Textarea
                               id="como_entrega_valor"
                               value={productForm.como_entrega_valor}
@@ -861,6 +862,15 @@ const Admin = () => {
                               id="entregaveis_relacionados"
                               value={productForm.entregaveis_relacionados}
                               onChange={(e) => setProductForm({...productForm, entregaveis_relacionados: e.target.value})}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="icp_url">ICP</Label>
+                            <Input
+                              id="icp_url"
+                              value={productForm.icp_url}
+                              onChange={(e) => setProductForm({...productForm, icp_url: e.target.value})}
+                              placeholder="URL do documento ICP"
                             />
                           </div>
                           <div>
@@ -930,20 +940,20 @@ const Admin = () => {
 
                         <TabsContent value="entrega" className="space-y-4">
                           <div>
+                            <Label htmlFor="description">Como eu entrego?</Label>
+                            <Textarea
+                              id="description"
+                              value={productForm.description}
+                              onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                              rows={3}
+                            />
+                          </div>
+                          <div>
                             <Label htmlFor="o_que_entrego">O que entrego</Label>
                             <Textarea
                               id="o_que_entrego"
                               value={productForm.o_que_entrego}
                               onChange={(e) => setProductForm({...productForm, o_que_entrego: e.target.value})}
-                              rows={3}
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="description">Como eu entrego</Label>
-                            <Textarea
-                              id="description"
-                              value={productForm.description}
-                              onChange={(e) => setProductForm({...productForm, description: e.target.value})}
                               rows={3}
                             />
                           </div>
@@ -955,8 +965,10 @@ const Admin = () => {
                               positions={positions}
                             />
                           </div>
+                        </TabsContent>
 
-                          <div className="space-y-4 mt-6">
+                        <TabsContent value="materiais" className="space-y-4">
+                          <div className="space-y-4">
                             <h4 className="font-semibold">URLs de Documentos</h4>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
@@ -965,6 +977,7 @@ const Admin = () => {
                                   id="pitch_url"
                                   value={productForm.pitch_url}
                                   onChange={(e) => setProductForm({...productForm, pitch_url: e.target.value})}
+                                  placeholder="Link teste"
                                 />
                               </div>
                               <div>
@@ -973,6 +986,7 @@ const Admin = () => {
                                   id="bpmn_url"
                                   value={productForm.bpmn_url}
                                   onChange={(e) => setProductForm({...productForm, bpmn_url: e.target.value})}
+                                  placeholder="Link teste"
                                 />
                               </div>
                               <div>
@@ -981,6 +995,7 @@ const Admin = () => {
                                   id="playbook_url"
                                   value={productForm.playbook_url}
                                   onChange={(e) => setProductForm({...productForm, playbook_url: e.target.value})}
+                                  placeholder="Link teste"
                                 />
                               </div>
                               <div>
@@ -989,6 +1004,7 @@ const Admin = () => {
                                   id="pricing_url"
                                   value={productForm.pricing_url}
                                   onChange={(e) => setProductForm({...productForm, pricing_url: e.target.value})}
+                                  placeholder="Link teste"
                                 />
                               </div>
                               <div>
@@ -997,6 +1013,7 @@ const Admin = () => {
                                   id="certificacao_url"
                                   value={productForm.certificacao_url}
                                   onChange={(e) => setProductForm({...productForm, certificacao_url: e.target.value})}
+                                  placeholder="Link teste"
                                 />
                               </div>
                             </div>
@@ -1011,6 +1028,7 @@ const Admin = () => {
                                   id="case_1_name"
                                   value={productForm.case_1_name}
                                   onChange={(e) => setProductForm({...productForm, case_1_name: e.target.value})}
+                                  placeholder="Case XPTO"
                                 />
                               </div>
                               <div>
@@ -1019,6 +1037,7 @@ const Admin = () => {
                                   id="case_1_unidade_responsavel"
                                   value={productForm.case_1_unidade_responsavel}
                                   onChange={(e) => setProductForm({...productForm, case_1_unidade_responsavel: e.target.value})}
+                                  placeholder="Colli & Co"
                                 />
                               </div>
                               <div>
@@ -1027,6 +1046,7 @@ const Admin = () => {
                                   id="case_1_responsavel_projeto"
                                   value={productForm.case_1_responsavel_projeto}
                                   onChange={(e) => setProductForm({...productForm, case_1_responsavel_projeto: e.target.value})}
+                                  placeholder="Rafael Corazza"
                                 />
                               </div>
                               <div>
@@ -1035,6 +1055,7 @@ const Admin = () => {
                                   id="case_1_documento_url"
                                   value={productForm.case_1_documento_url}
                                   onChange={(e) => setProductForm({...productForm, case_1_documento_url: e.target.value})}
+                                  placeholder="Link teste"
                                 />
                               </div>
                             </div>
@@ -1049,6 +1070,7 @@ const Admin = () => {
                                   id="case_2_name"
                                   value={productForm.case_2_name}
                                   onChange={(e) => setProductForm({...productForm, case_2_name: e.target.value})}
+                                  placeholder="Case XPTO 2"
                                 />
                               </div>
                               <div>
@@ -1057,6 +1079,7 @@ const Admin = () => {
                                   id="case_2_unidade_responsavel"
                                   value={productForm.case_2_unidade_responsavel}
                                   onChange={(e) => setProductForm({...productForm, case_2_unidade_responsavel: e.target.value})}
+                                  placeholder="Colli & Co"
                                 />
                               </div>
                               <div>
@@ -1065,6 +1088,7 @@ const Admin = () => {
                                   id="case_2_responsavel_projeto"
                                   value={productForm.case_2_responsavel_projeto}
                                   onChange={(e) => setProductForm({...productForm, case_2_responsavel_projeto: e.target.value})}
+                                  placeholder="Rafael Corazza"
                                 />
                               </div>
                               <div>
@@ -1073,6 +1097,7 @@ const Admin = () => {
                                   id="case_2_documento_url"
                                   value={productForm.case_2_documento_url}
                                   onChange={(e) => setProductForm({...productForm, case_2_documento_url: e.target.value})}
+                                  placeholder="Link teste"
                                 />
                               </div>
                             </div>
