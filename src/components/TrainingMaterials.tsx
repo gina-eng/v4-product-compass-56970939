@@ -145,7 +145,7 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Materiais de Treinamento e Documentos</CardTitle>
+        <CardTitle>Materiais de Treinamentos</CardTitle>
         {!readOnly && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -221,56 +221,61 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
             Nenhum material de treinamento cadastrado para este produto.
           </p>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {materials.map((material) => (
-              <div key={material.id} className="border rounded-lg p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <h4 className="font-semibold text-foreground">{material.name}</h4>
-                    <Badge variant={material.type === 'comercial' ? 'default' : 'secondary'}>
+              <Card key={material.id} className="h-fit">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant={material.type === 'comercial' ? 'default' : 'secondary'} className="mb-2">
                       {material.type === 'comercial' ? 'Comercial' : 'Operacional'}
                     </Badge>
+                    <div className="flex items-center space-x-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => window.open(material.url, '_blank')}
+                        className="h-8 w-8 p-0"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                      {!readOnly && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openEditDialog(material)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDelete(material.id)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(material.url, '_blank')}
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                    {!readOnly && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openEditDialog(material)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(material.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-                {material.description && (
-                  <p className="text-sm text-content">{material.description}</p>
-                )}
-                <a 
-                  href={material.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline block"
-                >
-                  {material.url}
-                </a>
-              </div>
+                  <CardTitle className="text-base leading-tight">{material.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  {material.description && (
+                    <p className="text-sm text-content mb-3 leading-relaxed">{material.description}</p>
+                  )}
+                  <a 
+                    href={material.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline break-all"
+                  >
+                    {material.url}
+                  </a>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}

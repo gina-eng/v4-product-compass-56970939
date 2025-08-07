@@ -522,7 +522,7 @@ const ProductDetails = () => {
           product.case_1_name || product.case_2_name) && (
           <Card>
             <CardHeader>
-              <CardTitle>Materiais e Documentos (Legado)</CardTitle>
+              <CardTitle>Materiais complementares</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* URLs de Documentos */}
