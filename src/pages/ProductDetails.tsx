@@ -287,13 +287,17 @@ const ProductDetails = () => {
               {product.para_quem_serve && (
                 <div>
                   <span className="text-sm font-bold text-foreground">Para quem serve:</span>
-                  <p className="text-sm text-muted-foreground leading-relaxed mt-1">{product.para_quem_serve}</p>
+                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mt-1 font-normal">
+                    {product.para_quem_serve}
+                  </div>
                 </div>
               )}
               {product.como_entrega_valor && (
                 <div>
                   <span className="text-sm font-bold text-foreground">Como entregar valor:</span>
-                  <p className="text-sm text-muted-foreground leading-relaxed mt-1">{product.como_entrega_valor}</p>
+                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed mt-1 font-normal">
+                    {product.como_entrega_valor}
+                  </div>
                 </div>
               )}
               {product.entregaveis_relacionados && (
