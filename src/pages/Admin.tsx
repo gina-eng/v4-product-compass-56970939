@@ -444,9 +444,14 @@ const Admin = () => {
     });
     setComoEntregoDados(product.como_entrego_dados || []);
     
-    // Calcular e definir o time envolvido automaticamente
+    // Calcular time envolvido e valor automaticamente
     const timeEnvolvido = await calculateTimeEnvolvido(product.id);
-    setProductForm(prev => ({...prev, time_envolvido: timeEnvolvido}));
+    const faturamentoSemDesconto = await calculateFaturamentoSemDesconto(product.id);
+    setProductForm(prev => ({
+      ...prev, 
+      time_envolvido: timeEnvolvido,
+      valor: faturamentoSemDesconto.toString()
+    }));
     
     setIsProductDialogOpen(true);
   };
@@ -472,16 +477,49 @@ const Admin = () => {
     }
   };
 
-  // Função para atualizar o time envolvido quando as posições mudarem
+  // Função para calcular faturamento sem desconto
+  const calculateFaturamentoSemDesconto = async (productId: string): Promise<number> => {
+    try {
+      const { data, error } = await supabase
+        .from('product_positions')
+        .select(`
+          *,
+          positions (cph)
+        `)
+        .eq('product_id', productId);
+      
+      if (error) throw error;
+      
+      const totalCSP = data?.reduce((total, pp) => {
+        return total + (pp.horas_alocadas * (pp.positions?.cph || 0));
+      }, 0) || 0;
+      
+      const markup = productForm.markup || 1;
+      return totalCSP * markup;
+    } catch (error) {
+      console.error('Erro ao calcular faturamento sem desconto:', error);
+      return 0;
+    }
+  };
+
+  // Função para atualizar o time envolvido e valor quando as posições mudarem
   const handlePositionsChange = async (productId: string) => {
     if (editingProduct) {
       const timeEnvolvido = await calculateTimeEnvolvido(productId);
-      setProductForm({...productForm, time_envolvido: timeEnvolvido});
+      const faturamentoSemDesconto = await calculateFaturamentoSemDesconto(productId);
+      setProductForm({
+        ...productForm, 
+        time_envolvido: timeEnvolvido,
+        valor: faturamentoSemDesconto.toString()
+      });
       
       // Também atualizar no banco de dados
       await supabase
         .from('products')
-        .update({ time_envolvido: timeEnvolvido })
+        .update({ 
+          time_envolvido: timeEnvolvido,
+          valor: faturamentoSemDesconto.toString()
+        })
         .eq('id', productId);
     }
   };
@@ -669,11 +707,13 @@ const Admin = () => {
                               </Select>
                             </div>
                             <div>
-                              <Label htmlFor="valor">Valor</Label>
+                              <Label htmlFor="valor">Valor (Automático)</Label>
                               <Input
                                 id="valor"
                                 value={productForm.valor}
-                                onChange={(e) => setProductForm({...productForm, valor: e.target.value})}
+                                readOnly
+                                className="bg-muted"
+                                placeholder="Será calculado automaticamente baseado no DRE"
                               />
                             </div>
                             <div>
