@@ -1185,7 +1185,10 @@ const Admin = () => {
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Valor:</span>
                               <span className="font-medium">
-                                {formatCurrency(calculatedValues[product.id] || parseFloat(product.valor) || 0)}
+                                {calculatedValues[product.id] && calculatedValues[product.id] > 0 
+                                  ? formatCurrency(calculatedValues[product.id]) 
+                                  : "A definir"
+                                }
                               </span>
                             </div>
                             <div className="flex justify-between">
