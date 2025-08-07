@@ -65,7 +65,23 @@ const mockProductData = {
 
   // Como eu entrego?
   informacoesOperar: {
-    oQueEntrego: `Semana 1 — Alinhamento e imersão no negócio • Briefing estratégico da operação e dos objetivos; • Reuniões de alinhamento para entendimento do contexto e definição de metas; • Acesso a dashboards e dados operacionais (quando disponível). Semana 2 — Diagnóstico de marketing digital • Auditoria de Mídia Paga: análise completa do ROI, performance, erros e oportunidades nas campanhas ativas. • Auditoria de Criativos: avaliação técnica de peças visuais, copy, perfil no Instagram e boas práticas de UX. • Diagnóstico de Páginas (CRO): análise de usabilidade, taxa de conversão de copy das principais páginas do funil. Semana 3 — Diagnóstico Comercial e Análise Competitiva • Auditoria do time Comercial: análise de maturidade técnica, jornada de atendimento e estratégia de inside sales. • Análise Competitiva: diagnóstico SWOT, presença digital, 4Ps do marketing e mapa estratégico da concorrência. Semana 4 — Planejamento Estratégico • Mapa de Marketing e Vendas: definição de oferta, estratégias de aquisição, engajamento, monetização, retenção e conteúdo. • Reunião final de apresentação com plano de ação estruturado, adaptado à realidade da empresa.`,
+    oQueEntrego: `Semana 1 — Alinhamento e imersão no negócio
+• Briefing estratégico da operação e dos objetivos;
+• Reuniões de alinhamento para entendimento do contexto e definição de metas;
+• Acesso a dashboards e dados operacionais (quando disponíveis).
+
+Semana 2 — Diagnóstico de marketing digital
+• Auditoria de Mídia Paga: análise completa de ROI, performance, erros e desperdícios nas campanhas ativas.
+• Auditoria de Criativos: avaliação técnica de peças visuais, copy, perfil no Instagram e boas práticas de UX.
+• Diagnóstico de Páginas (CRO): análise de usabilidade, taxa de conversão e copy das principais páginas do funil.
+
+Semana 3 — Diagnóstico Comercial e Análise Competitiva
+• Auditoria do time Comercial: análise de maturidade técnica, jornada de atendimento e estratégia de inside sales.
+• Análise Competitiva: diagnóstico SWOT, presença digital, 4Ps do marketing e mapa estratégico da concorrência.
+
+Semana 4 — Planejamento Estratégico
+• Mapa de Marketing e Vendas: definição de oferta, estratégias de aquisição, engajamento, monetização, retenção e conteúdo.
+• Reunião final de apresentação com plano de ação estruturado, adaptado à realidade da empresa.`,
     etapas: [
       {
         fase: "Semana 1",
@@ -289,7 +305,7 @@ const ProductStructurePreview = () => {
           {/* Campo de texto "O que entrego" */}
           <div className="bg-muted/50 p-4 rounded-lg">
             <h4 className="font-medium mb-3">"O que entrego"</h4>
-            <div className="text-sm leading-relaxed text-justify">
+            <div className="text-sm leading-relaxed whitespace-pre-line">
               {mockProductData.informacoesOperar.oQueEntrego}
             </div>
           </div>
