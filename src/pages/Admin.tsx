@@ -850,6 +850,17 @@ const Admin = () => {
                           </div>
                           
                           <div>
+                            <Label htmlFor="description">ICP (Ideal Customer Profile)</Label>
+                            <Textarea
+                              id="description"
+                              value={productForm.description}
+                              onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                              rows={5}
+                              placeholder="Descreva o perfil do cliente ideal para este produto..."
+                            />
+                          </div>
+                          
+                          <div>
                             <Label htmlFor="entregaveis_relacionados">Entregáveis relacionados</Label>
                             <Textarea
                               id="entregaveis_relacionados"
