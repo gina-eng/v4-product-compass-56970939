@@ -289,26 +289,26 @@ const ProductDetails = () => {
               )}
               {product.escopo && (
                 <div>
-                  <span className="text-sm font-bold text-foreground">ESCOPO:</span>
+                  <span className="text-sm font-bold text-foreground">Escopo:</span>
                   <p className="text-sm text-content">{product.escopo}</p>
                 </div>
               )}
               {product.duracao_media && (
                 <div>
-                  <span className="text-sm font-bold text-foreground">DURAÇÃO MÉDIA:</span>
+                  <span className="text-sm font-bold text-foreground">Duração média:</span>
                   <p className="text-sm text-content">{product.duracao_media}</p>
                 </div>
               )}
               {product.time_envolvido && (
                 <div>
-                  <span className="text-sm font-bold text-foreground">TIME ENVOLVIDO:</span>
+                  <span className="text-sm font-bold text-foreground">Time envolvido:</span>
                   <p className="text-sm text-content">{product.time_envolvido}</p>
                 </div>
               )}
             </div>
             {product.formato_entrega && (
               <div>
-                <span className="text-sm font-bold text-foreground">FORMATO DE ENTREGA:</span>
+                <span className="text-sm font-bold text-foreground">Formato de entrega:</span>
                 <p className="text-sm text-content">{product.formato_entrega}</p>
               </div>
             )}
@@ -329,12 +329,10 @@ const ProductDetails = () => {
           <CardContent className="space-y-6">
             <div>
               <h4 className="text-sm font-bold text-foreground mb-2">"Como eu vendo?"</h4>
-              <div className="text-sm leading-relaxed bg-muted/30 p-4 rounded-lg">
-                {product.como_vendo.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 last:mb-0 text-content">
-                    {paragraph}
-                  </p>
-                ))}
+              <div className="text-sm leading-relaxed bg-muted/30 p-4 rounded-lg prose prose-sm max-w-none">
+                <div className="text-content whitespace-pre-wrap">
+                  {product.como_vendo}
+                </div>
               </div>
             </div>
             
