@@ -95,7 +95,7 @@ const ProductCard = ({
               <span className="font-medium text-foreground">Margem:</span>
               <span className="font-bold text-green-600">
                 {typeof margemOperacional === 'number' 
-                  ? formatCurrency(margemOperacional.toString()) 
+                  ? `${margemOperacional.toFixed(1)}%`
                   : margemOperacional
                 }
               </span>
