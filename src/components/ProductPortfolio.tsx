@@ -186,13 +186,12 @@ const ProductPortfolio = () => {
               <ProductCard
                 key={product.id}
                 id={product.id}
-                name={product.name}
+                produto={product.name}
                 description={product.description}
-                category={product.category}
+                categoria={product.category}
                 status={product.status}
-                valorBase={product.valorBase}
+                valor={product.valorBase}
                 margemOperacional={product.margemOperacional}
-                onViewDetails={handleViewDetails}
               />
             ))}
           </div>

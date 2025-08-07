@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import Header from "@/components/Header";
+import { Layout } from "@/components/Layout";
 import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
@@ -659,20 +659,22 @@ const Admin = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">Carregando...</div>
-        </div>
-      </div>
+      <Layout customBreadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Administração", current: true }
+      ]}>
+        <div className="text-center animate-fade-in">Carregando...</div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+    <Layout customBreadcrumbs={[
+      { label: "Home", href: "/" },
+      { label: "Administração", current: true }
+    ]}>
+      <div className="space-y-8 animate-fade-in">
+        <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Administração</h1>
         </div>
 
@@ -1356,7 +1358,7 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </Layout>
   );
 };
 

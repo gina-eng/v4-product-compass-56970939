@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, FileText } from "lucide-react";
+import { Layout } from "@/components/Layout";
+import { LoadingSpinner, EmptyState } from "@/components/LoadingStates";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import Header from "@/components/Header";
 
 interface SupportMaterial {
   id: string;
@@ -42,66 +43,60 @@ const SupportMaterials = () => {
     }
   };
 
-  const handleOpenMaterial = (url: string) => {
-    window.open(url, '_blank');
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto py-8 px-4">
-          <div className="flex justify-center items-center min-h-[400px]">
-            <div>Carregando materiais...</div>
-          </div>
+      <Layout customBreadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Materiais de Apoio", current: true }
+      ]}>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <LoadingSpinner size="lg" />
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto py-8 px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Materiais de Apoio
-          </h1>
-          <p className="text-muted-foreground">
-            Recursos padronizados para uso recorrente
-          </p>
+    <Layout customBreadcrumbs={[
+      { label: "Home", href: "/" },
+      { label: "Materiais de Apoio", current: true }
+    ]}>
+      <div className="space-y-8 animate-fade-in">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Materiais de Apoio</h1>
+            <p className="text-muted-foreground mt-2">
+              Recursos padronizados para uso recorrente
+            </p>
+          </div>
         </div>
 
         {materials.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-2">
-                  Nenhum material encontrado
-                </h3>
-                <p className="text-muted-foreground">
-                  Não há materiais de apoio adicionados ainda.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={FileText}
+            title="Nenhum material encontrado"
+            description="Ainda não há materiais de apoio disponíveis. Entre em contato com o administrador para mais informações."
+          />
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {materials.map((material) => (
-              <Card key={material.id} className="hover:shadow-md transition-shadow">
+              <Card key={material.id} className="card-hover animate-scale-in">
                 <CardHeader>
-                  <CardTitle className="text-lg">{material.nome_arquivo}</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    {material.nome_arquivo}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
                     Adicionado em {new Date(material.created_at).toLocaleDateString('pt-BR')}
-                  </CardDescription>
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <Button 
-                    onClick={() => handleOpenMaterial(material.url_direcionamento)}
-                    className="w-full"
+                  <Button
+                    className="w-full hover-scale"
+                    onClick={() => window.open(material.url_direcionamento, '_blank')}
                     variant="outline"
                   >
-                    <ExternalLink className="w-4 h-4 mr-2" />
+                    <ExternalLink className="h-4 w-4 mr-2" />
                     Acessar Material
                   </Button>
                 </CardContent>
@@ -110,7 +105,7 @@ const SupportMaterials = () => {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 };
 

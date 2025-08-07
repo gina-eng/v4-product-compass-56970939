@@ -1,16 +1,17 @@
-import Header from "@/components/Header";
+import { Layout } from "@/components/Layout";
 import StepIntroduction from "@/components/StepIntroduction"; 
 import ProductPortfolio from "@/components/ProductPortfolio";
 import StatusReport from "@/components/StatusReport";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <StepIntroduction />
-      <ProductPortfolio />
-      <StatusReport />
-    </div>
+    <Layout showSidebar={true}>
+      <div className="space-y-8 animate-fade-in">
+        <StepIntroduction />
+        <ProductPortfolio />
+        <StatusReport />
+      </div>
+    </Layout>
   );
 };
 

@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import Header from "@/components/Header";
+import { Layout } from "@/components/Layout";
+import { LoadingSpinner } from "@/components/LoadingStates";
 import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
@@ -189,36 +190,45 @@ const ProductDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">Carregando...</div>
+      <Layout customBreadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Carregando...", current: true }
+      ]}>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <LoadingSpinner size="lg" />
         </div>
-      </div>
+      </Layout>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">Produto não encontrado</div>
+      <Layout customBreadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Produto não encontrado", current: true }
+      ]}>
+        <div className="text-center animate-fade-in">
+          <h2 className="text-2xl font-bold mb-4">Produto não encontrado</h2>
+          <Button onClick={() => navigate("/")} variant="outline">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar ao início
+          </Button>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto px-4 py-8 space-y-8">
-        {/* Header com botão voltar */}
+    <Layout customBreadcrumbs={[
+      { label: "Home", href: "/" },
+      { label: product.produto, current: true }
+    ]}>
+      <div className="space-y-8 animate-fade-in">{/* Header com botão voltar */}
         <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover-scale"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar
@@ -673,7 +683,7 @@ const ProductDetails = () => {
           </Card>
         )}
       </div>
-    </div>
+    </Layout>
   );
 };
 
