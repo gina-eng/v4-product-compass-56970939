@@ -18,9 +18,9 @@ interface Product {
   status: string;
   valor: string;
   duracao: string;
+  dono: string;
   description: string;
   descricao_card?: string;
-  icp?: string;
   escopo?: string;
   duracao_media?: string;
   time_envolvido?: string;
@@ -29,11 +29,22 @@ interface Product {
   para_quem_serve?: string;
   como_entrega_valor?: string;
   entregaveis_relacionados?: string;
-  icp_url?: string;
+  stack_digital?: string;
+  bonus_kpi?: string;
+  garantia_especifica?: string;
+  kpi_principal?: string;
+  tempo_meta_kpi?: string;
   o_que_entrego?: string;
+  pitch?: boolean;
+  bpmn?: boolean;
+  playbook?: boolean;
+  icp?: boolean;
+  pricing?: boolean;
+  certificacao?: boolean;
   pitch_url?: string;
   bpmn_url?: string;
   playbook_url?: string;
+  icp_url?: string;
   pricing_url?: string;
   certificacao_url?: string;
   case_1_name?: string;
@@ -91,9 +102,9 @@ const ProductDetails = () => {
         status: data.status,
         valor: data.valor,
         duracao: data.duracao,
+        dono: data.dono,
         description: data.description,
         descricao_card: data.descricao_card,
-        icp: typeof data.icp === 'string' ? data.icp : undefined,
         escopo: data.escopo,
         duracao_media: data.duracao_media,
         time_envolvido: data.time_envolvido,
@@ -102,11 +113,22 @@ const ProductDetails = () => {
         para_quem_serve: data.para_quem_serve,
         como_entrega_valor: data.como_entrega_valor,
         entregaveis_relacionados: data.entregaveis_relacionados,
-        icp_url: data.icp_url,
+        stack_digital: data.stack_digital,
+        bonus_kpi: data.bonus_kpi,
+        garantia_especifica: data.garantia_especifica,
+        kpi_principal: data.kpi_principal,
+        tempo_meta_kpi: data.tempo_meta_kpi,
         o_que_entrego: data.o_que_entrego,
+        pitch: data.pitch,
+        bpmn: data.bpmn,
+        playbook: data.playbook,
+        icp: data.icp,
+        pricing: data.pricing,
+        certificacao: data.certificacao,
         pitch_url: data.pitch_url,
         bpmn_url: data.bpmn_url,
         playbook_url: data.playbook_url,
+        icp_url: data.icp_url,
         pricing_url: data.pricing_url,
         certificacao_url: data.certificacao_url,
         case_1_name: data.case_1_name,
@@ -242,9 +264,15 @@ const ProductDetails = () => {
                 </p>
               </div>
             </div>
-            <div>
-              <span className="text-sm font-bold text-foreground">Duração:</span>
-              <p className="text-sm text-content">{product.duracao}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <span className="text-sm font-bold text-foreground">Duração:</span>
+                <p className="text-sm text-content">{product.duracao}</p>
+              </div>
+              <div>
+                <span className="text-sm font-bold text-foreground">Dono:</span>
+                <p className="text-sm text-content">{product.dono}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -305,6 +333,36 @@ const ProductDetails = () => {
                   <p className="text-sm text-content">{product.time_envolvido}</p>
                 </div>
               )}
+              {product.stack_digital && (
+                <div>
+                  <span className="text-sm font-bold text-foreground">Stack digital:</span>
+                  <p className="text-sm text-content">{product.stack_digital}</p>
+                </div>
+              )}
+              {product.bonus_kpi && (
+                <div>
+                  <span className="text-sm font-bold text-foreground">Bônus KPI:</span>
+                  <p className="text-sm text-content">{product.bonus_kpi}</p>
+                </div>
+              )}
+              {product.garantia_especifica && (
+                <div>
+                  <span className="text-sm font-bold text-foreground">Garantia específica:</span>
+                  <p className="text-sm text-content">{product.garantia_especifica}</p>
+                </div>
+              )}
+              {product.kpi_principal && (
+                <div>
+                  <span className="text-sm font-bold text-foreground">KPI principal:</span>
+                  <p className="text-sm text-content">{product.kpi_principal}</p>
+                </div>
+              )}
+              {product.tempo_meta_kpi && (
+                <div>
+                  <span className="text-sm font-bold text-foreground">Tempo meta KPI:</span>
+                  <p className="text-sm text-content">{product.tempo_meta_kpi}</p>
+                </div>
+              )}
             </div>
             {product.formato_entrega && (
               <div>
@@ -316,6 +374,13 @@ const ProductDetails = () => {
               <div>
                 <span className="text-sm font-bold text-foreground">Descrição completa do produto:</span>
                 <p className="text-sm text-justify leading-relaxed text-content">{product.descricao_completa}</p>
+              </div>
+            )}
+            {/* Seção específica para exibir o ICP (description) */}
+            {product.description && (
+              <div>
+                <span className="text-sm font-bold text-foreground">ICP (Ideal Customer Profile):</span>
+                <p className="text-sm text-justify leading-relaxed text-content">{product.description}</p>
               </div>
             )}
           </CardContent>
@@ -361,11 +426,6 @@ const ProductDetails = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div>
-                <span className="text-sm font-bold text-foreground">"Como eu entrego?"</span>
-                <p className="text-sm mt-2 text-content">{product.description}</p>
-              </div>
-              
               {product.o_que_entrego && (
                 <div>
                   <span className="text-sm font-bold text-foreground">"O que entrego"</span>
