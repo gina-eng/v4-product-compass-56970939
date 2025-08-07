@@ -284,7 +284,7 @@ const Admin = () => {
       // Calcular valores automaticamente para todos os produtos
       const calculatedVals: {[key: string]: number} = {};
       for (const product of formattedProducts) {
-        const calculatedValue = await calculateFaturamentoSemDesconto(product.id);
+        const calculatedValue = await calculateFaturamentoSemDesconto(product.id, product.markup || 1.0);
         calculatedVals[product.id] = calculatedValue;
       }
       setCalculatedValues(calculatedVals);
@@ -490,9 +490,9 @@ const Admin = () => {
   };
 
   // Função para calcular faturamento sem desconto
-  const calculateFaturamentoSemDesconto = async (productId: string): Promise<number> => {
+  const calculateFaturamentoSemDesconto = async (productId: string, productMarkup?: number): Promise<number> => {
     try {
-      const { data, error } = await supabase
+      const { data: positions, error: positionsError } = await supabase
         .from('product_positions')
         .select(`
           *,
@@ -500,13 +500,25 @@ const Admin = () => {
         `)
         .eq('product_id', productId);
       
-      if (error) throw error;
+      if (positionsError) throw positionsError;
       
-      const totalCSP = data?.reduce((total, pp) => {
+      // Buscar markup do produto se não foi fornecido
+      let markup = productMarkup;
+      if (!markup) {
+        const { data: product, error: productError } = await supabase
+          .from('products')
+          .select('markup')
+          .eq('id', productId)
+          .single();
+        
+        if (productError) throw productError;
+        markup = product?.markup || 1;
+      }
+      
+      const totalCSP = positions?.reduce((total, pp) => {
         return total + (pp.horas_alocadas * (pp.positions?.cph || 0));
       }, 0) || 0;
       
-      const markup = productForm.markup || 1;
       return totalCSP * markup;
     } catch (error) {
       console.error('Erro ao calcular faturamento sem desconto:', error);
