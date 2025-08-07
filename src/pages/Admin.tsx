@@ -660,14 +660,14 @@ const Admin = () => {
 
   if (loading) {
     return (
-      <Layout showHeader={false}>
+      <Layout showHeader={true}>
         <div className="text-center animate-fade-in">Carregando...</div>
       </Layout>
     );
   }
 
   return (
-    <Layout showHeader={false}>
+    <Layout showHeader={true}>
       <div className="space-y-8 animate-fade-in">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Administração</h1>
