@@ -47,30 +47,27 @@ const SpicedTable = ({ data, onChange, readOnly = false }: SpicedTableProps) => 
 
   if (readOnly) {
     return (
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-foreground">Metodologia SPICED</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full border border-border rounded-lg">
-            <thead>
-              <tr className="bg-muted">
-                <th className="p-4 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider">Etapa (SPICED)</th>
-                <th className="p-4 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider">Objetivo da etapa</th>
-                <th className="p-4 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider">Perguntas chaves</th>
-                <th className="p-4 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider">O que observar no lead</th>
+      <div className="overflow-x-auto">
+        <table className="w-full border border-border rounded-lg">
+          <thead>
+            <tr className="bg-muted">
+              <th className="p-4 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider">Etapa (SPICED)</th>
+              <th className="p-4 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider">Objetivo da etapa</th>
+              <th className="p-4 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider">Perguntas chaves</th>
+              <th className="p-4 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider">O que observar no lead</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={row.key} className={index % 2 === 1 ? "border-t bg-muted/30" : "border-t"}>
+                <td className="p-4 font-medium text-foreground">{row.label}</td>
+                <td className="p-4 text-muted-foreground">{safeData[row.key].objetivo}</td>
+                <td className="p-4 text-muted-foreground">{safeData[row.key].perguntas}</td>
+                <td className="p-4 text-muted-foreground">{safeData[row.key].observar}</td>
               </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={row.key} className={index % 2 === 1 ? "border-t bg-muted/30" : "border-t"}>
-                  <td className="p-4 font-medium text-foreground">{row.label}</td>
-                  <td className="p-4 text-muted-foreground">{safeData[row.key].objetivo}</td>
-                  <td className="p-4 text-muted-foreground">{safeData[row.key].perguntas}</td>
-                  <td className="p-4 text-muted-foreground">{safeData[row.key].observar}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   }
