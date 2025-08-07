@@ -268,8 +268,12 @@ const ProductDetails = () => {
           <CardContent className="space-y-6">
             <div>
               <h4 className="text-sm font-medium text-muted-foreground mb-2">"Como eu vendo?"</h4>
-              <div className="text-sm leading-relaxed text-justify bg-muted/30 p-4 rounded-lg">
-                {product.como_vendo}
+              <div className="text-sm leading-relaxed bg-muted/30 p-4 rounded-lg">
+                {product.como_vendo.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4 last:mb-0 text-foreground">
+                    {paragraph}
+                  </p>
+                ))}
               </div>
             </div>
             
