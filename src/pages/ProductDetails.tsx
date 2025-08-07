@@ -265,17 +265,17 @@ const ProductDetails = () => {
           <CardHeader>
             <CardTitle>Informações para vender</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">"Como eu vendo?"</span>
-                <p className="text-sm mt-2">{product.como_vendo}</p>
+          <CardContent className="space-y-6">
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-2">"Como eu vendo?"</h4>
+              <div className="text-sm leading-relaxed text-justify bg-muted/30 p-4 rounded-lg">
+                {product.como_vendo}
               </div>
-              
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <h4 className="font-medium mb-4">Metodologia SPICED</h4>
-                <SpicedTable data={product.spiced_data} readOnly />
-              </div>
+            </div>
+            
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium mb-4">Metodologia SPICED</h4>
+              <SpicedTable data={product.spiced_data} readOnly />
             </div>
           </CardContent>
         </Card>

@@ -103,6 +103,9 @@ const Admin = () => {
   
   // Estados para produtos
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -271,6 +274,7 @@ const Admin = () => {
       }));
       
       setProducts(formattedProducts);
+      setFilteredProducts(formattedProducts);
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
       toast({
@@ -332,7 +336,7 @@ const Admin = () => {
         pitch_url: productForm.pitch_url || null,
         bpmn_url: productForm.bpmn_url || null,
         playbook_url: productForm.playbook_url || null,
-        icp_url: productForm.icp_url || null,
+      icp_url: productForm.icp_url || null,
         pricing_url: productForm.pricing_url || null,
         certificacao_url: productForm.certificacao_url || null,
         case_1_name: productForm.case_1_name || null,
@@ -440,6 +444,31 @@ const Admin = () => {
     setComoEntregoDados(product.como_entrego_dados || []);
     setIsProductDialogOpen(true);
   };
+
+  // Função para calcular time envolvido automaticamente
+  const calculateTimeEnvolvido = (positions: Position[], allocations: any[]): string => {
+    const roleNames = allocations.map(allocation => {
+      const position = positions.find(pos => pos.id === allocation.position_id);
+      return position?.nome || '';
+    }).filter(name => name).join(', ');
+    
+    return roleNames;
+  };
+
+  // Filtrar produtos
+  useEffect(() => {
+    let filtered = products;
+    
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(product => product.categoria === categoryFilter);
+    }
+    
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(product => product.status === statusFilter);
+    }
+    
+    setFilteredProducts(filtered);
+  }, [products, categoryFilter, statusFilter]);
 
   const resetProductForm = () => {
     setEditingProduct(null);
@@ -644,11 +673,12 @@ const Admin = () => {
 
                         <TabsContent value="visao" className="space-y-4">
                           <div>
-                            <Label htmlFor="icp_url">ICP URL</Label>
-                            <Input
+                            <Label htmlFor="icp_url">ICP</Label>
+                            <Textarea
                               id="icp_url"
                               value={productForm.icp_url}
                               onChange={(e) => setProductForm({...productForm, icp_url: e.target.value})}
+                              rows={3}
                             />
                           </div>
                           <div>
@@ -956,8 +986,39 @@ const Admin = () => {
                 </div>
               </CardHeader>
               <CardContent>
+                <div className="flex gap-4 mb-6">
+                  <div>
+                    <Label htmlFor="categoryFilter">Filtrar por Categoria</Label>
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="Todas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas</SelectItem>
+                        <SelectItem value="saber">SABER</SelectItem>
+                        <SelectItem value="ter">TER</SelectItem>
+                        <SelectItem value="executar">EXECUTAR</SelectItem>
+                        <SelectItem value="potencializar">POTENCIALIZAR</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="statusFilter">Filtrar por Status</Label>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="Todos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="Disponível">Disponível</SelectItem>
+                        <SelectItem value="Em produção">Em produção</SelectItem>
+                        <SelectItem value="Em homologação">Em homologação</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <Card key={product.id} className="relative hover:shadow-lg transition-shadow">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
