@@ -497,7 +497,7 @@ const ProductDetails = () => {
               {product.o_que_entrego && (
                 <div>
                   <span className="text-sm font-bold text-foreground">"O que entrego"</span>
-                  <p className="text-sm mt-2 text-content">{product.o_que_entrego}</p>
+                  <div className="text-sm mt-2 text-content whitespace-pre-line leading-relaxed">{product.o_que_entrego}</div>
                 </div>
               )}
               
