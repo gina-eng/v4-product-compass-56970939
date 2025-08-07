@@ -33,11 +33,7 @@ export const Layout = ({
           {/* Header com trigger da sidebar e breadcrumbs */}
           <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
             <div className="flex h-14 items-center gap-4 px-4">
-              <SidebarTrigger asChild>
-                <Button variant="ghost" size="sm" className="hover-scale">
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </SidebarTrigger>
+              <SidebarTrigger className="hover-scale" />
               
               <div className="flex-1">
                 <Breadcrumbs customItems={customBreadcrumbs} />
