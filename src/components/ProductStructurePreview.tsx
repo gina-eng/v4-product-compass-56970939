@@ -64,32 +64,37 @@ const mockProductData = {
   ],
 
   // Como eu entrego?
-  comoEntrego: [
-    {
-      fase: "Semana 1",
-      etapa: "Preparação",
-      tarefa: "Diagnóstico automático",
-      dri: "Account Manager",
-      horas: 0.5,
-      pop: "URL do POP"
-    },
-    {
-      fase: "Semana 1", 
-      etapa: "Diagnóstico e Planejamento",
-      tarefa: "Raio-x completo atual",
-      dri: "Account Manager",
-      horas: 0.5,
-      pop: "URL do POP"
-    },
-    {
-      fase: "Semana 1",
-      etapa: "Diagnóstico e Planejamento", 
-      tarefa: "Plano estruturado",
-      dri: "Account Manager",
-      horas: 1,
-      pop: "URL do POP"
-    }
-  ]
+  informacoesOperar: {
+    oQueEntrego: `"O que entrego"
+
+Semana 1 — Alinhamento e imersão no negócio • Briefing estratégico da operação e dos objetivos; • Reuniões de alinhamento para entendimento do contexto e definição de metas; • Acesso a dashboards e dados operacionais (quando disponível). Semana 2 — Diagnóstico de marketing digital • Auditoria de Mídia Paga: análise completa do ROI, performance, erros e oportunidades nas campanhas ativas. • Auditoria de Criativos: avaliação técnica de peças visuais, copy, perfil no Instagram e boas práticas de UX. • Diagnóstico de Páginas (CRO): análise de usabilidade, taxa de conversão, copy das principais páginas ao funil. Semana 3 — Diagnóstico Comercial e Análise Competitiva • Auditoria do time Comercial: análise de maturidade técnica, jornada de atendimento e estratégia de inside sales. • Análise Competitiva: diagnóstico SWOT, presença digital, 4Ps do marketing e mapa estratégico da concorrência. Semana 4 — Planejamento Estratégico • Mapa de Marketing e Vendas: definição de oferta, estratégias de aquisição, engajamento, monetização, retenção e conteúdo. • Reunião final de apresentação com plano de ação estruturado, adaptado à realidade da empresa.`,
+    etapas: [
+      {
+        fase: "Semana 1",
+        etapa: "Preparação",
+        tarefa: "Diagnóstico automático",
+        dri: "Account Manager",
+        horas: 0.5,
+        pop: "URL do POP"
+      },
+      {
+        fase: "Semana 1", 
+        etapa: "Diagnóstico e Planejamento",
+        tarefa: "Raio-x completo atual",
+        dri: "Account Manager",
+        horas: 0.5,
+        pop: "URL do POP"
+      },
+      {
+        fase: "Semana 1",
+        etapa: "Diagnóstico e Planejamento", 
+        tarefa: "Plano estruturado",
+        dri: "Account Manager",
+        horas: 1,
+        pop: "URL do POP"
+      }
+    ]
+  }
 };
 
 const ProductStructurePreview = () => {
@@ -282,7 +287,15 @@ const ProductStructurePreview = () => {
           <CardTitle>Informações para Operar</CardTitle>
           <p className="text-sm text-muted-foreground">"Como eu entrego?" - Campo de texto igual atual (Campo de texto acima da tabela de etapas)</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          {/* Campo de texto "O que entrego" */}
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <div className="whitespace-pre-wrap text-sm leading-relaxed">
+              {mockProductData.informacoesOperar.oQueEntrego}
+            </div>
+          </div>
+          
+          {/* Tabela de Etapas */}
           <div className="bg-muted/50 p-4 rounded-lg">
             <div className="flex justify-between items-center mb-4">
               <h4 className="font-medium">Como eu entrego? - Etapas de Entrega</h4>
@@ -302,7 +315,7 @@ const ProductStructurePreview = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockProductData.comoEntrego.map((item, index) => (
+                  {mockProductData.informacoesOperar.etapas.map((item, index) => (
                     <tr key={index} className="border-b">
                       <td className="p-3">{item.fase}</td>
                       <td className="p-3">{item.etapa}</td>
