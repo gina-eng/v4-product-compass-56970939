@@ -178,7 +178,7 @@ const ProductPortfolio = () => {
         {/* Grid de Produtos */}
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">Carregando produtos...</p>
+            <p className="text-foreground">Carregando produtos...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -200,7 +200,7 @@ const ProductPortfolio = () => {
 
         {!loading && filteredProducts.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">Nenhum produto encontrado para esta categoria.</p>
+            <p className="text-foreground">Nenhum produto encontrado para esta categoria.</p>
           </div>
         )}
       </div>

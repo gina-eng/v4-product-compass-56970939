@@ -22,7 +22,7 @@ const buttonVariants = cva(
         ter: "bg-ter text-ter-foreground hover:bg-ter/90",
         executar: "bg-executar text-executar-foreground hover:bg-executar/90",
         potencializar: "bg-potencializar text-potencializar-foreground hover:bg-potencializar/90",
-        details: "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50",
+        details: "bg-background border border-input text-foreground hover:bg-muted",
       },
       size: {
         default: "h-10 px-4 py-2",
