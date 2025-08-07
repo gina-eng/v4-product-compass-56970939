@@ -16,6 +16,7 @@ import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Plus, Edit, Trash2, Upload } from "lucide-react";
+import { formatCurrency } from "@/lib/formatters";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -450,7 +451,7 @@ const Admin = () => {
     setProductForm(prev => ({
       ...prev, 
       time_envolvido: timeEnvolvido,
-      valor: faturamentoSemDesconto.toString()
+      valor: faturamentoSemDesconto.toFixed(2)
     }));
     
     setIsProductDialogOpen(true);
@@ -510,7 +511,7 @@ const Admin = () => {
       setProductForm({
         ...productForm, 
         time_envolvido: timeEnvolvido,
-        valor: faturamentoSemDesconto.toString()
+        valor: faturamentoSemDesconto.toFixed(2)
       });
       
       // Também atualizar no banco de dados
@@ -518,7 +519,7 @@ const Admin = () => {
         .from('products')
         .update({ 
           time_envolvido: timeEnvolvido,
-          valor: faturamentoSemDesconto.toString()
+          valor: faturamentoSemDesconto.toFixed(2)
         })
         .eq('id', productId);
     }
@@ -710,7 +711,7 @@ const Admin = () => {
                               <Label htmlFor="valor">Valor (Automático)</Label>
                               <Input
                                 id="valor"
-                                value={productForm.valor}
+                                value={productForm.valor ? formatCurrency(productForm.valor) : ''}
                                 readOnly
                                 className="bg-muted"
                                 placeholder="Será calculado automaticamente baseado no DRE"
@@ -1163,7 +1164,7 @@ const Admin = () => {
                           <div className="space-y-1 text-sm">
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Valor:</span>
-                              <span className="font-medium">{product.valor}</span>
+                              <span className="font-medium">{formatCurrency(product.valor)}</span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Duração:</span>
