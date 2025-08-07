@@ -14,6 +14,7 @@ import { Layout } from "@/components/Layout";
 import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
+import TrainingMaterials from "@/components/TrainingMaterials";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Plus, Edit, Trash2, Upload } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
@@ -703,7 +704,7 @@ const Admin = () => {
                         <TabsList className="grid w-full grid-cols-4">
                           <TabsTrigger value="basico">Informações Básicas</TabsTrigger>
                           <TabsTrigger value="vendas">Vendas e Entrega</TabsTrigger>
-                          <TabsTrigger value="materiais">Materiais e Documentos</TabsTrigger>
+                          <TabsTrigger value="materiais">Materiais de Treinamento</TabsTrigger>
                           <TabsTrigger value="posicoes">Posições e DRE</TabsTrigger>
                         </TabsList>
 
@@ -963,8 +964,14 @@ const Admin = () => {
                         </TabsContent>
 
                         <TabsContent value="materiais" className="space-y-4">
+                          {editingProduct && (
+                            <div className="mb-6">
+                              <TrainingMaterials productId={editingProduct.id} readOnly={false} />
+                            </div>
+                          )}
+                          
                           <div className="space-y-4">
-                            <h4 className="font-semibold">URLs de Documentos</h4>
+                            <h4 className="font-semibold">URLs de Documentos (Legado)</h4>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
                                 <Label htmlFor="pitch_url">Pitch URL</Label>

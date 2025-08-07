@@ -10,6 +10,7 @@ import { LoadingSpinner } from "@/components/LoadingStates";
 import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
+import TrainingMaterials from "@/components/TrainingMaterials";
 import { formatCurrency } from "@/lib/formatters";
 
 interface Product {
@@ -513,12 +514,15 @@ const ProductDetails = () => {
           </CardContent>
         </Card>
 
-        {/* Materiais e Documentos */}
+        {/* Materiais de Treinamento e Documentos */}
+        <TrainingMaterials productId={product.id} readOnly={true} />
+
+        {/* Materiais Antigos e Documentos (manter para compatibilidade) */}
         {(product.pitch_url || product.bpmn_url || product.playbook_url || product.pricing_url || product.certificacao_url || 
           product.case_1_name || product.case_2_name) && (
           <Card>
             <CardHeader>
-              <CardTitle>Materiais e Documentos</CardTitle>
+              <CardTitle>Materiais e Documentos (Legado)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* URLs de Documentos */}
