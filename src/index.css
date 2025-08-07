@@ -9,25 +9,28 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 99%;
-    --foreground: 0 0% 0%; /* Texto principal preto */
+    --foreground: 0 0% 0%; /* Títulos e labels em preto */
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%; /* Texto do card preto */
+    --card-foreground: 0 0% 0%; /* Títulos em cards preto */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%; /* Texto do popover preto */
+    --popover-foreground: 0 0% 0%; /* Títulos em popover preto */
 
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
-    --secondary-foreground: 0 0% 0%; /* Texto secundário preto */
+    --secondary-foreground: 0 0% 0%; /* Títulos secundários preto */
 
     --muted: 210 40% 96.1%;
-    --muted-foreground: 0 0% 0%; /* Texto muted agora preto */
+    --muted-foreground: 0 0% 30%; /* Conteúdo/respostas em cinza escuro */
 
     --accent: 210 40% 96.1%;
-    --accent-foreground: 0 0% 0%; /* Texto accent preto */
+    --accent-foreground: 0 0% 0%; /* Títulos accent preto */
+
+    /* Nova variável para conteúdo/respostas dos campos */
+    --content-text: 0 0% 30%; /* Cinza escuro para respostas */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -85,25 +88,28 @@ All colors MUST be HSL.
 
   .dark {
     --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%; /* Mantém branco no modo escuro */
+    --foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
 
     --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%; /* Mantém branco no modo escuro */
+    --card-foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
 
     --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%; /* Mantém branco no modo escuro */
+    --popover-foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
 
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%; /* Mantém branco no modo escuro */
+    --secondary-foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
 
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 210 40% 98%; /* Muted branco no modo escuro */
+    --muted-foreground: 215 20.2% 65.1%; /* Conteúdo cinza claro no modo escuro */
 
     --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%; /* Mantém branco no modo escuro */
+    --accent-foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
+
+    /* Conteúdo no modo escuro */
+    --content-text: 215 20.2% 65.1%; /* Cinza claro para respostas no modo escuro */
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;

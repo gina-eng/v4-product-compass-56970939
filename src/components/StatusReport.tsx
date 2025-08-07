@@ -171,7 +171,7 @@ const StatusReport = () => {
                     <tr key={item.id} className="hover:bg-muted/50">
                       <td className="px-6 py-4">
                         <div className="max-w-xs">
-                          <div className="text-sm font-semibold text-foreground leading-5 break-words">
+                          <div className="text-sm font-bold text-foreground leading-5 break-words">
                             {item.produto}
                           </div>
                         </div>
@@ -185,8 +185,8 @@ const StatusReport = () => {
                           {getCategoryLabel(item.categoria)}
                         </Badge>
                       </td>
-                      <td className="px-6 py-4 text-sm text-foreground">{item.duracao}</td>
-                      <td className="px-6 py-4 text-sm text-foreground">{item.dono}</td>
+                      <td className="px-6 py-4 text-sm text-content">{item.duracao}</td>
+                      <td className="px-6 py-4 text-sm text-content">{item.dono}</td>
                       <td className="px-6 py-4 text-center">
                         <StatusIcon value={item.pitch} />
                       </td>

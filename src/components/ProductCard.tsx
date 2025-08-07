@@ -50,26 +50,26 @@ const ProductCard = ({ id, name, description, category, valorBase, status, marge
         </Badge>
       </div>
       
-      <h3 className="text-lg font-semibold mb-3 text-foreground group-hover:text-foreground/70 transition-colors">
+      <h3 className="text-lg font-bold mb-3 text-foreground group-hover:text-foreground/70 transition-colors">
         {name}
       </h3>
       
       {description && description.trim() && (
-        <p className="text-sm text-foreground mb-4 leading-relaxed line-clamp-3 text-justify">
+        <p className="text-sm text-content mb-4 leading-relaxed line-clamp-3 text-justify">
           {description}
         </p>
       )}
       
       <div className="mb-6 space-y-2">
         <div>
-          <span className="text-xs text-foreground uppercase tracking-wide">Valor Base</span>
-          <p className="text-lg font-semibold text-foreground">
+          <span className="text-xs font-bold text-foreground uppercase tracking-wide">Valor Base</span>
+          <p className="text-lg font-normal text-content">
             {valorBase === "A definir" ? valorBase : formatCurrency(valorBase)}
           </p>
         </div>
         {margemOperacional !== undefined && margemOperacional !== "A definir" && (
           <div>
-            <span className="text-xs text-foreground uppercase tracking-wide">Margem Operacional</span>
+            <span className="text-xs font-bold text-foreground uppercase tracking-wide">Margem Operacional</span>
             <p className="text-sm font-medium text-green-700">
               {typeof margemOperacional === "string" ? margemOperacional : `${margemOperacional.toFixed(2)}%`}
             </p>
@@ -77,8 +77,8 @@ const ProductCard = ({ id, name, description, category, valorBase, status, marge
         )}
         {margemOperacional === "A definir" && (
           <div>
-            <span className="text-xs text-foreground uppercase tracking-wide">Margem Operacional</span>
-            <p className="text-sm font-medium text-foreground">A definir</p>
+            <span className="text-xs font-bold text-foreground uppercase tracking-wide">Margem Operacional</span>
+            <p className="text-sm font-normal text-content">A definir</p>
           </div>
         )}
       </div>

@@ -212,11 +212,11 @@ const ProductDetails = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <span className="text-sm font-medium text-muted-foreground">Título:</span>
-                <p className="font-medium">{product.produto}</p>
+                <span className="text-sm font-bold text-foreground">Título:</span>
+                <p className="font-normal text-content">{product.produto}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-muted-foreground">Categoria:</span>
+                <span className="text-sm font-bold text-foreground">Categoria:</span>
                 <div className="flex items-center gap-2">
                   <div 
                     className="inline-block px-3 py-1 rounded-full text-xs font-medium text-white"
@@ -227,7 +227,7 @@ const ProductDetails = () => {
                 </div>
               </div>
               <div>
-                <span className="text-sm font-medium text-muted-foreground">Status:</span>
+                <span className="text-sm font-bold text-foreground">Status:</span>
                 <Badge 
                   variant={getStatusBadge(product.status).variant}
                   className={`ml-2 ${getStatusBadge(product.status).className}`}
@@ -236,15 +236,15 @@ const ProductDetails = () => {
                 </Badge>
               </div>
               <div>
-                <span className="text-sm font-medium text-muted-foreground">Valor Base:</span>
-                <p className="font-medium">
+                <span className="text-sm font-bold text-foreground">Valor Base:</span>
+                <p className="font-normal text-content">
                   {product.valor === "A definir" ? product.valor : formatCurrency(product.valor)}
                 </p>
               </div>
             </div>
             <div>
-              <span className="text-sm font-medium text-muted-foreground">Duração:</span>
-              <p className="text-sm">{product.duracao}</p>
+              <span className="text-sm font-bold text-foreground">Duração:</span>
+              <p className="text-sm text-content">{product.duracao}</p>
             </div>
           </CardContent>
         </Card>
@@ -258,25 +258,25 @@ const ProductDetails = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {product.para_quem_serve && (
                 <div>
-                  <span className="text-sm font-medium text-muted-foreground">Para quem serve:</span>
-                  <p className="text-sm">{product.para_quem_serve}</p>
+                  <span className="text-sm font-bold text-foreground">Para quem serve:</span>
+                  <p className="text-sm text-content">{product.para_quem_serve}</p>
                 </div>
               )}
               {product.como_entrega_valor && (
                 <div>
-                  <span className="text-sm font-medium text-muted-foreground">Como entregar valor:</span>
-                  <p className="text-sm">{product.como_entrega_valor}</p>
+                  <span className="text-sm font-bold text-foreground">Como entregar valor:</span>
+                  <p className="text-sm text-content">{product.como_entrega_valor}</p>
                 </div>
               )}
               {product.entregaveis_relacionados && (
                 <div>
-                  <span className="text-sm font-medium text-muted-foreground">Entregáveis relacionados:</span>
-                  <p className="text-sm">{product.entregaveis_relacionados}</p>
+                  <span className="text-sm font-bold text-foreground">Entregáveis relacionados:</span>
+                  <p className="text-sm text-content">{product.entregaveis_relacionados}</p>
                 </div>
               )}
               {product.icp_url && (
                 <div>
-                  <span className="text-sm font-medium text-muted-foreground">ICP:</span>
+                  <span className="text-sm font-bold text-foreground">ICP:</span>
                   <a 
                     href={product.icp_url} 
                     target="_blank" 
@@ -289,33 +289,33 @@ const ProductDetails = () => {
               )}
               {product.escopo && (
                 <div>
-                  <span className="text-sm font-medium text-muted-foreground">ESCOPO:</span>
-                  <p className="text-sm">{product.escopo}</p>
+                  <span className="text-sm font-bold text-foreground">ESCOPO:</span>
+                  <p className="text-sm text-content">{product.escopo}</p>
                 </div>
               )}
               {product.duracao_media && (
                 <div>
-                  <span className="text-sm font-medium text-muted-foreground">DURAÇÃO MÉDIA:</span>
-                  <p className="text-sm">{product.duracao_media}</p>
+                  <span className="text-sm font-bold text-foreground">DURAÇÃO MÉDIA:</span>
+                  <p className="text-sm text-content">{product.duracao_media}</p>
                 </div>
               )}
               {product.time_envolvido && (
                 <div>
-                  <span className="text-sm font-medium text-muted-foreground">TIME ENVOLVIDO:</span>
-                  <p className="text-sm">{product.time_envolvido}</p>
+                  <span className="text-sm font-bold text-foreground">TIME ENVOLVIDO:</span>
+                  <p className="text-sm text-content">{product.time_envolvido}</p>
                 </div>
               )}
             </div>
             {product.formato_entrega && (
               <div>
-                <span className="text-sm font-medium text-muted-foreground">FORMATO DE ENTREGA:</span>
-                <p className="text-sm">{product.formato_entrega}</p>
+                <span className="text-sm font-bold text-foreground">FORMATO DE ENTREGA:</span>
+                <p className="text-sm text-content">{product.formato_entrega}</p>
               </div>
             )}
             {product.descricao_completa && (
               <div>
-                <span className="text-sm font-medium text-muted-foreground">Descrição completa do produto:</span>
-                <p className="text-sm text-justify leading-relaxed">{product.descricao_completa}</p>
+                <span className="text-sm font-bold text-foreground">Descrição completa do produto:</span>
+                <p className="text-sm text-justify leading-relaxed text-content">{product.descricao_completa}</p>
               </div>
             )}
           </CardContent>
@@ -328,10 +328,10 @@ const ProductDetails = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h4 className="text-sm font-medium text-muted-foreground mb-2">"Como eu vendo?"</h4>
+              <h4 className="text-sm font-bold text-foreground mb-2">"Como eu vendo?"</h4>
               <div className="text-sm leading-relaxed bg-muted/30 p-4 rounded-lg">
                 {product.como_vendo.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4 last:mb-0 text-foreground">
+                  <p key={index} className="mb-4 last:mb-0 text-content">
                     {paragraph}
                   </p>
                 ))}
@@ -339,7 +339,7 @@ const ProductDetails = () => {
             </div>
             
             <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-medium mb-4">Metodologia SPICED</h4>
+              <h4 className="font-bold text-foreground mb-4">Metodologia SPICED</h4>
               <SpicedTable data={product.spiced_data} readOnly />
             </div>
           </CardContent>
@@ -360,19 +360,19 @@ const ProductDetails = () => {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <span className="text-sm font-medium text-muted-foreground">"Como eu entrego?"</span>
-                <p className="text-sm mt-2">{product.description}</p>
+                <span className="text-sm font-bold text-foreground">"Como eu entrego?"</span>
+                <p className="text-sm mt-2 text-content">{product.description}</p>
               </div>
               
               {product.o_que_entrego && (
                 <div>
-                  <span className="text-sm font-medium text-muted-foreground">"O que entrego"</span>
-                  <p className="text-sm mt-2">{product.o_que_entrego}</p>
+                  <span className="text-sm font-bold text-foreground">"O que entrego"</span>
+                  <p className="text-sm mt-2 text-content">{product.o_que_entrego}</p>
                 </div>
               )}
               
               <div className="bg-muted/50 p-4 rounded-lg">
-                <h4 className="font-medium mb-4">Etapas de Entrega</h4>
+                <h4 className="font-bold text-foreground mb-4">Etapas de Entrega</h4>
                 <ComoEntregoTable 
                   data={product.como_entrego_dados || []} 
                   readOnly={true}
@@ -394,11 +394,11 @@ const ProductDetails = () => {
               {/* URLs de Documentos */}
               {(product.pitch_url || product.bpmn_url || product.playbook_url || product.pricing_url || product.certificacao_url) && (
                 <div>
-                  <h4 className="font-semibold mb-4">URLs de Documentos</h4>
+                  <h4 className="font-bold text-foreground mb-4">URLs de Documentos</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {product.pitch_url && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Pitch URL:</span>
+                        <span className="text-sm font-bold text-foreground">Pitch URL:</span>
                         <a 
                           href={product.pitch_url} 
                           target="_blank" 
@@ -411,7 +411,7 @@ const ProductDetails = () => {
                     )}
                     {product.bpmn_url && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">BPMN URL:</span>
+                        <span className="text-sm font-bold text-foreground">BPMN URL:</span>
                         <a 
                           href={product.bpmn_url} 
                           target="_blank" 
@@ -424,7 +424,7 @@ const ProductDetails = () => {
                     )}
                     {product.playbook_url && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Playbook URL:</span>
+                        <span className="text-sm font-bold text-foreground">Playbook URL:</span>
                         <a 
                           href={product.playbook_url} 
                           target="_blank" 
@@ -437,7 +437,7 @@ const ProductDetails = () => {
                     )}
                     {product.pricing_url && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Pricing URL:</span>
+                        <span className="text-sm font-bold text-foreground">Pricing URL:</span>
                         <a 
                           href={product.pricing_url} 
                           target="_blank" 
@@ -450,7 +450,7 @@ const ProductDetails = () => {
                     )}
                     {product.certificacao_url && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Certificação URL:</span>
+                        <span className="text-sm font-bold text-foreground">Certificação URL:</span>
                         <a 
                           href={product.certificacao_url} 
                           target="_blank" 
@@ -468,27 +468,27 @@ const ProductDetails = () => {
               {/* Case 1 */}
               {product.case_1_name && (
                 <div>
-                  <h4 className="font-semibold mb-4">Case 1</h4>
+                  <h4 className="font-bold text-foreground mb-4">Case 1</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <span className="text-sm font-medium text-muted-foreground">Nome do Case 1:</span>
-                      <p className="text-sm">{product.case_1_name}</p>
+                      <span className="text-sm font-bold text-foreground">Nome do Case 1:</span>
+                      <p className="text-sm text-content">{product.case_1_name}</p>
                     </div>
                     {product.case_1_unidade_responsavel && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Unidade Responsável:</span>
-                        <p className="text-sm">{product.case_1_unidade_responsavel}</p>
+                        <span className="text-sm font-bold text-foreground">Unidade Responsável:</span>
+                        <p className="text-sm text-content">{product.case_1_unidade_responsavel}</p>
                       </div>
                     )}
                     {product.case_1_responsavel_projeto && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Responsável Projeto:</span>
-                        <p className="text-sm">{product.case_1_responsavel_projeto}</p>
+                        <span className="text-sm font-bold text-foreground">Responsável Projeto:</span>
+                        <p className="text-sm text-content">{product.case_1_responsavel_projeto}</p>
                       </div>
                     )}
                     {product.case_1_documento_url && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">URL do Documento:</span>
+                        <span className="text-sm font-bold text-foreground">URL do Documento:</span>
                         <a 
                           href={product.case_1_documento_url} 
                           target="_blank" 
@@ -506,27 +506,27 @@ const ProductDetails = () => {
               {/* Case 2 */}
               {product.case_2_name && (
                 <div>
-                  <h4 className="font-semibold mb-4">Case 2</h4>
+                  <h4 className="font-bold text-foreground mb-4">Case 2</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <span className="text-sm font-medium text-muted-foreground">Nome do Case 2:</span>
-                      <p className="text-sm">{product.case_2_name}</p>
+                      <span className="text-sm font-bold text-foreground">Nome do Case 2:</span>
+                      <p className="text-sm text-content">{product.case_2_name}</p>
                     </div>
                     {product.case_2_unidade_responsavel && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Unidade Responsável:</span>
-                        <p className="text-sm">{product.case_2_unidade_responsavel}</p>
+                        <span className="text-sm font-bold text-foreground">Unidade Responsável:</span>
+                        <p className="text-sm text-content">{product.case_2_unidade_responsavel}</p>
                       </div>
                     )}
                     {product.case_2_responsavel_projeto && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">Responsável Projeto:</span>
-                        <p className="text-sm">{product.case_2_responsavel_projeto}</p>
+                        <span className="text-sm font-bold text-foreground">Responsável Projeto:</span>
+                        <p className="text-sm text-content">{product.case_2_responsavel_projeto}</p>
                       </div>
                     )}
                     {product.case_2_documento_url && (
                       <div>
-                        <span className="text-sm font-medium text-muted-foreground">URL do Documento:</span>
+                        <span className="text-sm font-bold text-foreground">URL do Documento:</span>
                         <a 
                           href={product.case_2_documento_url} 
                           target="_blank" 

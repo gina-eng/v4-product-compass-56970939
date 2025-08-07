@@ -1214,14 +1214,14 @@ const Admin = () => {
                       <CardContent className="pt-0">
                         <div className="space-y-3">
                           {product.descricao_card && (
-                            <p className="text-sm text-muted-foreground line-clamp-2">
+                            <p className="text-sm text-content line-clamp-2">
                               {product.descricao_card}
                             </p>
                           )}
                           <div className="space-y-1 text-sm">
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">Valor:</span>
-                              <span className="font-medium">
+                              <span className="font-bold text-foreground">Valor:</span>
+                              <span className="font-normal text-content">
                                 {calculatedValues[product.id] && calculatedValues[product.id] > 0 
                                   ? formatCurrency(calculatedValues[product.id]) 
                                   : "A definir"
@@ -1229,12 +1229,12 @@ const Admin = () => {
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">Duração:</span>
-                              <span>{product.duracao}</span>
+                              <span className="font-bold text-foreground">Duração:</span>
+                              <span className="text-content">{product.duracao}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">Dono:</span>
-                              <span>{product.dono}</span>
+                              <span className="font-bold text-foreground">Dono:</span>
+                              <span className="text-content">{product.dono}</span>
                             </div>
                           </div>
                         </div>
@@ -1263,8 +1263,8 @@ const Admin = () => {
                     <Card key={position.id} className="p-4">
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold">{position.nome}</h3>
-                          <div className="text-sm text-muted-foreground">
+                          <h3 className="font-bold text-foreground">{position.nome}</h3>
+                          <div className="text-sm text-content">
                             CPH: R$ {position.cph.toFixed(2)} • 
                             Investimento Total: R$ {position.investimento_total.toFixed(2)}
                           </div>
@@ -1302,8 +1302,8 @@ const Admin = () => {
                     <Card key={material.id} className="p-4">
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-semibold">{material.nome_arquivo}</h3>
-                          <p className="text-sm text-muted-foreground">{material.url_direcionamento}</p>
+                          <h3 className="font-bold text-foreground">{material.nome_arquivo}</h3>
+                          <p className="text-sm text-content">{material.url_direcionamento}</p>
                         </div>
                         <div className="flex gap-2">
                           <Button variant="outline" size="sm">

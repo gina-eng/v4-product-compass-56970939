@@ -45,7 +45,7 @@ const StepIntroduction = () => {
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-6 text-foreground">{settings.step_title}</h2>
-          <div className="max-w-4xl mx-auto text-foreground/70 leading-relaxed space-y-4 text-justify">
+          <div className="max-w-4xl mx-auto text-content leading-relaxed space-y-4 text-justify">
             {settings.step_description.split('\n\n').map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
@@ -76,10 +76,10 @@ const StepIntroduction = () => {
                     >
                       {item.letter} - {item.title}
                     </h3>
-                    <p className="text-sm font-medium text-foreground">
+                    <p className="text-sm font-bold text-foreground">
                       "{item.subtitle}"
                     </p>
-                    <div className="text-sm text-foreground/70 leading-relaxed text-justify space-y-2">
+                    <div className="text-sm text-content leading-relaxed text-justify space-y-2">
                       {item.description.split('→').map((part, index) => {
                         const trimmedPart = part.trim();
                         if (!trimmedPart) return null;
