@@ -108,6 +108,9 @@ const Admin = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  
+  // Cache para valores calculados por produto
+  const [calculatedValues, setCalculatedValues] = useState<{[key: string]: number}>({});
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -277,6 +280,14 @@ const Admin = () => {
       
       setProducts(formattedProducts);
       setFilteredProducts(formattedProducts);
+      
+      // Calcular valores automaticamente para todos os produtos
+      const calculatedVals: {[key: string]: number} = {};
+      for (const product of formattedProducts) {
+        const calculatedValue = await calculateFaturamentoSemDesconto(product.id);
+        calculatedVals[product.id] = calculatedValue;
+      }
+      setCalculatedValues(calculatedVals);
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
       toast({
@@ -522,6 +533,15 @@ const Admin = () => {
           valor: faturamentoSemDesconto.toFixed(2)
         })
         .eq('id', productId);
+        
+      // Atualizar cache para os cards
+      setCalculatedValues(prev => ({
+        ...prev,
+        [productId]: faturamentoSemDesconto
+      }));
+      
+      // Recarregar produtos para atualizar a lista
+      fetchProducts();
     }
   };
 
@@ -1164,7 +1184,9 @@ const Admin = () => {
                           <div className="space-y-1 text-sm">
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Valor:</span>
-                              <span className="font-medium">{formatCurrency(product.valor)}</span>
+                              <span className="font-medium">
+                                {formatCurrency(calculatedValues[product.id] || parseFloat(product.valor) || 0)}
+                              </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Duração:</span>
