@@ -659,20 +659,14 @@ const Admin = () => {
 
   if (loading) {
     return (
-      <Layout customBreadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Administração", current: true }
-      ]}>
+      <Layout showHeader={false}>
         <div className="text-center animate-fade-in">Carregando...</div>
       </Layout>
     );
   }
 
   return (
-    <Layout customBreadcrumbs={[
-      { label: "Home", href: "/" },
-      { label: "Administração", current: true }
-    ]}>
+    <Layout showHeader={false}>
       <div className="space-y-8 animate-fade-in">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Administração</h1>

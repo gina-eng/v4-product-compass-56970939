@@ -45,10 +45,7 @@ const SupportMaterials = () => {
 
   if (loading) {
     return (
-      <Layout customBreadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Materiais de Apoio", current: true }
-      ]}>
+      <Layout>
         <div className="flex items-center justify-center min-h-[400px]">
           <LoadingSpinner size="lg" />
         </div>
@@ -57,10 +54,7 @@ const SupportMaterials = () => {
   }
 
   return (
-    <Layout customBreadcrumbs={[
-      { label: "Home", href: "/" },
-      { label: "Materiais de Apoio", current: true }
-    ]}>
+    <Layout>
       <div className="space-y-8 animate-fade-in">
         <div className="flex justify-between items-center">
           <div>

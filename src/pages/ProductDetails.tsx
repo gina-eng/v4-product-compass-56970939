@@ -190,10 +190,7 @@ const ProductDetails = () => {
 
   if (loading) {
     return (
-      <Layout customBreadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Carregando...", current: true }
-      ]}>
+      <Layout>
         <div className="flex items-center justify-center min-h-[400px]">
           <LoadingSpinner size="lg" />
         </div>
@@ -203,10 +200,7 @@ const ProductDetails = () => {
 
   if (!product) {
     return (
-      <Layout customBreadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Produto não encontrado", current: true }
-      ]}>
+      <Layout>
         <div className="text-center animate-fade-in">
           <h2 className="text-2xl font-bold mb-4">Produto não encontrado</h2>
           <Button onClick={() => navigate("/")} variant="outline">
@@ -219,10 +213,7 @@ const ProductDetails = () => {
   }
 
   return (
-    <Layout customBreadcrumbs={[
-      { label: "Home", href: "/" },
-      { label: product.produto, current: true }
-    ]}>
+    <Layout>
       <div className="space-y-8 animate-fade-in">{/* Header com botão voltar */}
         <div className="flex items-center gap-4">
           <Button 

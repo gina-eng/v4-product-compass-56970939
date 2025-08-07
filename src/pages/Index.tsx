@@ -5,7 +5,7 @@ import StatusReport from "@/components/StatusReport";
 
 const Index = () => {
   return (
-    <Layout showSidebar={true}>
+    <Layout showHeader={true}>
       <div className="space-y-8 animate-fade-in">
         <StepIntroduction />
         <ProductPortfolio />
