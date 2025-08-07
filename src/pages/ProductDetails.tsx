@@ -286,7 +286,7 @@ const ProductDetails = () => {
             {/* Seção Principal - Público e Valor */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {product.para_quem_serve && (
-                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800">
+                <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-800">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center gap-2">
                       👥 Para quem serve
@@ -301,7 +301,7 @@ const ProductDetails = () => {
               )}
               
               {product.como_entrega_valor && (
-                <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-800">
+                <Card className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 border-orange-200 dark:border-orange-800">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center gap-2">
                       💎 Como entregar valor
@@ -412,7 +412,7 @@ const ProductDetails = () => {
                 <h3 className="text-lg font-semibold text-foreground border-b pb-2">⚙️ Aspectos Técnicos</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {product.duracao_media && (
-                    <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="bg-slate-50 dark:bg-slate-950/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
                       <span className="text-sm font-bold text-foreground block mb-2">⏳ Duração média:</span>
                       <div className="text-sm text-gray-700 dark:text-gray-300">
                         {product.duracao_media}
