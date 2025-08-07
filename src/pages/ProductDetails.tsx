@@ -329,9 +329,13 @@ const ProductDetails = () => {
           <CardContent className="space-y-6">
             <div>
               <h4 className="text-sm font-bold text-foreground mb-2">"Como eu vendo?"</h4>
-              <div className="text-sm leading-relaxed bg-muted/30 p-4 rounded-lg prose prose-sm max-w-none">
-                <div className="text-content whitespace-pre-wrap">
-                  {product.como_vendo}
+              <div className="text-sm leading-relaxed bg-muted/30 p-4 rounded-lg">
+                <div className="text-content space-y-3 text-justify">
+                  {product.como_vendo.split('\n').filter(line => line.trim()).map((line, index) => (
+                    <p key={index} className="mb-0">
+                      {line.trim()}
+                    </p>
+                  ))}
                 </div>
               </div>
             </div>
