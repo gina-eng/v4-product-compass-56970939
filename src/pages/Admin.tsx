@@ -704,11 +704,9 @@ const Admin = () => {
                       </DialogHeader>
 
                       <Tabs defaultValue="basico" className="mt-4">
-                        <TabsList className="grid w-full grid-cols-6">
-                          <TabsTrigger value="basico">Básico</TabsTrigger>
-                          <TabsTrigger value="visao">Visão Geral</TabsTrigger>
-                          <TabsTrigger value="venda">Como Vendo</TabsTrigger>
-                          <TabsTrigger value="entrega">Como Entrego</TabsTrigger>
+                        <TabsList className="grid w-full grid-cols-4">
+                          <TabsTrigger value="basico">Informações Básicas</TabsTrigger>
+                          <TabsTrigger value="vendas">Vendas e Entrega</TabsTrigger>
                           <TabsTrigger value="materiais">Materiais e Documentos</TabsTrigger>
                           <TabsTrigger value="posicoes">Posições e DRE</TabsTrigger>
                         </TabsList>
@@ -766,36 +764,6 @@ const Admin = () => {
                                 </SelectContent>
                               </Select>
                             </div>
-                          </div>
-                          <div>
-                            <Label htmlFor="descricao_card">Descrição do Card</Label>
-                            <Textarea
-                              id="descricao_card"
-                              value={productForm.descricao_card}
-                              onChange={(e) => setProductForm({...productForm, descricao_card: e.target.value})}
-                            />
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="visao" className="space-y-4">
-                          <div>
-                            <Label htmlFor="icp_url">ICP</Label>
-                            <Textarea
-                              id="icp_url"
-                              value={productForm.icp_url}
-                              onChange={(e) => setProductForm({...productForm, icp_url: e.target.value})}
-                              rows={3}
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="escopo">Escopo</Label>
-                            <Textarea
-                              id="escopo"
-                              value={productForm.escopo}
-                              onChange={(e) => setProductForm({...productForm, escopo: e.target.value})}
-                            />
-                          </div>
-                          <div className="grid grid-cols-3 gap-4">
                             <div>
                               <Label htmlFor="duracao">Duração</Label>
                               <Input
@@ -812,17 +780,37 @@ const Admin = () => {
                                 onChange={(e) => setProductForm({...productForm, dono: e.target.value})}
                               />
                             </div>
-                            <div>
-                              <Label htmlFor="time_envolvido">Time Envolvido (Automático)</Label>
-                              <Input
-                                id="time_envolvido"
-                                value={productForm.time_envolvido}
-                                readOnly
-                                className="bg-muted"
-                                placeholder="Será preenchido automaticamente com base nas posições alocadas"
-                              />
-                            </div>
                           </div>
+                          
+                          <div>
+                            <Label htmlFor="descricao_card">Descrição do Card</Label>
+                            <Textarea
+                              id="descricao_card"
+                              value={productForm.descricao_card}
+                              onChange={(e) => setProductForm({...productForm, descricao_card: e.target.value})}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="escopo">Escopo</Label>
+                            <Textarea
+                              id="escopo"
+                              value={productForm.escopo}
+                              onChange={(e) => setProductForm({...productForm, escopo: e.target.value})}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="time_envolvido">Time Envolvido (Automático)</Label>
+                            <Input
+                              id="time_envolvido"
+                              value={productForm.time_envolvido}
+                              readOnly
+                              className="bg-muted"
+                              placeholder="Será preenchido automaticamente com base nas posições alocadas"
+                            />
+                          </div>
+                          
                           <div>
                             <Label htmlFor="formato_entrega">Formato de Entrega</Label>
                             <Textarea
@@ -831,6 +819,7 @@ const Admin = () => {
                               onChange={(e) => setProductForm({...productForm, formato_entrega: e.target.value})}
                             />
                           </div>
+                          
                           <div>
                             <Label htmlFor="descricao_completa">Descrição Completa</Label>
                             <Textarea
@@ -840,22 +829,26 @@ const Admin = () => {
                               rows={5}
                             />
                           </div>
-                          <div>
-                            <Label htmlFor="para_quem_serve">Para quem serve</Label>
-                            <Textarea
-                              id="para_quem_serve"
-                              value={productForm.para_quem_serve}
-                              onChange={(e) => setProductForm({...productForm, para_quem_serve: e.target.value})}
-                            />
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="para_quem_serve">Para quem serve</Label>
+                              <Textarea
+                                id="para_quem_serve"
+                                value={productForm.para_quem_serve}
+                                onChange={(e) => setProductForm({...productForm, para_quem_serve: e.target.value})}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="como_entrega_valor">Como entregar valor</Label>
+                              <Textarea
+                                id="como_entrega_valor"
+                                value={productForm.como_entrega_valor}
+                                onChange={(e) => setProductForm({...productForm, como_entrega_valor: e.target.value})}
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <Label htmlFor="como_entrega_valor">Como entregar valor</Label>
-                            <Textarea
-                              id="como_entrega_valor"
-                              value={productForm.como_entrega_valor}
-                              onChange={(e) => setProductForm({...productForm, como_entrega_valor: e.target.value})}
-                            />
-                          </div>
+                          
                           <div>
                             <Label htmlFor="entregaveis_relacionados">Entregáveis relacionados</Label>
                             <Textarea
@@ -864,15 +857,7 @@ const Admin = () => {
                               onChange={(e) => setProductForm({...productForm, entregaveis_relacionados: e.target.value})}
                             />
                           </div>
-                          <div>
-                            <Label htmlFor="icp_url">ICP</Label>
-                            <Input
-                              id="icp_url"
-                              value={productForm.icp_url}
-                              onChange={(e) => setProductForm({...productForm, icp_url: e.target.value})}
-                              placeholder="URL do documento ICP"
-                            />
-                          </div>
+                          
                           <div>
                             <Label htmlFor="stack_digital">Stack digital</Label>
                             <Textarea
@@ -881,6 +866,7 @@ const Admin = () => {
                               onChange={(e) => setProductForm({...productForm, stack_digital: e.target.value})}
                             />
                           </div>
+                          
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <Label htmlFor="bonus_kpi">Bônus KPI</Label>
@@ -899,6 +885,7 @@ const Admin = () => {
                               />
                             </div>
                           </div>
+                          
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <Label htmlFor="kpi_principal">KPI Principal</Label>
@@ -919,7 +906,7 @@ const Admin = () => {
                           </div>
                         </TabsContent>
 
-                        <TabsContent value="venda" className="space-y-4">
+                        <TabsContent value="vendas" className="space-y-4">
                           <div>
                             <Label htmlFor="como_vendo">Como eu vendo?</Label>
                             <Textarea
@@ -929,6 +916,7 @@ const Admin = () => {
                               rows={3}
                             />
                           </div>
+                          
                           <div>
                             <Label>Metodologia SPICED</Label>
                             <SpicedTable 
@@ -936,9 +924,7 @@ const Admin = () => {
                               onChange={setSpicedData}
                             />
                           </div>
-                        </TabsContent>
-
-                        <TabsContent value="entrega" className="space-y-4">
+                          
                           <div>
                             <Label htmlFor="description">Como eu entrego?</Label>
                             <Textarea
@@ -948,6 +934,7 @@ const Admin = () => {
                               rows={3}
                             />
                           </div>
+                          
                           <div>
                             <Label htmlFor="o_que_entrego">O que entrego</Label>
                             <Textarea
@@ -957,6 +944,7 @@ const Admin = () => {
                               rows={3}
                             />
                           </div>
+                          
                           <div>
                             <Label>Etapas de Entrega</Label>
                             <ComoEntregoTable 
@@ -1014,6 +1002,15 @@ const Admin = () => {
                                   value={productForm.certificacao_url}
                                   onChange={(e) => setProductForm({...productForm, certificacao_url: e.target.value})}
                                   placeholder="Link teste"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="icp_url">ICP URL</Label>
+                                <Input
+                                  id="icp_url"
+                                  value={productForm.icp_url}
+                                  onChange={(e) => setProductForm({...productForm, icp_url: e.target.value})}
+                                  placeholder="URL do documento ICP"
                                 />
                               </div>
                             </div>
