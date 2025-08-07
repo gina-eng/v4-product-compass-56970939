@@ -26,6 +26,24 @@ interface Product {
   time_envolvido?: string;
   formato_entrega?: string;
   descricao_completa?: string;
+  para_quem_serve?: string;
+  como_entrega_valor?: string;
+  entregaveis_relacionados?: string;
+  icp_url?: string;
+  o_que_entrego?: string;
+  pitch_url?: string;
+  bpmn_url?: string;
+  playbook_url?: string;
+  pricing_url?: string;
+  certificacao_url?: string;
+  case_1_name?: string;
+  case_1_unidade_responsavel?: string;
+  case_1_responsavel_projeto?: string;
+  case_1_documento_url?: string;
+  case_2_name?: string;
+  case_2_unidade_responsavel?: string;
+  case_2_responsavel_projeto?: string;
+  case_2_documento_url?: string;
   como_vendo: string;
   spiced_data: any;
   como_entrego_dados: any[];
@@ -75,12 +93,30 @@ const ProductDetails = () => {
         duracao: data.duracao,
         description: data.description,
         descricao_card: data.descricao_card,
-        icp: typeof data.icp === 'string' ? data.icp : undefined, // Nova coluna text
-        escopo: data.escopo, // Nova coluna text
-        duracao_media: data.duracao_media, // Nova coluna text
-        time_envolvido: data.time_envolvido, // Nova coluna text
-        formato_entrega: data.formato_entrega, // Nova coluna text
-        descricao_completa: data.descricao_completa, // Nova coluna text
+        icp: typeof data.icp === 'string' ? data.icp : undefined,
+        escopo: data.escopo,
+        duracao_media: data.duracao_media,
+        time_envolvido: data.time_envolvido,
+        formato_entrega: data.formato_entrega,
+        descricao_completa: data.descricao_completa,
+        para_quem_serve: data.para_quem_serve,
+        como_entrega_valor: data.como_entrega_valor,
+        entregaveis_relacionados: data.entregaveis_relacionados,
+        icp_url: data.icp_url,
+        o_que_entrego: data.o_que_entrego,
+        pitch_url: data.pitch_url,
+        bpmn_url: data.bpmn_url,
+        playbook_url: data.playbook_url,
+        pricing_url: data.pricing_url,
+        certificacao_url: data.certificacao_url,
+        case_1_name: data.case_1_name,
+        case_1_unidade_responsavel: data.case_1_unidade_responsavel,
+        case_1_responsavel_projeto: data.case_1_responsavel_projeto,
+        case_1_documento_url: data.case_1_documento_url,
+        case_2_name: data.case_2_name,
+        case_2_unidade_responsavel: data.case_2_unidade_responsavel,
+        case_2_responsavel_projeto: data.case_2_responsavel_projeto,
+        case_2_documento_url: data.case_2_documento_url,
         como_vendo: data.como_vendo,
         spiced_data: data.spiced_data,
         como_entrego_dados: Array.isArray(data.como_entrego_dados) ? data.como_entrego_dados : [],
@@ -220,10 +256,35 @@ const ProductDetails = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {product.icp && (
+              {product.para_quem_serve && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">Para quem serve:</span>
+                  <p className="text-sm">{product.para_quem_serve}</p>
+                </div>
+              )}
+              {product.como_entrega_valor && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">Como entregar valor:</span>
+                  <p className="text-sm">{product.como_entrega_valor}</p>
+                </div>
+              )}
+              {product.entregaveis_relacionados && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">Entregáveis relacionados:</span>
+                  <p className="text-sm">{product.entregaveis_relacionados}</p>
+                </div>
+              )}
+              {product.icp_url && (
                 <div>
                   <span className="text-sm font-medium text-muted-foreground">ICP:</span>
-                  <p className="text-sm">{product.icp}</p>
+                  <a 
+                    href={product.icp_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Documento ICP
+                  </a>
                 </div>
               )}
               {product.escopo && (
@@ -303,6 +364,13 @@ const ProductDetails = () => {
                 <p className="text-sm mt-2">{product.description}</p>
               </div>
               
+              {product.o_que_entrego && (
+                <div>
+                  <span className="text-sm font-medium text-muted-foreground">"O que entrego"</span>
+                  <p className="text-sm mt-2">{product.o_que_entrego}</p>
+                </div>
+              )}
+              
               <div className="bg-muted/50 p-4 rounded-lg">
                 <h4 className="font-medium mb-4">Etapas de Entrega</h4>
                 <ComoEntregoTable 
@@ -314,6 +382,167 @@ const ProductDetails = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Materiais e Documentos */}
+        {(product.pitch_url || product.bpmn_url || product.playbook_url || product.pricing_url || product.certificacao_url || 
+          product.case_1_name || product.case_2_name) && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Materiais e Documentos</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* URLs de Documentos */}
+              {(product.pitch_url || product.bpmn_url || product.playbook_url || product.pricing_url || product.certificacao_url) && (
+                <div>
+                  <h4 className="font-semibold mb-4">URLs de Documentos</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {product.pitch_url && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">Pitch URL:</span>
+                        <a 
+                          href={product.pitch_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline block"
+                        >
+                          {product.pitch_url || "Link teste"}
+                        </a>
+                      </div>
+                    )}
+                    {product.bpmn_url && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">BPMN URL:</span>
+                        <a 
+                          href={product.bpmn_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline block"
+                        >
+                          {product.bpmn_url || "Link teste"}
+                        </a>
+                      </div>
+                    )}
+                    {product.playbook_url && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">Playbook URL:</span>
+                        <a 
+                          href={product.playbook_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline block"
+                        >
+                          {product.playbook_url || "Link teste"}
+                        </a>
+                      </div>
+                    )}
+                    {product.pricing_url && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">Pricing URL:</span>
+                        <a 
+                          href={product.pricing_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline block"
+                        >
+                          {product.pricing_url || "Link teste"}
+                        </a>
+                      </div>
+                    )}
+                    {product.certificacao_url && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">Certificação URL:</span>
+                        <a 
+                          href={product.certificacao_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline block"
+                        >
+                          {product.certificacao_url || "Link teste"}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Case 1 */}
+              {product.case_1_name && (
+                <div>
+                  <h4 className="font-semibold mb-4">Case 1</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm font-medium text-muted-foreground">Nome do Case 1:</span>
+                      <p className="text-sm">{product.case_1_name}</p>
+                    </div>
+                    {product.case_1_unidade_responsavel && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">Unidade Responsável:</span>
+                        <p className="text-sm">{product.case_1_unidade_responsavel}</p>
+                      </div>
+                    )}
+                    {product.case_1_responsavel_projeto && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">Responsável Projeto:</span>
+                        <p className="text-sm">{product.case_1_responsavel_projeto}</p>
+                      </div>
+                    )}
+                    {product.case_1_documento_url && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">URL do Documento:</span>
+                        <a 
+                          href={product.case_1_documento_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline block"
+                        >
+                          {product.case_1_documento_url || "Link teste"}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Case 2 */}
+              {product.case_2_name && (
+                <div>
+                  <h4 className="font-semibold mb-4">Case 2</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm font-medium text-muted-foreground">Nome do Case 2:</span>
+                      <p className="text-sm">{product.case_2_name}</p>
+                    </div>
+                    {product.case_2_unidade_responsavel && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">Unidade Responsável:</span>
+                        <p className="text-sm">{product.case_2_unidade_responsavel}</p>
+                      </div>
+                    )}
+                    {product.case_2_responsavel_projeto && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">Responsável Projeto:</span>
+                        <p className="text-sm">{product.case_2_responsavel_projeto}</p>
+                      </div>
+                    )}
+                    {product.case_2_documento_url && (
+                      <div>
+                        <span className="text-sm font-medium text-muted-foreground">URL do Documento:</span>
+                        <a 
+                          href={product.case_2_documento_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline block"
+                        >
+                          {product.case_2_documento_url || "Link teste"}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
