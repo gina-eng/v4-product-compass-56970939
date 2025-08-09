@@ -11,6 +11,7 @@ import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
 import TrainingMaterials from "@/components/TrainingMaterials";
+import SalesMaterials from "@/components/SalesMaterials";
 import UseCaseMap from "@/components/UseCaseMap";
 import ProductSummary from "@/components/ProductSummary";
 import { formatCurrency } from "@/lib/formatters";
@@ -426,6 +427,11 @@ const ProductDetails = () => {
             </div>
           </CardContent>
         </Card>
+        </section>
+
+        {/* Materiais de Vendas */}
+        <section id="materiais-vendas">
+        <SalesMaterials productId={product.id} readOnly={true} />
         </section>
 
         {/* Posições Alocadas */}

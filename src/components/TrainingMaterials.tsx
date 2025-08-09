@@ -311,7 +311,7 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
 
   return (
     <div className="space-y-6">
-      {renderSection("Informações para Vender", comercialMaterials)}
+      {renderSection("Materiais de Vendas", comercialMaterials)}
       {renderSection("Informações para Operar", operacionalMaterials)}
       {renderSection("Materiais de Treinamento", treinamentoMaterials)}
     </div>
