@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Plus, Edit, Trash2, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/formatters";
@@ -44,6 +45,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
     horas_alocadas: ''
   });
   const [markup, setMarkup] = useState<number>(initialMarkup);
+  const [isDreOpen, setIsDreOpen] = useState(false);
 
   useEffect(() => {
     fetchProductPositions();
@@ -397,92 +399,101 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
             )}
 
             {/* Tabela DRE */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-right bg-muted p-2 rounded">DRE FINAL</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">(=) Faturamento (MRR) - Sem Desconto</TableCell>
-                      <TableCell className="text-center">R$</TableCell>
-                      <TableCell className="text-right font-medium">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600">(-) Desconto de Pagamento (-17%)</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(descontoPagamento).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600">(-) Desconto de Cupom (-20%)</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(descontoCupom).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow className="bg-muted/50">
-                      <TableCell className="font-medium">(=) Faturamento (MRR) - Com Desconto</TableCell>
-                      <TableCell className="text-center">R$</TableCell>
-                      <TableCell className="text-right font-medium">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600">(-) Royalties (-17%)</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(royalties).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600">(-) Taxa de Pagamento (-3%)</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaPagamento).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600">(-) Taxa de Antecipação (-10%)</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaAntecipacao).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow className="bg-muted/50">
-                      <TableCell className="font-medium">(=) Receita Bruta (MRR)</TableCell>
-                      <TableCell className="text-center">R$</TableCell>
-                      <TableCell className="text-right font-medium">{formatCurrency(receitaBruta).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600">(-) Impostos sobre Receita</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(impostosReceita).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow className="bg-muted/50">
-                      <TableCell className="font-medium">(=) Receita Líquida</TableCell>
-                      <TableCell className="text-center">R$</TableCell>
-                      <TableCell className="text-right font-medium">{formatCurrency(receitaLiquida).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600">(-) Custos diretos</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosDiretos).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow className="pl-6">
-                      <TableCell className="font-medium text-red-600 pl-8">(-) CSP</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosCSP).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium text-red-600 pl-8">(-) Auxílio</TableCell>
-                      <TableCell className="text-center text-red-600">R$</TableCell>
-                      <TableCell className="text-right font-medium text-red-600">-</TableCell>
-                    </TableRow>
-                    <TableRow className="bg-muted/50 border-t-2">
-                      <TableCell className="font-bold">(=) Margem operacional</TableCell>
-                      <TableCell className="text-center font-bold">R$</TableCell>
-                      <TableCell className="text-right font-bold">{formatCurrency(margemOperacional).replace('R$ ', '')}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell className="text-right font-bold text-sm">{margemPercentual.toFixed(2)}%</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            <Collapsible open={isDreOpen} onOpenChange={setIsDreOpen}>
+              <Card>
+                <CollapsibleTrigger asChild>
+                  <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <CardTitle className="text-right bg-muted p-2 rounded flex items-center justify-between">
+                      DRE FINAL
+                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isDreOpen ? 'rotate-180' : ''}`} />
+                    </CardTitle>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="p-0">
+                    <Table>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-medium">(=) Faturamento (MRR) - Sem Desconto</TableCell>
+                          <TableCell className="text-center">R$</TableCell>
+                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-red-600">(-) Desconto de Pagamento (-17%)</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(descontoPagamento).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-red-600">(-) Desconto de Cupom (-20%)</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(descontoCupom).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow className="bg-muted/50">
+                          <TableCell className="font-medium">(=) Faturamento (MRR) - Com Desconto</TableCell>
+                          <TableCell className="text-center">R$</TableCell>
+                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-red-600">(-) Royalties (-17%)</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(royalties).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-red-600">(-) Taxa de Pagamento (-3%)</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaPagamento).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-red-600">(-) Taxa de Antecipação (-10%)</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaAntecipacao).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow className="bg-muted/50">
+                          <TableCell className="font-medium">(=) Receita Bruta (MRR)</TableCell>
+                          <TableCell className="text-center">R$</TableCell>
+                          <TableCell className="text-right font-medium">{formatCurrency(receitaBruta).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-red-600">(-) Impostos sobre Receita</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(impostosReceita).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow className="bg-muted/50">
+                          <TableCell className="font-medium">(=) Receita Líquida</TableCell>
+                          <TableCell className="text-center">R$</TableCell>
+                          <TableCell className="text-right font-medium">{formatCurrency(receitaLiquida).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-red-600">(-) Custos diretos</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosDiretos).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow className="pl-6">
+                          <TableCell className="font-medium text-red-600 pl-8">(-) CSP</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosCSP).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium text-red-600 pl-8">(-) Auxílio</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">-</TableCell>
+                        </TableRow>
+                        <TableRow className="bg-muted/50 border-t-2">
+                          <TableCell className="font-bold">(=) Margem operacional</TableCell>
+                          <TableCell className="text-center font-bold">R$</TableCell>
+                          <TableCell className="text-right font-bold">{formatCurrency(margemOperacional).replace('R$ ', '')}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell></TableCell>
+                          <TableCell></TableCell>
+                          <TableCell className="text-right font-bold text-sm">{margemPercentual.toFixed(2)}%</TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
           </div>
         )}
       </CardContent>
