@@ -44,18 +44,20 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   const TopSummary = () => (
     <Card className="mb-8">
       <CardContent className="pt-6">
-        <h2 className="text-lg font-semibold mb-4">Sumário da Página</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-          {sections.map((section) => (
-            <Button
-              key={section.id}
-              variant="outline"
-              size="sm"
-              onClick={() => scrollToSection(section.id)}
-              className="justify-start text-sm h-8"
-            >
-              {section.label}
-            </Button>
+        <h2 className="text-xl font-bold mb-6 text-foreground">Sumário da Página</h2>
+        <div className="space-y-3">
+          {sections.map((section, index) => (
+            <div key={section.id} className="flex items-center gap-3">
+              <span className="text-muted-foreground font-mono text-sm min-w-[2rem]">
+                {String(index + 1).padStart(2, '0')}.
+              </span>
+              <button
+                onClick={() => scrollToSection(section.id)}
+                className="text-left hover:text-primary transition-colors duration-200 text-base font-medium cursor-pointer"
+              >
+                {section.label}
+              </button>
+            </div>
           ))}
         </div>
       </CardContent>
