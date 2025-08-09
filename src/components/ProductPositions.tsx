@@ -46,6 +46,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
   });
   const [markup, setMarkup] = useState<number>(initialMarkup);
   const [isDreOpen, setIsDreOpen] = useState(false);
+  const [isPositionsOpen, setIsPositionsOpen] = useState(false);
 
   useEffect(() => {
     fetchProductPositions();
@@ -259,62 +260,72 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
   const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Posições Alocadas</CardTitle>
-        {!readOnly && (
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={openNewDialog} size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Adicionar Posição
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {editingPosition ? 'Editar Posição' : 'Adicionar Posição'}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="position">Posição</Label>
-                  <Select
-                    value={formData.position_id}
-                    onValueChange={(value) => setFormData({ ...formData, position_id: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma posição" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {positions.map((position) => (
-                        <SelectItem key={position.id} value={position.id}>
-                          {position.nome}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="horas">Horas Alocadas</Label>
-                  <Input
-                    id="horas"
-                    type="number"
-                    step="0.1"
-                    value={formData.horas_alocadas}
-                    onChange={(e) => setFormData({ ...formData, horas_alocadas: e.target.value })}
-                    placeholder="Ex: 40.0"
-                  />
-                </div>
-                <Button onClick={handleSubmit} className="w-full">
-                  {editingPosition ? 'Atualizar' : 'Adicionar'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </CardHeader>
-      <CardContent>
+    <Collapsible open={isPositionsOpen} onOpenChange={setIsPositionsOpen}>
+      <Card>
+        <CollapsibleTrigger asChild>
+          <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-primary"></div>
+                Posições Alocadas
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isPositionsOpen ? 'rotate-180' : ''}`} />
+              </CardTitle>
+              {!readOnly && isPositionsOpen && (
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button onClick={(e) => { e.stopPropagation(); openNewDialog(); }} size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Adicionar Posição
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingPosition ? 'Editar Posição' : 'Adicionar Posição'}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="position">Posição</Label>
+                        <Select
+                          value={formData.position_id}
+                          onValueChange={(value) => setFormData({ ...formData, position_id: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione uma posição" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {positions.map((position) => (
+                              <SelectItem key={position.id} value={position.id}>
+                                {position.nome}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="horas">Horas Alocadas</Label>
+                        <Input
+                          id="horas"
+                          type="number"
+                          step="0.1"
+                          value={formData.horas_alocadas}
+                          onChange={(e) => setFormData({ ...formData, horas_alocadas: e.target.value })}
+                          placeholder="Ex: 40.0"
+                        />
+                      </div>
+                      <Button onClick={handleSubmit} className="w-full">
+                        {editingPosition ? 'Atualizar' : 'Adicionar'}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent>
         {productPositions.length === 0 ? (
           <p className="text-muted-foreground text-center py-4">
             Nenhuma posição alocada para este produto.
@@ -496,8 +507,10 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
             </Collapsible>
           </div>
         )}
-      </CardContent>
-    </Card>
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
   );
 };
 
