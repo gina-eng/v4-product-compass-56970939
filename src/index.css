@@ -188,24 +188,24 @@ All colors MUST be HSL.
   }
   
   .padding-card {
-    @apply p-4;
+    @apply p-5;
   }
   
   .padding-section {
-    @apply p-3;
+    @apply p-4;
   }
   
   .padding-tight {
-    @apply p-2;
+    @apply p-3;
   }
   
   /* Containers Padronizados */
   .container-section {
-    @apply bg-muted/30 p-4 rounded-lg;
+    @apply bg-muted/30 p-5 rounded-lg;
   }
   
   .container-highlight {
-    @apply bg-primary/5 border border-primary/20 p-4 rounded-lg;
+    @apply bg-primary/5 border border-primary/20 p-5 rounded-lg;
   }
   
   /* Table Styling Padronizado */

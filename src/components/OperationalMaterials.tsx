@@ -262,7 +262,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
         <div className="grid grid-cols-1 gap-3">
           {materials.map((material) => (
             <Card key={material.id} className="h-fit">
-              <CardContent className="padding-card">
+              <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
