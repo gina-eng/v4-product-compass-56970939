@@ -15,6 +15,9 @@ import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
 import TrainingMaterials from "@/components/TrainingMaterials";
+import SalesMaterials from "@/components/SalesMaterials";
+import OperationalMaterials from "@/components/OperationalMaterials";
+import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Plus, Edit, Trash2, Upload } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
@@ -965,8 +968,21 @@ const Admin = () => {
 
                         <TabsContent value="materiais" className="space-y-4">
                           {editingProduct && (
-                            <div className="mb-6">
-                              <TrainingMaterials productId={editingProduct.id} readOnly={false} />
+                            <div className="space-y-6">
+                              <div>
+                                <h4 className="font-semibold mb-4">Materiais de Vendas</h4>
+                                <SalesMaterials productId={editingProduct.id} readOnly={false} />
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold mb-4">Materiais Operacionais</h4>
+                                <OperationalMaterials productId={editingProduct.id} readOnly={false} />
+                              </div>
+                              
+                              <div>
+                                <h4 className="font-semibold mb-4">Materiais de Treinamento</h4>
+                                <TrainingMaterialsOnly productId={editingProduct.id} readOnly={false} />
+                              </div>
                             </div>
                           )}
                           
