@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ProductSummaryProps {
@@ -10,7 +9,6 @@ interface ProductSummaryProps {
 
 const ProductSummary = ({ productName }: ProductSummaryProps) => {
   const [isSticky, setIsSticky] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,7 +25,6 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    setIsExpanded(false);
   };
 
   const sections = [
@@ -68,44 +65,29 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   const StickySummary = () => (
     <div
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b transition-transform duration-300",
+        "fixed top-0 left-0 right-0 z-50 bg-background border-b shadow-lg transition-transform duration-300",
         isSticky ? "translate-y-0" : "-translate-y-full"
       )}
     >
-      <div className="container mx-auto px-4 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h3 className="font-semibold text-sm truncate">{productName}</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="h-8 px-2"
-            >
-              <Menu className="h-4 w-4 mr-1" />
-              Sumário
-              <ChevronDown className={cn("h-4 w-4 ml-1 transition-transform", isExpanded && "rotate-180")} />
-            </Button>
-          </div>
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-base text-foreground">{productName} - Sumário</h3>
         </div>
         
-        {isExpanded && (
-          <div className="mt-2 pb-2 border-t pt-2">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
-              {sections.map((section) => (
-                <Button
-                  key={section.id}
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => scrollToSection(section.id)}
-                  className="justify-start text-xs h-7"
-                >
-                  {section.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
+          {sections.map((section, index) => (
+            <Button
+              key={section.id}
+              variant="ghost"
+              size="sm"
+              onClick={() => scrollToSection(section.id)}
+              className="justify-start text-xs h-8 hover:bg-muted/80"
+            >
+              <span className="font-mono mr-1">{index + 1}.</span>
+              {section.label}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );
