@@ -10,7 +10,7 @@ import {
 
 const Header = () => {
   return (
-    <header className="bg-header-bg text-header-foreground py-6 px-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-header-bg text-header-foreground py-6 px-4 shadow-sm">
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           {/* Logo à esquerda */}

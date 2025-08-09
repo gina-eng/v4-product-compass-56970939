@@ -84,7 +84,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
           </h3>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-7 gap-2">
           {sections.map((section, index) => (
             <Button
               key={section.id}
