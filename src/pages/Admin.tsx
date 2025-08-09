@@ -21,6 +21,7 @@ import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Plus, Edit, Trash2, Upload } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
+import UseCaseMap from "@/components/UseCaseMap";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -94,6 +95,10 @@ interface Product {
   spiced_data: SpicedData;
   como_entrego_dados: ComoEntregoItem[];
   markup?: number;
+  use_case_map_1_name?: string;
+  use_case_map_1_data?: any;
+  use_case_map_2_name?: string;
+  use_case_map_2_data?: any;
 }
 
 interface SupportMaterial {
@@ -178,7 +183,9 @@ const Admin = () => {
     case_2_unidade_responsavel: '',
     case_2_responsavel_projeto: '',
     case_2_documento_url: '',
-    markup: 1
+    markup: 1,
+    use_case_map_1_name: 'Use Case Map - Cliente sem Investimento',
+    use_case_map_2_name: 'Use Case Map - Cliente com Investimento'
   });
 
   const [positionForm, setPositionForm] = useState({
@@ -196,6 +203,14 @@ const Admin = () => {
   });
 
   const [comoEntregoDados, setComoEntregoDados] = useState<ComoEntregoItem[]>([]);
+  
+  // Estados para Use Case Maps
+  const [useCaseMap1Data, setUseCaseMap1Data] = useState({
+    problema: '', persona: '', alternativa: '', why: '', frequencia: ''
+  });
+  const [useCaseMap2Data, setUseCaseMap2Data] = useState({
+    problema: '', persona: '', alternativa: '', why: '', frequencia: ''
+  });
 
   useEffect(() => {
     fetchProducts();
@@ -366,7 +381,11 @@ const Admin = () => {
         case_2_documento_url: productForm.case_2_documento_url || null,
         spiced_data: spicedData,
         como_entrego_dados: comoEntregoDados,
-        markup: productForm.markup
+        markup: productForm.markup,
+        use_case_map_1_name: productForm.use_case_map_1_name,
+        use_case_map_1_data: useCaseMap1Data,
+        use_case_map_2_name: productForm.use_case_map_2_name,
+        use_case_map_2_data: useCaseMap2Data
       } as any;
 
       let error;
@@ -449,7 +468,9 @@ const Admin = () => {
       case_2_unidade_responsavel: (product as any).case_2_unidade_responsavel || '',
       case_2_responsavel_projeto: (product as any).case_2_responsavel_projeto || '',
       case_2_documento_url: (product as any).case_2_documento_url || '',
-      markup: product.markup || 1
+      markup: product.markup || 1,
+      use_case_map_1_name: product.use_case_map_1_name || 'Use Case Map - Cliente sem Investimento',
+      use_case_map_2_name: product.use_case_map_2_name || 'Use Case Map - Cliente com Investimento'
     });
     setSpicedData(product.spiced_data || {
       situation: { objetivo: "", perguntas: "", observar: "" },
@@ -459,6 +480,12 @@ const Admin = () => {
       decision: { objetivo: "", perguntas: "", observar: "" }
     });
     setComoEntregoDados(product.como_entrego_dados || []);
+    setUseCaseMap1Data(product.use_case_map_1_data || {
+      problema: '', persona: '', alternativa: '', why: '', frequencia: ''
+    });
+    setUseCaseMap2Data(product.use_case_map_2_data || {
+      problema: '', persona: '', alternativa: '', why: '', frequencia: ''
+    });
     
     // Calcular time envolvido e valor automaticamente
     const timeEnvolvido = await calculateTimeEnvolvido(product.id);
@@ -622,7 +649,9 @@ const Admin = () => {
       case_2_unidade_responsavel: '',
       case_2_responsavel_projeto: '',
       case_2_documento_url: '',
-      markup: 1
+      markup: 1,
+      use_case_map_1_name: 'Use Case Map - Cliente sem Investimento',
+      use_case_map_2_name: 'Use Case Map - Cliente com Investimento'
     });
     setSpicedData({
       situation: { objetivo: "", perguntas: "", observar: "" },
@@ -632,6 +661,12 @@ const Admin = () => {
       decision: { objetivo: "", perguntas: "", observar: "" }
     });
     setComoEntregoDados([]);
+    setUseCaseMap1Data({
+      problema: '', persona: '', alternativa: '', why: '', frequencia: ''
+    });
+    setUseCaseMap2Data({
+      problema: '', persona: '', alternativa: '', why: '', frequencia: ''
+    });
   };
 
   const handleDeleteProduct = async (id: string) => {
@@ -704,9 +739,10 @@ const Admin = () => {
                       </DialogHeader>
 
                       <Tabs defaultValue="basico" className="mt-4">
-                        <TabsList className="grid w-full grid-cols-4">
+                        <TabsList className="grid w-full grid-cols-5">
                           <TabsTrigger value="basico">Informações Básicas</TabsTrigger>
                           <TabsTrigger value="vendas">Vendas e Entrega</TabsTrigger>
+                          <TabsTrigger value="use-cases">Use Case Maps</TabsTrigger>
                           <TabsTrigger value="materiais">Materiais de Treinamento</TabsTrigger>
                           <TabsTrigger value="posicoes">Posições e DRE</TabsTrigger>
                         </TabsList>
@@ -962,6 +998,44 @@ const Admin = () => {
                               data={comoEntregoDados} 
                               onChange={(data) => setComoEntregoDados(data as any)}
                               positions={positions}
+                            />
+                          </div>
+                        </TabsContent>
+
+                        <TabsContent value="use-cases" className="space-y-4">
+                          <div className="space-y-6">
+                            <div>
+                              <Label htmlFor="use_case_map_1_name">Nome do Primeiro Use Case Map</Label>
+                              <Input
+                                id="use_case_map_1_name"
+                                value={productForm.use_case_map_1_name}
+                                onChange={(e) => setProductForm({...productForm, use_case_map_1_name: e.target.value})}
+                                placeholder="Ex: Use Case Map - Cliente sem Investimento"
+                              />
+                            </div>
+                            
+                            <UseCaseMap
+                              title={productForm.use_case_map_1_name}
+                              data={useCaseMap1Data}
+                              onChange={setUseCaseMap1Data}
+                              readOnly={false}
+                            />
+                            
+                            <div>
+                              <Label htmlFor="use_case_map_2_name">Nome do Segundo Use Case Map</Label>
+                              <Input
+                                id="use_case_map_2_name"
+                                value={productForm.use_case_map_2_name}
+                                onChange={(e) => setProductForm({...productForm, use_case_map_2_name: e.target.value})}
+                                placeholder="Ex: Use Case Map - Cliente com Investimento"
+                              />
+                            </div>
+                            
+                            <UseCaseMap
+                              title={productForm.use_case_map_2_name}
+                              data={useCaseMap2Data}
+                              onChange={setUseCaseMap2Data}
+                              readOnly={false}
                             />
                           </div>
                         </TabsContent>

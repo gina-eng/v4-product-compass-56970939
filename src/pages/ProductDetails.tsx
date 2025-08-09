@@ -66,6 +66,10 @@ interface Product {
   spiced_data: any;
   como_entrego_dados: any[];
   markup?: number;
+  use_case_map_1_name?: string;
+  use_case_map_1_data?: any;
+  use_case_map_2_name?: string;
+  use_case_map_2_data?: any;
 }
 
 interface Position {
@@ -149,7 +153,11 @@ const ProductDetails = () => {
         como_vendo: data.como_vendo,
         spiced_data: data.spiced_data,
         como_entrego_dados: Array.isArray(data.como_entrego_dados) ? data.como_entrego_dados : [],
-        markup: data.markup
+        markup: data.markup,
+        use_case_map_1_name: data.use_case_map_1_name,
+        use_case_map_1_data: data.use_case_map_1_data,
+        use_case_map_2_name: data.use_case_map_2_name,
+        use_case_map_2_data: data.use_case_map_2_data
       };
       
       setProduct(mappedProduct);
@@ -412,31 +420,34 @@ const ProductDetails = () => {
               </div>
             </div>
             
-            {/* Use Case Map 1 */}
-            <UseCaseMap 
-              title="Use Case Map 1"
-              data={{
-                problema: '',
-                persona: '',
-                alternativa: '',
-                why: '',
-                frequencia: ''
-              }}
-              readOnly={true}
-            />
+            {/* Use Case Maps */}
+            {product.use_case_map_1_data && (
+              <UseCaseMap 
+                title={product.use_case_map_1_name || "Use Case Map 1"}
+                data={product.use_case_map_1_data || {
+                  problema: '',
+                  persona: '',
+                  alternativa: '',
+                  why: '',
+                  frequencia: ''
+                }}
+                readOnly={true}
+              />
+            )}
 
-            {/* Use Case Map 2 */}
-            <UseCaseMap 
-              title="Use Case Map 2"
-              data={{
-                problema: '',
-                persona: '',
-                alternativa: '',
-                why: '',
-                frequencia: ''
-              }}
-              readOnly={true}
-            />
+            {product.use_case_map_2_data && (
+              <UseCaseMap 
+                title={product.use_case_map_2_name || "Use Case Map 2"}
+                data={product.use_case_map_2_data || {
+                  problema: '',
+                  persona: '',
+                  alternativa: '',
+                  why: '',
+                  frequencia: ''
+                }}
+                readOnly={true}
+              />
+            )}
             
             <div className="bg-muted/50 p-4 rounded-lg">
               <h4 className="font-bold text-foreground mb-4">Metodologia SPICED</h4>
