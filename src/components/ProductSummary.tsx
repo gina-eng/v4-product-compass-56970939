@@ -13,7 +13,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      setIsSticky(scrollTop > 400);
+      setIsSticky(scrollTop > 600); // Aumentei para 600px para garantir que só apareça após rolar bastante
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -65,7 +65,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   const StickySummary = () => (
     <div
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-background border-b shadow-lg transition-transform duration-300",
+        "fixed top-0 left-0 right-0 z-40 bg-background border-b shadow-lg transition-transform duration-300",
         isSticky ? "translate-y-0" : "-translate-y-full"
       )}
     >
