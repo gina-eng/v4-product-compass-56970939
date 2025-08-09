@@ -1,6 +1,7 @@
-import { Building2, Settings, Home, Menu, FileText } from "lucide-react";
+import { Building2, Settings, Home, Menu, FileText, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +10,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-header-bg text-header-foreground py-6 px-4 shadow-sm">
       <div className="container mx-auto">
@@ -43,6 +50,10 @@ const Header = () => {
                     <FileText className="w-4 h-4 mr-2" />
                     Materiais de Apoio
                   </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut} className="flex items-center text-destructive">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sair
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
