@@ -253,7 +253,7 @@ const ProductDetails = () => {
           <div className="lg:col-span-3">
             <section id="estrutura-produto">
               <Card>
-                <CardContent className="padding-page">
+                <CardContent className="p-6 pt-8">
                   <div className="spacing-card">
                     <div className="grid grid-cols-2 gap-6">
                       <div>
