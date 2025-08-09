@@ -43,29 +43,22 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
 
   // Top Summary (always visible)
   const TopSummary = () => (
-    <Card className="mb-6">
-      <CardContent className="pt-4 pb-4">
-        <h2 className="text-base font-semibold mb-3 text-foreground flex items-center gap-2">
-          📋 Sumário da Página
-        </h2>
-        <div className="grid grid-cols-2 gap-2">
-          {sections.map((section, index) => (
-            <button
-              key={section.id}
-              onClick={() => scrollToSection(section.id)}
-              className="flex items-center gap-2 p-2 rounded border hover:bg-muted/50 transition-colors cursor-pointer text-left text-sm"
-            >
-              <span className="font-mono text-xs bg-muted rounded-full w-5 h-5 flex items-center justify-center">
-                {index + 1}
-              </span>
-              <span className="text-sm">
-                {section.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="mb-6">
+      <h2 className="text-sm font-medium mb-3 text-muted-foreground flex items-center gap-2">
+        📋 Sumário da Página
+      </h2>
+      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+        {sections.map((section, index) => (
+          <button
+            key={section.id}
+            onClick={() => scrollToSection(section.id)}
+            className="text-foreground hover:text-primary transition-colors cursor-pointer underline-offset-4 hover:underline"
+          >
+            {index + 1}. {section.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 
   // Sticky Summary (appears when scrolling)
