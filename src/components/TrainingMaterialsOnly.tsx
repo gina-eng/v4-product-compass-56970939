@@ -11,25 +11,25 @@ import { Plus, Trash2, ExternalLink, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-interface SalesMaterial {
+interface TrainingMaterial {
   id: string;
   name: string;
-  type: 'comercial';
+  type: 'treinamento';
   url: string;
   description?: string;
   formato?: 'gravado' | 'material';
 }
 
-interface SalesMaterialsProps {
+interface TrainingMaterialsOnlyProps {
   productId: string;
   readOnly?: boolean;
 }
 
-const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) => {
-  const [materials, setMaterials] = useState<SalesMaterial[]>([]);
+const TrainingMaterialsOnly = ({ productId, readOnly = false }: TrainingMaterialsOnlyProps) => {
+  const [materials, setMaterials] = useState<TrainingMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingMaterial, setEditingMaterial] = useState<SalesMaterial | null>(null);
+  const [editingMaterial, setEditingMaterial] = useState<TrainingMaterial | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     url: "",
@@ -47,14 +47,14 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
         .from('training_materials')
         .select('*')
         .eq('product_id', productId)
-        .eq('type', 'comercial')
+        .eq('type', 'treinamento')
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMaterials((data || []) as SalesMaterial[]);
+      setMaterials((data || []) as TrainingMaterial[]);
     } catch (error) {
-      console.error('Erro ao buscar materiais de vendas:', error);
-      toast.error('Erro ao carregar materiais de vendas');
+      console.error('Erro ao buscar materiais de treinamento:', error);
+      toast.error('Erro ao carregar materiais de treinamento');
     } finally {
       setLoading(false);
     }
@@ -79,21 +79,21 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
           .eq('id', editingMaterial.id);
 
         if (error) throw error;
-        toast.success('Material de vendas atualizado com sucesso');
+        toast.success('Material de treinamento atualizado com sucesso');
       } else {
         const { error } = await supabase
           .from('training_materials')
           .insert({
             product_id: productId,
             name: formData.name,
-            type: 'comercial',
+            type: 'treinamento',
             url: formData.url,
             description: formData.description || null,
             formato: formData.formato
           });
 
         if (error) throw error;
-        toast.success('Material de vendas adicionado com sucesso');
+        toast.success('Material de treinamento adicionado com sucesso');
       }
 
       setDialogOpen(false);
@@ -102,12 +102,12 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
       fetchMaterials();
     } catch (error) {
       console.error('Erro ao salvar material:', error);
-      toast.error('Erro ao salvar material de vendas');
+      toast.error('Erro ao salvar material de treinamento');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este material de vendas?')) return;
+    if (!confirm('Tem certeza que deseja excluir este material de treinamento?')) return;
 
     try {
       const { error } = await supabase
@@ -116,15 +116,15 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
         .eq('id', id);
 
       if (error) throw error;
-      toast.success('Material de vendas excluído com sucesso');
+      toast.success('Material de treinamento excluído com sucesso');
       fetchMaterials();
     } catch (error) {
       console.error('Erro ao excluir material:', error);
-      toast.error('Erro ao excluir material de vendas');
+      toast.error('Erro ao excluir material de treinamento');
     }
   };
 
-  const openEditDialog = (material: SalesMaterial) => {
+  const openEditDialog = (material: TrainingMaterial) => {
     setEditingMaterial(material);
     setFormData({
       name: material.name,
@@ -142,13 +142,13 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
   };
 
   if (loading) {
-    return <div>Carregando materiais de vendas...</div>;
+    return <div>Carregando materiais de treinamento...</div>;
   }
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Materiais de Vendas</CardTitle>
+        <CardTitle>Materiais de Treinamento</CardTitle>
         {!readOnly && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -160,7 +160,7 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingMaterial ? 'Editar Material' : 'Novo Material de Vendas'}
+                  {editingMaterial ? 'Editar Material' : 'Novo Material de Treinamento'}
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
@@ -170,17 +170,7 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Ex: Pitch de Vendas - Produto X"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="url">URL do Material *</Label>
-                  <Input
-                    id="url"
-                    type="url"
-                    value={formData.url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                    placeholder="https://..."
+                    placeholder="Ex: Treinamento Completo - Produto X"
                   />
                 </div>
                 <div>
@@ -194,6 +184,16 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                       <SelectItem value="material">Material Físico (PPT, PDF, etc.)</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div>
+                  <Label htmlFor="url">URL do Material *</Label>
+                  <Input
+                    id="url"
+                    type="url"
+                    value={formData.url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                    placeholder="https://..."
+                  />
                 </div>
                 <div>
                   <Label htmlFor="description">Descrição</Label>
@@ -221,7 +221,7 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
       <CardContent>
         {materials.length === 0 ? (
           <p className="text-content text-center py-8">
-            Nenhum material de vendas cadastrado para este produto.
+            Nenhum material de treinamento cadastrado para este produto.
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -230,8 +230,8 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Badge variant="default" className="mb-2">
-                        Comercial
+                      <Badge variant="outline" className="mb-2">
+                        Treinamento
                       </Badge>
                       {material.formato && (
                         <Badge variant="outline" className="mb-2 text-xs">
@@ -294,4 +294,4 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
   );
 };
 
-export default SalesMaterials;
+export default TrainingMaterialsOnly;

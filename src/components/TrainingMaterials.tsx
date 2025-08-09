@@ -15,6 +15,7 @@ interface TrainingMaterial {
   id: string;
   name: string;
   type: 'comercial' | 'operacional' | 'treinamento';
+  formato?: 'gravado' | 'material';
   url: string;
   description?: string;
 }

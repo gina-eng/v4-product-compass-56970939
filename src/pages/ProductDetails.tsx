@@ -12,6 +12,8 @@ import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
 import TrainingMaterials from "@/components/TrainingMaterials";
 import SalesMaterials from "@/components/SalesMaterials";
+import OperationalMaterials from "@/components/OperationalMaterials";
+import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import UseCaseMap from "@/components/UseCaseMap";
 import ProductSummary from "@/components/ProductSummary";
 import { formatCurrency } from "@/lib/formatters";
@@ -445,35 +447,20 @@ const ProductDetails = () => {
 
         {/* Informações para Operar */}
         <section id="informacoes-operar">
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações para Operar</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {product.o_que_entrego && (
-                <div>
-                  <span className="text-sm font-bold text-foreground">"O que entrego"</span>
-                  <div className="text-sm mt-2 text-content whitespace-pre-line leading-relaxed">{product.o_que_entrego}</div>
-                </div>
-              )}
-              
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <h4 className="font-bold text-foreground mb-4">Etapas de Entrega</h4>
-                <ComoEntregoTable 
-                  data={product.como_entrego_dados || []} 
-                  readOnly={true}
-                  positions={positions}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <OperationalMaterials 
+          productId={product.id} 
+          readOnly={true}
+          productData={{
+            o_que_entrego: product.o_que_entrego,
+            como_entrego_dados: product.como_entrego_dados
+          }}
+          positions={positions}
+        />
         </section>
 
-        {/* Materiais de Treinamento e Documentos */}
+        {/* Materiais de Treinamento */}
         <section id="materiais-treinamentos">
-        <TrainingMaterials productId={product.id} readOnly={true} />
+        <TrainingMaterialsOnly productId={product.id} readOnly={true} />
         </section>
 
         {/* Materiais Antigos e Documentos (manter para compatibilidade) */}
