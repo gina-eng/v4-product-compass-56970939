@@ -233,21 +233,18 @@ const ProductDetails = () => {
           <h1 className="text-3xl font-bold">{product.produto}</h1>
         </div>
 
-        {/* Layout Principal com Sumário à esquerda e conteúdo à direita */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Coluna da esquerda - Sumário fixo */}
+        {/* Layout com Sumário ao lado da primeira seção */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+          {/* Coluna da esquerda - Sumário */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <ProductSummary productName={product.produto} />
-            </div>
+            <ProductSummary productName={product.produto} />
           </div>
 
-          {/* Coluna da direita - Conteúdo principal */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Estrutura do Produto */}
+          {/* Coluna da direita - Estrutura do Produto */}
+          <div className="lg:col-span-3">
             <section id="estrutura-produto">
-          <Card>
-          <CardContent className="pt-6 space-y-4">
+              <Card>
+                <CardContent className="pt-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <span className="text-sm font-bold text-foreground">Título:</span>
@@ -290,10 +287,14 @@ const ProductDetails = () => {
                 <p className="text-sm text-content">{product.dono}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        </section>
+              </CardContent>
+            </Card>
+            </section>
+          </div>
+        </div>
 
+        {/* Restante do conteúdo em largura total */}
+        <div className="space-y-8">
         {/* Visão Geral do Produto */}
         <section id="visao-geral">
         <Card>
@@ -632,7 +633,6 @@ const ProductDetails = () => {
             </CardContent>
           </Card>
         )}
-          </div>
         </div>
       </div>
     </Layout>
