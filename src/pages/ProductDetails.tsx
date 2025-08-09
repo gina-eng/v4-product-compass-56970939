@@ -427,13 +427,14 @@ const ProductDetails = () => {
               <h4 className="font-bold text-foreground mb-4">Metodologia SPICED</h4>
               <SpicedTable data={product.spiced_data} readOnly />
             </div>
+
+            {/* Materiais de Vendas integrados */}
+            <div className="mt-6">
+              <h4 className="font-bold text-foreground mb-4">Materiais de Vendas</h4>
+              <SalesMaterials productId={product.id} readOnly={true} />
+            </div>
           </CardContent>
         </Card>
-        </section>
-
-        {/* Materiais de Vendas */}
-        <section id="materiais-vendas">
-        <SalesMaterials productId={product.id} readOnly={true} />
         </section>
 
         {/* Posições Alocadas */}
