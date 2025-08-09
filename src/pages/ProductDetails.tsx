@@ -262,13 +262,13 @@ const ProductDetails = () => {
                       </div>
                       <div>
                         <span className="text-label">Categoria:</span>
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="inline-block padding-tight rounded-full text-body-small font-medium text-white"
-                            style={{backgroundColor: getCategoryColor(product.categoria)}}
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge 
+                            className="text-body-small font-medium px-3 py-1"
+                            style={{backgroundColor: getCategoryColor(product.categoria), color: 'white'}}
                           >
                             {product.categoria.toUpperCase()}
-                          </div>
+                          </Badge>
                         </div>
                       </div>
                     </div>
