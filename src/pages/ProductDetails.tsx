@@ -233,57 +233,51 @@ const ProductDetails = () => {
           <h1 className="text-3xl font-bold">{product.produto}</h1>
         </div>
 
-        {/* Layout com Sumário à esquerda e conteúdo à direita */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sumário da Página - 1 coluna */}
-          <div className="lg:col-span-1">
-            <ProductSummary productName={product.produto} />
-          </div>
+        {/* Sumário da Página */}
+        <ProductSummary productName={product.produto} />
 
-          {/* Conteúdo principal - 3 colunas */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Estrutura do Produto */}
-            <section id="estrutura-produto">
-              <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div>
-                    <span className="text-sm font-bold text-foreground">Título:</span>
-                    <p className="font-normal text-content">{product.produto}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm font-bold text-foreground">Categoria:</span>
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="inline-block px-3 py-1 rounded-full text-xs font-medium text-white"
-                        style={{backgroundColor: getCategoryColor(product.categoria)}}
-                      >
-                        {product.categoria.toUpperCase()}
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-sm font-bold text-foreground">Status:</span>
-                    <Badge 
-                      variant={getStatusBadge(product.status).variant}
-                      className={`ml-2 ${getStatusBadge(product.status).className}`}
-                    >
-                      {product.status}
-                    </Badge>
-                  </div>
-                  <div>
-                    <span className="text-sm font-bold text-foreground">Valor Base:</span>
-                    <p className="font-normal text-content">
-                      {product.valor === "A definir" ? product.valor : formatCurrency(product.valor)}
-                    </p>
+        {/* Estrutura do Produto */}
+        <section id="estrutura-produto">
+          <Card>
+          <CardContent className="pt-6 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <span className="text-sm font-bold text-foreground">Título:</span>
+                <p className="font-normal text-content">{product.produto}</p>
+              </div>
+              <div>
+                <span className="text-sm font-bold text-foreground">Categoria:</span>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="inline-block px-3 py-1 rounded-full text-xs font-medium text-white"
+                    style={{backgroundColor: getCategoryColor(product.categoria)}}
+                  >
+                    {product.categoria.toUpperCase()}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-sm font-bold text-foreground">Duração:</span>
-                    <p className="text-sm text-content">{product.duracao}</p>
-                  </div>
-                  <div>
+              </div>
+              <div>
+                <span className="text-sm font-bold text-foreground">Status:</span>
+                <Badge 
+                  variant={getStatusBadge(product.status).variant}
+                  className={`ml-2 ${getStatusBadge(product.status).className}`}
+                >
+                  {product.status}
+                </Badge>
+              </div>
+              <div>
+                <span className="text-sm font-bold text-foreground">Valor Base:</span>
+                <p className="font-normal text-content">
+                  {product.valor === "A definir" ? product.valor : formatCurrency(product.valor)}
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <span className="text-sm font-bold text-foreground">Duração:</span>
+                <p className="text-sm text-content">{product.duracao}</p>
+              </div>
+              <div>
                 <span className="text-sm font-bold text-foreground">Dono:</span>
                 <p className="text-sm text-content">{product.dono}</p>
               </div>
@@ -630,8 +624,6 @@ const ProductDetails = () => {
             </CardContent>
           </Card>
         )}
-          </div>
-        </div>
       </div>
     </Layout>
   );

@@ -43,7 +43,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
 
   // Top Summary (always visible)
   const TopSummary = () => (
-    <div className="sticky top-8">
+    <div className="mb-6">
       <h2 className="text-sm font-medium mb-3 text-muted-foreground flex items-center gap-2">
         📋 Sumário da Página
       </h2>
@@ -52,7 +52,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
           <button
             key={section.id}
             onClick={() => scrollToSection(section.id)}
-            className="text-left text-foreground hover:text-primary transition-colors cursor-pointer underline-offset-4 hover:underline py-1"
+            className="text-foreground hover:text-primary transition-colors cursor-pointer underline-offset-4 hover:underline"
           >
             {index + 1}. {section.label}
           </button>
