@@ -14,7 +14,7 @@ import { toast } from "sonner";
 interface TrainingMaterial {
   id: string;
   name: string;
-  type: 'comercial' | 'operacional';
+  type: 'comercial' | 'operacional' | 'treinamento';
   url: string;
   description?: string;
 }
@@ -31,7 +31,7 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
   const [editingMaterial, setEditingMaterial] = useState<TrainingMaterial | null>(null);
   const [formData, setFormData] = useState({
     name: "",
-    type: "" as 'comercial' | 'operacional' | "",
+    type: "" as 'comercial' | 'operacional' | 'treinamento' | "",
     url: "",
     description: ""
   });
@@ -138,15 +138,90 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
     setDialogOpen(true);
   };
 
-  if (loading) {
-    return <div>Carregando materiais de treinamento...</div>;
-  }
+  // Separar materiais por tipo
+  const comercialMaterials = materials.filter(m => m.type === 'comercial');
+  const operacionalMaterials = materials.filter(m => m.type === 'operacional');
+  const treinamentoMaterials = materials.filter(m => m.type === 'treinamento');
 
-  return (
-    <Card>
+  const getBadgeVariant = (type: string) => {
+    switch (type) {
+      case 'comercial': return 'default';
+      case 'operacional': return 'secondary';
+      case 'treinamento': return 'outline';
+      default: return 'default';
+    }
+  };
+
+  const getBadgeLabel = (type: string) => {
+    switch (type) {
+      case 'comercial': return 'Comercial';
+      case 'operacional': return 'Operacional';
+      case 'treinamento': return 'Treinamento';
+      default: return type;
+    }
+  };
+
+  const renderMaterialCard = (material: TrainingMaterial) => (
+    <Card key={material.id} className="h-fit">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <Badge variant={getBadgeVariant(material.type)} className="mb-2">
+            {getBadgeLabel(material.type)}
+          </Badge>
+          <div className="flex items-center space-x-1">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => window.open(material.url, '_blank')}
+              className="h-8 w-8 p-0"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+            {!readOnly && (
+              <>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => openEditDialog(material)}
+                  className="h-8 w-8 p-0"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleDelete(material.id)}
+                  className="h-8 w-8 p-0"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+        <CardTitle className="text-base leading-tight">{material.name}</CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {material.description && (
+          <p className="text-sm text-content mb-3 leading-relaxed">{material.description}</p>
+        )}
+        <a 
+          href={material.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-xs text-primary hover:underline break-all"
+        >
+          {material.url}
+        </a>
+      </CardContent>
+    </Card>
+  );
+
+  const renderSection = (title: string, materials: TrainingMaterial[], showAddButton = true) => (
+    <Card className="mb-6">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Materiais de Treinamentos</CardTitle>
-        {!readOnly && (
+        <CardTitle>{title}</CardTitle>
+        {!readOnly && showAddButton && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" onClick={openAddDialog}>
@@ -157,7 +232,7 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingMaterial ? 'Editar Material' : 'Novo Material de Treinamento'}
+                  {editingMaterial ? 'Editar Material' : 'Novo Material'}
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
@@ -172,13 +247,14 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
                 </div>
                 <div>
                   <Label htmlFor="type">Tipo *</Label>
-                  <Select value={formData.type} onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as 'comercial' | 'operacional' }))}>
+                  <Select value={formData.type} onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as 'comercial' | 'operacional' | 'treinamento' }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="comercial">Comercial</SelectItem>
                       <SelectItem value="operacional">Operacional</SelectItem>
+                      <SelectItem value="treinamento">Treinamento</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -218,69 +294,27 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
       <CardContent>
         {materials.length === 0 ? (
           <p className="text-content text-center py-8">
-            Nenhum material de treinamento cadastrado para este produto.
+            Nenhum material cadastrado para esta seção.
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {materials.map((material) => (
-              <Card key={material.id} className="h-fit">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <Badge variant={material.type === 'comercial' ? 'default' : 'secondary'} className="mb-2">
-                      {material.type === 'comercial' ? 'Comercial' : 'Operacional'}
-                    </Badge>
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => window.open(material.url, '_blank')}
-                        className="h-8 w-8 p-0"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                      {!readOnly && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => openEditDialog(material)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDelete(material.id)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <CardTitle className="text-base leading-tight">{material.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  {material.description && (
-                    <p className="text-sm text-content mb-3 leading-relaxed">{material.description}</p>
-                  )}
-                  <a 
-                    href={material.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-xs text-primary hover:underline break-all"
-                  >
-                    {material.url}
-                  </a>
-                </CardContent>
-              </Card>
-            ))}
+            {materials.map(renderMaterialCard)}
           </div>
         )}
       </CardContent>
     </Card>
+  );
+
+  if (loading) {
+    return <div>Carregando materiais...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {renderSection("Informações para Vender", comercialMaterials)}
+      {renderSection("Informações para Operar", operacionalMaterials)}
+      {renderSection("Materiais de Treinamento", treinamentoMaterials)}
+    </div>
   );
 };
 
