@@ -243,52 +243,63 @@ const ProductDetails = () => {
           {/* Coluna da direita - Estrutura do Produto */}
           <div className="lg:col-span-3">
             <section id="estrutura-produto">
-              <Card>
-                <CardContent className="pt-6 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <span className="text-sm font-bold text-foreground">Título:</span>
-                <p className="font-normal text-content">{product.produto}</p>
-              </div>
-              <div>
-                <span className="text-sm font-bold text-foreground">Categoria:</span>
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="inline-block px-3 py-1 rounded-full text-xs font-medium text-white"
-                    style={{backgroundColor: getCategoryColor(product.categoria)}}
-                  >
-                    {product.categoria.toUpperCase()}
+              <Card className="border-2 border-primary/10 shadow-lg">
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Coluna da esquerda */}
+                    <div className="space-y-4">
+                      <div className="bg-gradient-to-r from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20">
+                        <span className="text-xs font-semibold text-primary uppercase tracking-wide">Título</span>
+                        <p className="text-lg font-bold text-foreground mt-1">{product.produto}</p>
+                      </div>
+                      
+                      <div className="bg-gradient-to-r from-secondary/5 to-secondary/10 p-4 rounded-lg border border-secondary/20">
+                        <span className="text-xs font-semibold text-secondary uppercase tracking-wide">Categoria</span>
+                        <div className="mt-2">
+                          <div 
+                            className="inline-block px-4 py-2 rounded-full text-sm font-bold text-white shadow-md"
+                            style={{backgroundColor: getCategoryColor(product.categoria)}}
+                          >
+                            {product.categoria.toUpperCase()}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                        <span className="text-xs font-semibold text-green-700 dark:text-green-300 uppercase tracking-wide">Status</span>
+                        <div className="mt-2">
+                          <Badge 
+                            variant={getStatusBadge(product.status).variant}
+                            className={`${getStatusBadge(product.status).className} px-3 py-1 text-sm font-medium`}
+                          >
+                            {product.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Coluna da direita */}
+                    <div className="space-y-4">
+                      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">Valor Base</span>
+                        <p className="text-lg font-bold text-blue-900 dark:text-blue-100 mt-1">
+                          {product.valor === "A definir" ? product.valor : formatCurrency(product.valor)}
+                        </p>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+                        <span className="text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase tracking-wide">Duração</span>
+                        <p className="text-lg font-semibold text-purple-900 dark:text-purple-100 mt-1">{product.duracao}</p>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+                        <span className="text-xs font-semibold text-orange-700 dark:text-orange-300 uppercase tracking-wide">PMM Responsável</span>
+                        <p className="text-lg font-semibold text-orange-900 dark:text-orange-100 mt-1">{product.dono}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div>
-                <span className="text-sm font-bold text-foreground">Status:</span>
-                <Badge 
-                  variant={getStatusBadge(product.status).variant}
-                  className={`ml-2 ${getStatusBadge(product.status).className}`}
-                >
-                  {product.status}
-                </Badge>
-              </div>
-              <div>
-                <span className="text-sm font-bold text-foreground">Valor Base:</span>
-                <p className="font-normal text-content">
-                  {product.valor === "A definir" ? product.valor : formatCurrency(product.valor)}
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm font-bold text-foreground">Duração:</span>
-                <p className="text-sm text-content">{product.duracao}</p>
-              </div>
-              <div>
-                <span className="text-sm font-bold text-foreground">Dono:</span>
-                <p className="text-sm text-content">{product.dono}</p>
-              </div>
-            </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             </section>
           </div>
         </div>
