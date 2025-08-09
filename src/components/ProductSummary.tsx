@@ -47,7 +47,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
       <h2 className="text-sm font-medium mb-3 text-muted-foreground flex items-center gap-2">
         📋 Sumário da Página
       </h2>
-      <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+      <div className="flex flex-col gap-1 text-sm">
         {sections.map((section, index) => (
           <button
             key={section.id}
