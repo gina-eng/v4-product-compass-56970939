@@ -72,9 +72,10 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   const StickySummary = () => (
     <div
       className={cn(
-        "fixed top-0 left-0 right-0 z-[100] bg-background/95 backdrop-blur-md border-b shadow-md transition-transform duration-300 m-0 p-0",
+        "fixed top-0 left-0 right-0 z-[100] bg-background border-b shadow-md transition-transform duration-300",
         isSticky ? "translate-y-0" : "-translate-y-full"
       )}
+      style={{ margin: 0, padding: 0 }}
     >
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between mb-4">
