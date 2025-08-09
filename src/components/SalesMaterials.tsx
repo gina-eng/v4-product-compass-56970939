@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ExternalLink, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -146,9 +146,10 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
   }
 
   return (
-    <>
+    <div className="space-y-4">
+      {/* Header com botão de adicionar */}
       {!readOnly && (
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" onClick={openAddDialog}>
@@ -156,7 +157,7 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                 Adicionar Material
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>
                   {editingMaterial ? 'Editar Material' : 'Novo Material de Vendas'}
@@ -178,7 +179,7 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o formato" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-50 bg-background">
                       <SelectItem value="gravado">Material Gravado (Vídeo)</SelectItem>
                       <SelectItem value="material">Material Físico (PPT, PDF, etc.)</SelectItem>
                     </SelectContent>
@@ -204,7 +205,7 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                     rows={3}
                   />
                 </div>
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-2 pt-4">
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
                     Cancelar
                   </Button>
@@ -218,34 +219,49 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
         </div>
       )}
       
+      {/* Lista de materiais */}
       {materials.length === 0 ? (
-        <p className="text-content text-center py-8">
-          Nenhum material de vendas cadastrado para este produto.
+        <p className="text-content text-center py-4 text-sm bg-muted/30 rounded-lg">
+          Nenhum material de vendas cadastrado.
         </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {materials.map((material) => (
             <Card key={material.id} className="h-fit">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="default" className="mb-2">
-                      Comercial
-                    </Badge>
-                    {material.formato && (
-                      <Badge variant="outline" className="mb-2 text-xs">
-                        {material.formato === 'gravado' ? '🎥 Gravado' : '📄 Material'}
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="default" className="text-xs">
+                        Comercial
                       </Badge>
+                      {material.formato && (
+                        <Badge variant="outline" className="text-xs">
+                          {material.formato === 'gravado' ? '🎥 Gravado' : '📄 Material'}
+                        </Badge>
+                      )}
+                    </div>
+                    <h5 className="font-medium text-sm leading-tight mb-2 pr-2">{material.name}</h5>
+                    {material.description && (
+                      <p className="text-xs text-content mb-2 leading-relaxed">{material.description}</p>
                     )}
+                    <a 
+                      href={material.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline break-all"
+                    >
+                      {material.url}
+                    </a>
                   </div>
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center space-x-1 ml-2">
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => window.open(material.url, '_blank')}
                       className="h-8 w-8 p-0"
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <ExternalLink className="h-3 w-3" />
                     </Button>
                     {!readOnly && (
                       <>
@@ -255,7 +271,7 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                           onClick={() => openEditDialog(material)}
                           className="h-8 w-8 p-0"
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-3 w-3" />
                         </Button>
                         <Button
                           size="sm"
@@ -263,32 +279,18 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                           onClick={() => handleDelete(material.id)}
                           className="h-8 w-8 p-0"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3" />
                         </Button>
                       </>
                     )}
                   </div>
                 </div>
-                <CardTitle className="text-base leading-tight">{material.name}</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                {material.description && (
-                  <p className="text-sm text-content mb-3 leading-relaxed">{material.description}</p>
-                )}
-                <a 
-                  href={material.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-xs text-primary hover:underline break-all"
-                >
-                  {material.url}
-                </a>
               </CardContent>
             </Card>
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 };
 

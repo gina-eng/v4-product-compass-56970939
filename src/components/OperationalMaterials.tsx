@@ -152,9 +152,35 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Informações para Operar</CardTitle>
+    <div className="space-y-6">
+      {/* Informações Operacionais */}
+      {(productData?.o_que_entrego || productData?.como_entrego_dados?.length) && (
+        <div className="space-y-4">
+          {productData.o_que_entrego && (
+            <div>
+              <span className="text-sm font-bold text-foreground">"O que entrego"</span>
+              <div className="text-sm mt-2 text-content whitespace-pre-line leading-relaxed bg-muted/30 p-3 rounded-lg">
+                {productData.o_que_entrego}
+              </div>
+            </div>
+          )}
+          
+          {productData.como_entrego_dados && productData.como_entrego_dados.length > 0 && (
+            <div className="bg-muted/30 p-4 rounded-lg">
+              <h4 className="font-bold text-foreground mb-4">Etapas de Entrega</h4>
+              <ComoEntregoTable 
+                data={productData.como_entrego_dados || []} 
+                readOnly={true}
+                positions={positions || []}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Header com botão de adicionar */}
+      <div className="flex items-center justify-between">
+        <h4 className="font-bold text-foreground">Materiais Operacionais</h4>
         {!readOnly && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -163,7 +189,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
                 Adicionar Material
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>
                   {editingMaterial ? 'Editar Material' : 'Novo Material Operacional'}
@@ -185,7 +211,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o formato" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-50 bg-background">
                       <SelectItem value="gravado">Material Gravado (Vídeo)</SelectItem>
                       <SelectItem value="material">Material Físico (PPT, PDF, etc.)</SelectItem>
                     </SelectContent>
@@ -211,7 +237,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
                     rows={3}
                   />
                 </div>
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-2 pt-4">
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
                     Cancelar
                   </Button>
@@ -223,90 +249,33 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
             </DialogContent>
           </Dialog>
         )}
-      </CardHeader>
-      <CardContent>
-        {/* Informações Operacionais */}
-        {(productData?.o_que_entrego || productData?.como_entrego_dados?.length) && (
-          <div className="space-y-4 mb-6">
-            {productData.o_que_entrego && (
-              <div>
-                <span className="text-sm font-bold text-foreground">"O que entrego"</span>
-                <div className="text-sm mt-2 text-content whitespace-pre-line leading-relaxed">{productData.o_que_entrego}</div>
-              </div>
-            )}
-            
-            {productData.como_entrego_dados && productData.como_entrego_dados.length > 0 && (
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <h4 className="font-bold text-foreground mb-4">Etapas de Entrega</h4>
-                <ComoEntregoTable 
-                  data={productData.como_entrego_dados || []} 
-                  readOnly={true}
-                  positions={positions || []}
-                />
-              </div>
-            )}
-          </div>
-        )}
+      </div>
 
-        {/* Materiais Operacionais */}
-        <div>
-          <h4 className="font-bold text-foreground mb-4">Materiais Operacionais</h4>
-          {materials.length === 0 ? (
-            <p className="text-content text-center py-8">
-              Nenhum material operacional cadastrado para este produto.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {materials.map((material) => (
-                <Card key={material.id} className="h-fit">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="mb-2">
-                          Operacional
+      {/* Lista de materiais */}
+      {materials.length === 0 ? (
+        <p className="text-content text-center py-4 text-sm bg-muted/30 rounded-lg">
+          Nenhum material operacional cadastrado.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {materials.map((material) => (
+            <Card key={material.id} className="h-fit">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="secondary" className="text-xs">
+                        Operacional
+                      </Badge>
+                      {material.formato && (
+                        <Badge variant="outline" className="text-xs">
+                          {material.formato === 'gravado' ? '🎥 Gravado' : '📄 Material'}
                         </Badge>
-                        {material.formato && (
-                          <Badge variant="outline" className="mb-2 text-xs">
-                            {material.formato === 'gravado' ? '🎥 Gravado' : '📄 Material'}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => window.open(material.url, '_blank')}
-                          className="h-8 w-8 p-0"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
-                        {!readOnly && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => openEditDialog(material)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleDelete(material.id)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
+                      )}
                     </div>
-                    <CardTitle className="text-base leading-tight">{material.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
+                    <h5 className="font-medium text-sm leading-tight mb-2 pr-2">{material.name}</h5>
                     {material.description && (
-                      <p className="text-sm text-content mb-3 leading-relaxed">{material.description}</p>
+                      <p className="text-xs text-content mb-2 leading-relaxed">{material.description}</p>
                     )}
                     <a 
                       href={material.url} 
@@ -316,14 +285,44 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
                     >
                       {material.url}
                     </a>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                  </div>
+                  <div className="flex items-center space-x-1 ml-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => window.open(material.url, '_blank')}
+                      className="h-8 w-8 p-0"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                    </Button>
+                    {!readOnly && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEditDialog(material)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDelete(material.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 };
 
