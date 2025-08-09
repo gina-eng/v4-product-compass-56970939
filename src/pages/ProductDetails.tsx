@@ -11,6 +11,7 @@ import SpicedTable from "@/components/SpicedTable";
 import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
 import TrainingMaterials from "@/components/TrainingMaterials";
+import UseCaseMap from "@/components/UseCaseMap";
 import { formatCurrency } from "@/lib/formatters";
 
 interface Product {
@@ -285,38 +286,17 @@ const ProductDetails = () => {
             <CardTitle className="text-xl">Visão Geral do Produto</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Seção Principal - Público e Valor */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {product.para_quem_serve && (
-                <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-800">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      👥 Para quem serve
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {product.para_quem_serve}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-              
-              {product.como_entrega_valor && (
-                <Card className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 border-orange-200 dark:border-orange-800">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      💎 Como entregar valor
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {product.como_entrega_valor}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+            {/* Descrição Completa */}
+            {product.descricao_completa && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground border-b pb-2">📝 Descrição Completa</h3>
+                <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed text-justify">
+                    {product.descricao_completa}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* ICP - Destaque especial */}
             {product.description && (
@@ -333,125 +313,57 @@ const ProductDetails = () => {
                 </CardContent>
               </Card>
             )}
+          </CardContent>
+        </Card>
 
-            {/* Informações de Entrega */}
-            {(product.entregaveis_relacionados || product.escopo || product.formato_entrega) && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground border-b pb-2">📦 Entrega e Escopo</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {product.entregaveis_relacionados && (
-                    <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                      <span className="text-sm font-bold text-foreground block mb-2">Entregáveis relacionados:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                        {product.entregaveis_relacionados}
-                      </div>
-                    </div>
-                  )}
-                  {product.escopo && (
-                    <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                      <span className="text-sm font-bold text-foreground block mb-2">Escopo:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                        {product.escopo}
-                      </div>
-                    </div>
-                  )}
-                  {product.formato_entrega && (
-                    <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                      <span className="text-sm font-bold text-foreground block mb-2">Formato de entrega:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                        {product.formato_entrega}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Informações de Performance e KPIs */}
-            {(product.kpi_principal || product.bonus_kpi || product.garantia_especifica || product.tempo_meta_kpi) && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground border-b pb-2">📊 Performance e KPIs</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {product.kpi_principal && (
-                    <div className="bg-yellow-50 dark:bg-yellow-950/30 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                      <span className="text-sm font-bold text-foreground block mb-2">🎯 KPI Principal:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {product.kpi_principal}
-                      </div>
-                    </div>
-                  )}
-                  {product.tempo_meta_kpi && (
-                    <div className="bg-orange-50 dark:bg-orange-950/30 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
-                      <span className="text-sm font-bold text-foreground block mb-2">⏱️ Tempo Meta KPI:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {product.tempo_meta_kpi}
-                      </div>
-                    </div>
-                  )}
-                  {product.bonus_kpi && (
-                    <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                      <span className="text-sm font-bold text-foreground block mb-2">🎁 Bônus KPI:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {product.bonus_kpi}
-                      </div>
-                    </div>
-                  )}
-                  {product.garantia_especifica && (
-                    <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                      <span className="text-sm font-bold text-foreground block mb-2">🛡️ Garantia específica:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {product.garantia_especifica}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Informações Técnicas e de Equipe */}
-            {(product.duracao_media || product.time_envolvido || product.stack_digital) && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground border-b pb-2">⚙️ Aspectos Técnicos</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {product.duracao_media && (
-                    <div className="bg-slate-50 dark:bg-slate-950/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
-                      <span className="text-sm font-bold text-foreground block mb-2">⏳ Duração média:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {product.duracao_media}
-                      </div>
-                    </div>
-                  )}
-                  {product.time_envolvido && (
-                    <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                      <span className="text-sm font-bold text-foreground block mb-2">👥 Time envolvido:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {product.time_envolvido}
-                      </div>
-                    </div>
-                  )}
-                  {product.stack_digital && (
-                    <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
-                      <span className="text-sm font-bold text-foreground block mb-2">💻 Stack digital:</span>
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {product.stack_digital}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Descrição Completa */}
-            {product.descricao_completa && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground border-b pb-2">📝 Descrição Completa</h3>
-                <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg">
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed text-justify">
-                    {product.descricao_completa}
+        {/* Aspectos Técnicos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">⚙️ Aspectos Técnicos</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {product.escopo && (
+                <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
+                  <span className="text-sm font-bold text-foreground block mb-2">Escopo:</span>
+                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {product.escopo}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+              {product.formato_entrega && (
+                <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
+                  <span className="text-sm font-bold text-foreground block mb-2">Formato de entrega:</span>
+                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {product.formato_entrega}
+                  </div>
+                </div>
+              )}
+              {product.duracao_media && (
+                <div className="bg-slate-50 dark:bg-slate-950/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+                  <span className="text-sm font-bold text-foreground block mb-2">⏳ Duração média:</span>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                    {product.duracao_media}
+                  </div>
+                </div>
+              )}
+              {product.time_envolvido && (
+                <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                  <span className="text-sm font-bold text-foreground block mb-2">👥 Time envolvido:</span>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                    {product.time_envolvido}
+                  </div>
+                </div>
+              )}
+              {product.stack_digital && (
+                <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <span className="text-sm font-bold text-foreground block mb-2">💻 Stack digital:</span>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                    {product.stack_digital}
+                  </div>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -473,6 +385,32 @@ const ProductDetails = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Use Case Map 1 */}
+            <UseCaseMap 
+              title="Use Case Map 1"
+              data={{
+                problema: '',
+                persona: '',
+                alternativa: '',
+                why: '',
+                frequencia: ''
+              }}
+              readOnly={true}
+            />
+
+            {/* Use Case Map 2 */}
+            <UseCaseMap 
+              title="Use Case Map 2"
+              data={{
+                problema: '',
+                persona: '',
+                alternativa: '',
+                why: '',
+                frequencia: ''
+              }}
+              readOnly={true}
+            />
             
             <div className="bg-muted/50 p-4 rounded-lg">
               <h4 className="font-bold text-foreground mb-4">Metodologia SPICED</h4>
