@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, ExternalLink } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface ComoEntregoItem {
   fase?: string;
@@ -89,69 +90,77 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
 
   if (readOnly) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         {data.length === 0 ? (
           <p className="text-muted-foreground text-center py-4">
             Nenhuma etapa de entrega foi definida ainda.
           </p>
         ) : (
-          Object.entries(groupedData).map(([fase, items]) => (
-            <div key={fase} className="space-y-4">
-              {fase !== 'ungrouped' && (
-                <div className="mb-4">
-                  <h4 className="text-lg font-semibold text-foreground bg-primary/10 px-4 py-2 rounded-lg border-l-4 border-primary">
-                    {fase}
-                  </h4>
-                </div>
-              )}
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-border">
-                  <thead>
-                    <tr className="bg-muted">
-                      <th className="border border-border p-3 text-left font-semibold">ETAPA</th>
-                      <th className="border border-border p-3 text-left font-semibold">TAREFA</th>
-                      <th className="border border-border p-3 text-left font-semibold">DRI</th>
-                      <th className="border border-border p-3 text-left font-semibold">ESTIMATIVA DE HORAS</th>
-                      <th className="border border-border p-3 text-left font-semibold">COMO EXECUTAR (POP)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((row, index) => (
-                      <tr key={`${fase}-${index}`} className="hover:bg-muted/50">
-                        <td className="border border-border p-3">
-                          <div className="font-medium">{row.etapa}</div>
-                        </td>
-                        <td className="border border-border p-3">
-                          <div>{row.tarefa}</div>
-                        </td>
-                        <td className="border border-border p-3">
-                          <div className="text-sm">{row.dri}</div>
-                        </td>
-                        <td className="border border-border p-3 text-center">
-                          <div className="font-mono">{row.estimativaHoras}h</div>
-                        </td>
-                        <td className="border border-border p-3">
-                          {row.comoExecutar ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => window.open(row.comoExecutar, '_blank')}
-                              className="h-8 px-2 text-primary hover:text-primary-foreground"
-                            >
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              Ver POP
-                            </Button>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">Não definido</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))
+          <Accordion type="multiple" className="w-full space-y-2">
+            {Object.entries(groupedData).map(([fase, items]) => (
+              <AccordionItem key={fase} value={fase} className="border rounded-lg">
+                <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                    <span className="text-lg font-semibold text-foreground">
+                      {fase}
+                    </span>
+                    <div className="text-sm text-muted-foreground">
+                      ({items.length} etapa{items.length !== 1 ? 's' : ''})
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-4">
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-border rounded-md">
+                      <thead>
+                        <tr className="bg-muted">
+                          <th className="border border-border p-3 text-left font-semibold">ETAPA</th>
+                          <th className="border border-border p-3 text-left font-semibold">TAREFA</th>
+                          <th className="border border-border p-3 text-left font-semibold">DRI</th>
+                          <th className="border border-border p-3 text-left font-semibold">ESTIMATIVA DE HORAS</th>
+                          <th className="border border-border p-3 text-left font-semibold">COMO EXECUTAR (POP)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map((row, index) => (
+                          <tr key={`${fase}-${index}`} className="hover:bg-muted/50">
+                            <td className="border border-border p-3">
+                              <div className="font-medium">{row.etapa}</div>
+                            </td>
+                            <td className="border border-border p-3">
+                              <div>{row.tarefa}</div>
+                            </td>
+                            <td className="border border-border p-3">
+                              <div className="text-sm">{row.dri}</div>
+                            </td>
+                            <td className="border border-border p-3 text-center">
+                              <div className="font-mono">{row.estimativaHoras}h</div>
+                            </td>
+                            <td className="border border-border p-3">
+                              {row.comoExecutar ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => window.open(row.comoExecutar, '_blank')}
+                                  className="h-8 px-2 text-primary hover:text-primary-foreground"
+                                >
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  Ver POP
+                                </Button>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">Não definido</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         )}
       </div>
     );
