@@ -43,22 +43,25 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
 
   // Top Summary (always visible)
   const TopSummary = () => (
-    <Card className="mb-8">
-      <CardContent className="pt-4 pb-4">
-        <h2 className="text-lg font-semibold mb-3 text-foreground">Sumário</h2>
-        <div className="space-y-1">
+    <Card className="mb-8 bg-gradient-to-r from-background to-muted/30">
+      <CardContent className="pt-6 pb-6">
+        <h2 className="text-xl font-bold mb-5 text-foreground flex items-center gap-2">
+          📋 Sumário da Página
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {sections.map((section, index) => (
-            <div key={section.id} className="flex items-center gap-2">
-              <span className="text-muted-foreground font-mono text-xs w-6">
-                {index + 1}.
+            <button
+              key={section.id}
+              onClick={() => scrollToSection(section.id)}
+              className="flex items-center gap-3 p-3 rounded-lg bg-background hover:bg-muted/50 border border-border hover:border-primary/30 transition-all duration-200 cursor-pointer group text-left"
+            >
+              <span className="font-mono text-primary bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                {index + 1}
               </span>
-              <button
-                onClick={() => scrollToSection(section.id)}
-                className="text-left hover:text-primary transition-colors text-sm cursor-pointer"
-              >
+              <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                 {section.label}
-              </button>
-            </div>
+              </span>
+            </button>
           ))}
         </div>
       </CardContent>
@@ -69,26 +72,30 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   const StickySummary = () => (
     <div
       className={cn(
-        "fixed top-0 left-0 right-0 z-[100] bg-background border-b shadow-lg transition-transform duration-300",
+        "fixed top-0 left-0 right-0 z-[100] bg-background/95 backdrop-blur-md border-b shadow-md transition-transform duration-300 m-0 p-0",
         isSticky ? "translate-y-0" : "-translate-y-full"
       )}
     >
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-base text-foreground">{productName} - Sumário</h3>
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+            📋 {productName} - Navegação
+          </h3>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {sections.map((section, index) => (
             <Button
               key={section.id}
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => scrollToSection(section.id)}
-              className="justify-start text-xs h-8 hover:bg-muted/80"
+              className="justify-start text-sm h-10 hover:bg-primary/10 hover:border-primary/30 transition-all group"
             >
-              <span className="font-mono mr-1">{index + 1}.</span>
-              {section.label}
+              <span className="font-mono mr-2 text-primary bg-primary/10 rounded-full w-6 h-6 flex items-center justify-center text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                {index + 1}
+              </span>
+              <span className="truncate">{section.label}</span>
             </Button>
           ))}
         </div>
