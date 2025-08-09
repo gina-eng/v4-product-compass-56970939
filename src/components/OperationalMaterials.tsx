@@ -157,7 +157,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
       {(productData?.o_que_entrego || productData?.como_entrego_dados?.length) && (
         <div className="spacing-card">
           {productData.o_que_entrego && (
-            <div>
+            <div className="spacing-form">
               <span className="text-label">"O que entrego"</span>
               <div className="text-body mt-2 whitespace-pre-line container-section">
                 {productData.o_que_entrego}

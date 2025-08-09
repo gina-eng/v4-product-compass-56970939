@@ -255,7 +255,7 @@ const ProductDetails = () => {
               <Card>
                 <CardContent className="padding-page">
                   <div className="spacing-card">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                       <div>
                         <span className="text-label">Título:</span>
                         <p className="text-body">{product.produto}</p>
@@ -273,7 +273,7 @@ const ProductDetails = () => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                       <div>
                         <span className="text-label">Status:</span>
                         <Badge 
@@ -291,7 +291,7 @@ const ProductDetails = () => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                       <div>
                         <span className="text-label">Duração:</span>
                         <p className="text-body">{product.duracao}</p>
