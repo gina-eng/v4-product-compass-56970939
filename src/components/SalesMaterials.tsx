@@ -146,10 +146,9 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Materiais de Vendas</CardTitle>
-        {!readOnly && (
+    <>
+      {!readOnly && (
+        <div className="flex justify-end mb-4">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" onClick={openAddDialog}>
@@ -174,16 +173,6 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                   />
                 </div>
                 <div>
-                  <Label htmlFor="url">URL do Material *</Label>
-                  <Input
-                    id="url"
-                    type="url"
-                    value={formData.url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                    placeholder="https://..."
-                  />
-                </div>
-                <div>
                   <Label htmlFor="formato">Formato *</Label>
                   <Select value={formData.formato} onValueChange={(value) => setFormData(prev => ({ ...prev, formato: value as 'gravado' | 'material' }))}>
                     <SelectTrigger>
@@ -194,6 +183,16 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
                       <SelectItem value="material">Material Físico (PPT, PDF, etc.)</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div>
+                  <Label htmlFor="url">URL do Material *</Label>
+                  <Input
+                    id="url"
+                    type="url"
+                    value={formData.url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                    placeholder="https://..."
+                  />
                 </div>
                 <div>
                   <Label htmlFor="description">Descrição</Label>
@@ -216,81 +215,80 @@ const SalesMaterials = ({ productId, readOnly = false }: SalesMaterialsProps) =>
               </div>
             </DialogContent>
           </Dialog>
-        )}
-      </CardHeader>
-      <CardContent>
-        {materials.length === 0 ? (
-          <p className="text-content text-center py-8">
-            Nenhum material de vendas cadastrado para este produto.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {materials.map((material) => (
-              <Card key={material.id} className="h-fit">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="default" className="mb-2">
-                        Comercial
+        </div>
+      )}
+      
+      {materials.length === 0 ? (
+        <p className="text-content text-center py-8">
+          Nenhum material de vendas cadastrado para este produto.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {materials.map((material) => (
+            <Card key={material.id} className="h-fit">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="default" className="mb-2">
+                      Comercial
+                    </Badge>
+                    {material.formato && (
+                      <Badge variant="outline" className="mb-2 text-xs">
+                        {material.formato === 'gravado' ? '🎥 Gravado' : '📄 Material'}
                       </Badge>
-                      {material.formato && (
-                        <Badge variant="outline" className="mb-2 text-xs">
-                          {material.formato === 'gravado' ? '🎥 Gravado' : '📄 Material'}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => window.open(material.url, '_blank')}
-                        className="h-8 w-8 p-0"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                      {!readOnly && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => openEditDialog(material)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDelete(material.id)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                    )}
                   </div>
-                  <CardTitle className="text-base leading-tight">{material.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  {material.description && (
-                    <p className="text-sm text-content mb-3 leading-relaxed">{material.description}</p>
-                  )}
-                  <a 
-                    href={material.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-xs text-primary hover:underline break-all"
-                  >
-                    {material.url}
-                  </a>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                  <div className="flex items-center space-x-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => window.open(material.url, '_blank')}
+                      className="h-8 w-8 p-0"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                    {!readOnly && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEditDialog(material)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDelete(material.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <CardTitle className="text-base leading-tight">{material.name}</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {material.description && (
+                  <p className="text-sm text-content mb-3 leading-relaxed">{material.description}</p>
+                )}
+                <a 
+                  href={material.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary hover:underline break-all"
+                >
+                  {material.url}
+                </a>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </>
   );
 };
 
