@@ -13,7 +13,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      const shouldShow = scrollTop > 800; // Só aparece após rolar 800px
+      const shouldShow = scrollTop > 500; // Aparece após 500px
       setIsSticky(shouldShow);
     };
 
