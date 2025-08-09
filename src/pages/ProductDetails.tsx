@@ -12,6 +12,7 @@ import ComoEntregoTable from "@/components/ComoEntregoTable";
 import ProductPositions from "@/components/ProductPositions";
 import TrainingMaterials from "@/components/TrainingMaterials";
 import UseCaseMap from "@/components/UseCaseMap";
+import ProductSummary from "@/components/ProductSummary";
 import { formatCurrency } from "@/lib/formatters";
 
 interface Product {
@@ -229,8 +230,12 @@ const ProductDetails = () => {
           <h1 className="text-3xl font-bold">{product.produto}</h1>
         </div>
 
+        {/* Sumário da Página */}
+        <ProductSummary productName={product.produto} />
+
         {/* Estrutura do Produto */}
-        <Card>
+        <section id="estrutura-produto">
+          <Card>
           <CardHeader>
             <CardTitle>Estrutura do Produto</CardTitle>
           </CardHeader>
@@ -279,8 +284,10 @@ const ProductDetails = () => {
             </div>
           </CardContent>
         </Card>
+        </section>
 
         {/* Visão Geral do Produto */}
+        <section id="visao-geral">
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Visão Geral do Produto</CardTitle>
@@ -315,8 +322,10 @@ const ProductDetails = () => {
             )}
           </CardContent>
         </Card>
+        </section>
 
         {/* Aspectos Técnicos */}
+        <section id="aspectos-tecnicos">
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">⚙️ Aspectos Técnicos</CardTitle>
@@ -366,8 +375,10 @@ const ProductDetails = () => {
             </div>
           </CardContent>
         </Card>
+        </section>
 
         {/* Informações para vender */}
+        <section id="informacoes-vender">
         <Card>
           <CardHeader>
             <CardTitle>Informações para vender</CardTitle>
@@ -418,15 +429,19 @@ const ProductDetails = () => {
             </div>
           </CardContent>
         </Card>
+        </section>
 
         {/* Posições Alocadas */}
+        <section id="posicoes-alocadas">
         <ProductPositions 
           productId={product.id} 
           readOnly={true}
           initialMarkup={product.markup}
         />
+        </section>
 
         {/* Informações para Operar */}
+        <section id="informacoes-operar">
         <Card>
           <CardHeader>
             <CardTitle>Informações para Operar</CardTitle>
@@ -451,9 +466,12 @@ const ProductDetails = () => {
             </div>
           </CardContent>
         </Card>
+        </section>
 
         {/* Materiais de Treinamento e Documentos */}
+        <section id="materiais-treinamentos">
         <TrainingMaterials productId={product.id} readOnly={true} />
+        </section>
 
         {/* Materiais Antigos e Documentos (manter para compatibilidade) */}
         {(product.pitch_url || product.bpmn_url || product.playbook_url || product.pricing_url || product.certificacao_url || 
