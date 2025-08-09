@@ -41,18 +41,18 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
     { id: 'materiais-treinamentos', label: 'Materiais de Treinamentos' },
   ];
 
-  // Top Summary (always visible)
-  const TopSummary = () => (
-    <div className="mb-6">
+  // Sidebar Summary (always visible in sidebar)
+  const SidebarSummary = () => (
+    <div className="p-4 bg-muted/50 rounded-lg">
       <h2 className="text-sm font-medium mb-3 text-muted-foreground flex items-center gap-2">
         📋 Sumário da Página
       </h2>
-      <div className="flex flex-col gap-1 text-sm">
+      <div className="space-y-2">
         {sections.map((section, index) => (
           <button
             key={section.id}
             onClick={() => scrollToSection(section.id)}
-            className="text-foreground hover:text-primary transition-colors cursor-pointer underline-offset-4 hover:underline"
+            className="w-full text-left text-sm text-foreground hover:text-primary transition-colors cursor-pointer underline-offset-4 hover:underline block py-1"
           >
             {index + 1}. {section.label}
           </button>
@@ -99,7 +99,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
 
   return (
     <>
-      <TopSummary />
+      <SidebarSummary />
       <StickySummary />
     </>
   );

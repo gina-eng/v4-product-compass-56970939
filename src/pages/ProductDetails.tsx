@@ -233,11 +233,19 @@ const ProductDetails = () => {
           <h1 className="text-3xl font-bold">{product.produto}</h1>
         </div>
 
-        {/* Sumário da Página */}
-        <ProductSummary productName={product.produto} />
+        {/* Layout Principal com Sumário à esquerda e conteúdo à direita */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Coluna da esquerda - Sumário fixo */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <ProductSummary productName={product.produto} />
+            </div>
+          </div>
 
-        {/* Estrutura do Produto */}
-        <section id="estrutura-produto">
+          {/* Coluna da direita - Conteúdo principal */}
+          <div className="lg:col-span-3 space-y-8">
+            {/* Estrutura do Produto */}
+            <section id="estrutura-produto">
           <Card>
           <CardContent className="pt-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -624,6 +632,8 @@ const ProductDetails = () => {
             </CardContent>
           </Card>
         )}
+          </div>
+        </div>
       </div>
     </Layout>
   );
