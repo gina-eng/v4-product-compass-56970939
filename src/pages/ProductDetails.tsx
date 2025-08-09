@@ -228,7 +228,8 @@ const ProductDetails = () => {
 
   return (
     <Layout>
-      <div className="space-y-8 animate-fade-in">{/* Header com botão voltar */}
+      <div className="spacing-section animate-fade-in">
+        {/* Header com botão voltar */}
         <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
@@ -238,7 +239,7 @@ const ProductDetails = () => {
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </Button>
-          <h1 className="text-3xl font-bold">{product.produto}</h1>
+          <h1 className="text-title-main">{product.produto}</h1>
         </div>
 
         {/* Layout com Sumário ao lado da primeira seção */}
@@ -252,18 +253,18 @@ const ProductDetails = () => {
           <div className="lg:col-span-3">
             <section id="estrutura-produto">
               <Card>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
+                <CardContent className="padding-page">
+                  <div className="spacing-card">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <span className="text-sm font-bold text-foreground">Título:</span>
-                        <p className="font-normal text-content">{product.produto}</p>
+                        <span className="text-label">Título:</span>
+                        <p className="text-body">{product.produto}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-bold text-foreground">Categoria:</span>
+                        <span className="text-label">Categoria:</span>
                         <div className="flex items-center gap-2">
                           <div 
-                            className="inline-block px-3 py-1 rounded-full text-xs font-medium text-white"
+                            className="inline-block padding-tight rounded-full text-body-small font-medium text-white"
                             style={{backgroundColor: getCategoryColor(product.categoria)}}
                           >
                             {product.categoria.toUpperCase()}
@@ -274,7 +275,7 @@ const ProductDetails = () => {
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <span className="text-sm font-bold text-foreground">Status:</span>
+                        <span className="text-label">Status:</span>
                         <Badge 
                           variant={getStatusBadge(product.status).variant}
                           className={`ml-2 ${getStatusBadge(product.status).className}`}
@@ -283,8 +284,8 @@ const ProductDetails = () => {
                         </Badge>
                       </div>
                       <div>
-                        <span className="text-sm font-bold text-foreground">Valor Base:</span>
-                        <p className="font-normal text-content">
+                        <span className="text-label">Valor Base:</span>
+                        <p className="text-body">
                           {product.valor === "A definir" ? product.valor : formatCurrency(product.valor)}
                         </p>
                       </div>
@@ -292,12 +293,12 @@ const ProductDetails = () => {
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <span className="text-sm font-bold text-foreground">Duração:</span>
-                        <p className="text-sm text-content">{product.duracao}</p>
+                        <span className="text-label">Duração:</span>
+                        <p className="text-body">{product.duracao}</p>
                       </div>
                       <div>
-                        <span className="text-sm font-bold text-foreground">PMM Responsável:</span>
-                        <p className="text-sm text-content">{product.dono}</p>
+                        <span className="text-label">PMM Responsável:</span>
+                        <p className="text-body">{product.dono}</p>
                       </div>
                     </div>
                   </div>
@@ -308,20 +309,20 @@ const ProductDetails = () => {
         </div>
 
         {/* Restante do conteúdo em largura total */}
-        <div className="space-y-8">
+        <div className="spacing-section">
         {/* Visão Geral do Produto */}
         <section id="visao-geral">
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Visão Geral do Produto</CardTitle>
+            <CardTitle className="text-title-section">Visão Geral do Produto</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="spacing-card">
             {/* Descrição Completa */}
             {product.descricao_completa && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground border-b pb-2">📝 Descrição Completa</h3>
-                <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg">
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed text-justify">
+              <div className="spacing-card">
+                <h3 className="text-title-card border-b pb-2">📝 Descrição Completa</h3>
+                <div className="container-section">
+                  <div className="text-body leading-relaxed text-justify">
                     {product.descricao_completa}
                   </div>
                 </div>
@@ -330,14 +331,14 @@ const ProductDetails = () => {
 
             {/* ICP - Destaque especial */}
             {product.description && (
-              <Card className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 border-purple-200 dark:border-purple-800">
+              <Card className="container-highlight">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
+                  <CardTitle className="text-title-sub flex items-center gap-2">
                     🎯 ICP (Ideal Customer Profile)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                  <div className="text-body leading-relaxed">
                     {product.description}
                   </div>
                 </CardContent>
@@ -351,46 +352,46 @@ const ProductDetails = () => {
         <section id="aspectos-tecnicos">
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">⚙️ Aspectos Técnicos</CardTitle>
+            <CardTitle className="text-title-section">⚙️ Aspectos Técnicos</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="spacing-card">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {product.escopo && (
-                <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                  <span className="text-sm font-bold text-foreground block mb-2">Escopo:</span>
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                <div className="container-section">
+                  <span className="text-label block mb-2">Escopo:</span>
+                  <div className="text-body leading-relaxed">
                     {product.escopo}
                   </div>
                 </div>
               )}
               {product.formato_entrega && (
-                <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
-                  <span className="text-sm font-bold text-foreground block mb-2">Formato de entrega:</span>
-                  <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                <div className="container-section">
+                  <span className="text-label block mb-2">Formato de entrega:</span>
+                  <div className="text-body leading-relaxed">
                     {product.formato_entrega}
                   </div>
                 </div>
               )}
               {product.duracao_media && (
-                <div className="bg-slate-50 dark:bg-slate-950/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
-                  <span className="text-sm font-bold text-foreground block mb-2">⏳ Duração média:</span>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                <div className="container-section border border-slate-200 dark:border-slate-800">
+                  <span className="text-label block mb-2">⏳ Duração média:</span>
+                  <div className="text-body">
                     {product.duracao_media}
                   </div>
                 </div>
               )}
               {product.time_envolvido && (
-                <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                  <span className="text-sm font-bold text-foreground block mb-2">👥 Time envolvido:</span>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                <div className="container-section border border-green-200 dark:border-green-800">
+                  <span className="text-label block mb-2">👥 Time envolvido:</span>
+                  <div className="text-body">
                     {product.time_envolvido}
                   </div>
                 </div>
               )}
               {product.stack_digital && (
-                <div className="bg-purple-50 dark:bg-purple-950/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
-                  <span className="text-sm font-bold text-foreground block mb-2">💻 Stack digital:</span>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                <div className="container-section border border-purple-200 dark:border-purple-800">
+                  <span className="text-label block mb-2">💻 Stack digital:</span>
+                  <div className="text-body">
                     {product.stack_digital}
                   </div>
                 </div>
@@ -404,13 +405,13 @@ const ProductDetails = () => {
         <section id="informacoes-vender">
         <Card>
           <CardHeader>
-            <CardTitle>Informações para vender</CardTitle>
+            <CardTitle className="text-title-section">Informações para vender</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="spacing-card">
             <div>
-              <h4 className="text-sm font-bold text-foreground mb-2">"Como eu vendo?"</h4>
-              <div className="text-sm leading-relaxed bg-muted/30 p-4 rounded-lg">
-                <div className="text-content space-y-3 text-justify">
+              <h4 className="text-title-sub mb-3">"Como eu vendo?"</h4>
+              <div className="container-section">
+                <div className="text-body spacing-tight text-justify">
                   {product.como_vendo.split('\n').filter(line => line.trim()).map((line, index) => (
                     <p key={index} className="mb-0">
                       {line.trim()}
@@ -449,14 +450,14 @@ const ProductDetails = () => {
               />
             )}
             
-            <div className="bg-muted/50 p-4 rounded-lg">
-              <h4 className="font-bold text-foreground mb-4">Metodologia SPICED</h4>
+            <div className="container-section">
+              <h4 className="text-title-card mb-4">Metodologia SPICED</h4>
               <SpicedTable data={product.spiced_data} readOnly />
             </div>
 
             {/* Materiais de Vendas integrados */}
             <div className="mt-6">
-              <h4 className="font-bold text-foreground mb-4">Materiais de Vendas</h4>
+              <h4 className="text-title-card mb-4">Materiais de Vendas</h4>
               <SalesMaterials productId={product.id} readOnly={true} />
             </div>
           </CardContent>

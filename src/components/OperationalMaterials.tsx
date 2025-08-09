@@ -152,22 +152,22 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
   }
 
   return (
-    <div className="space-y-6">
+    <div className="spacing-section">
       {/* Informações Operacionais */}
       {(productData?.o_que_entrego || productData?.como_entrego_dados?.length) && (
-        <div className="space-y-4">
+        <div className="spacing-card">
           {productData.o_que_entrego && (
             <div>
-              <span className="text-sm font-bold text-foreground">"O que entrego"</span>
-              <div className="text-sm mt-2 text-content whitespace-pre-line leading-relaxed bg-muted/30 p-3 rounded-lg">
+              <span className="text-label">"O que entrego"</span>
+              <div className="text-body mt-2 whitespace-pre-line container-section">
                 {productData.o_que_entrego}
               </div>
             </div>
           )}
           
           {productData.como_entrego_dados && productData.como_entrego_dados.length > 0 && (
-            <div className="bg-muted/30 p-4 rounded-lg">
-              <h4 className="font-bold text-foreground mb-4">Etapas de Entrega</h4>
+            <div className="container-section">
+              <h4 className="text-title-card mb-4">Etapas de Entrega</h4>
               <ComoEntregoTable 
                 data={productData.como_entrego_dados || []} 
                 readOnly={true}
@@ -180,7 +180,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
 
       {/* Header com botão de adicionar */}
       <div className="flex items-center justify-between">
-        <h4 className="font-bold text-foreground">Materiais Operacionais</h4>
+        <h4 className="text-title-card">Materiais Operacionais</h4>
         {!readOnly && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -253,35 +253,37 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
 
       {/* Lista de materiais */}
       {materials.length === 0 ? (
-        <p className="text-content text-center py-4 text-sm bg-muted/30 rounded-lg">
-          Nenhum material operacional cadastrado.
-        </p>
+        <div className="text-center py-8">
+          <p className="text-body text-muted-foreground">
+            Nenhum material operacional cadastrado.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-3">
           {materials.map((material) => (
             <Card key={material.id} className="h-fit">
-              <CardContent className="p-4">
+              <CardContent className="padding-card">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-body-small">
                         Operacional
                       </Badge>
                       {material.formato && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-body-small">
                           {material.formato === 'gravado' ? '🎥 Gravado' : '📄 Material'}
                         </Badge>
                       )}
                     </div>
-                    <h5 className="font-medium text-sm leading-tight mb-2 pr-2">{material.name}</h5>
+                    <h5 className="text-title-sub leading-tight mb-2 pr-2">{material.name}</h5>
                     {material.description && (
-                      <p className="text-xs text-content mb-2 leading-relaxed">{material.description}</p>
+                      <p className="text-body-small mb-2 leading-relaxed">{material.description}</p>
                     )}
                     <a 
                       href={material.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-xs text-primary hover:underline break-all"
+                      className="text-body-small text-primary hover:underline break-all"
                     >
                       {material.url}
                     </a>

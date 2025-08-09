@@ -102,10 +102,10 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
                 <AccordionTrigger className="px-4 py-3 hover:no-underline">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 rounded-full bg-primary"></div>
-                    <span className="text-lg font-semibold text-foreground">
+                    <span className="text-title-sub">
                       {fase}
                     </span>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-body-small text-muted-foreground">
                       ({items.length} etapa{items.length !== 1 ? 's' : ''})
                     </div>
                   </div>
@@ -115,29 +115,29 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
                     <table className="w-full border-collapse border border-border rounded-md">
                       <thead>
                         <tr className="bg-muted">
-                          <th className="border border-border p-3 text-left font-semibold">ETAPA</th>
-                          <th className="border border-border p-3 text-left font-semibold">TAREFA</th>
-                          <th className="border border-border p-3 text-left font-semibold">DRI</th>
-                          <th className="border border-border p-3 text-left font-semibold">ESTIMATIVA DE HORAS</th>
-                          <th className="border border-border p-3 text-left font-semibold">COMO EXECUTAR (POP)</th>
+                          <th className="border border-border padding-section text-left table-header">Etapa</th>
+                          <th className="border border-border padding-section text-left table-header">Tarefa</th>
+                          <th className="border border-border padding-section text-left table-header">DRI</th>
+                          <th className="border border-border padding-section text-left table-header">Estimativa de Horas</th>
+                          <th className="border border-border padding-section text-left table-header">Como Executar (POP)</th>
                         </tr>
                       </thead>
                       <tbody>
                         {items.map((row, index) => (
                           <tr key={`${fase}-${index}`} className="hover:bg-muted/50">
-                            <td className="border border-border p-3">
-                              <div className="font-medium">{row.etapa}</div>
+                            <td className="border border-border padding-section">
+                              <div className="text-title-sub">{row.etapa}</div>
                             </td>
-                            <td className="border border-border p-3">
-                              <div>{row.tarefa}</div>
+                            <td className="border border-border padding-section">
+                              <div className="text-body">{row.tarefa}</div>
                             </td>
-                            <td className="border border-border p-3">
-                              <div className="text-sm">{row.dri}</div>
+                            <td className="border border-border padding-section">
+                              <div className="text-body-small">{row.dri}</div>
                             </td>
-                            <td className="border border-border p-3 text-center">
-                              <div className="font-mono">{row.estimativaHoras}h</div>
+                            <td className="border border-border padding-section text-center">
+                              <div className="table-cell-number">{row.estimativaHoras}h</div>
                             </td>
-                            <td className="border border-border p-3">
+                            <td className="border border-border padding-section">
                               {row.comoExecutar ? (
                                 <Button
                                   variant="ghost"
@@ -149,7 +149,7 @@ const ComoEntregoTable: React.FC<ComoEntregoTableProps> = ({
                                   Ver POP
                                 </Button>
                               ) : (
-                                <span className="text-muted-foreground text-sm">Não definido</span>
+                                <span className="text-body-small text-muted-foreground">Não definido</span>
                               )}
                             </td>
                           </tr>

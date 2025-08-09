@@ -265,7 +265,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-3">
+              <CardTitle className="text-title-card flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-primary"></div>
                 Posições Alocadas
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isPositionsOpen ? 'rotate-180' : ''}`} />
@@ -327,28 +327,30 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
         <CollapsibleContent>
           <CardContent>
         {productPositions.length === 0 ? (
-          <p className="text-muted-foreground text-center py-4">
-            Nenhuma posição alocada para este produto.
-          </p>
+          <div className="text-center py-8">
+            <p className="text-body text-muted-foreground">
+              Nenhuma posição alocada para este produto.
+            </p>
+          </div>
         ) : (
           <>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>POSIÇÃO</TableHead>
-                  <TableHead>HORAS ALOCADAS</TableHead>
-                  <TableHead>CSP</TableHead>
-                  {!readOnly && <TableHead>AÇÕES</TableHead>}
+                  <TableHead className="table-header">Posição</TableHead>
+                  <TableHead className="table-header">Horas Alocadas</TableHead>
+                  <TableHead className="table-header">CSP</TableHead>
+                  {!readOnly && <TableHead className="table-header">Ações</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {productPositions.map((productPosition) => (
                   <TableRow key={productPosition.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="table-cell font-medium">
                       {productPosition.positions.nome}
                     </TableCell>
-                    <TableCell>{productPosition.horas_alocadas}</TableCell>
-                    <TableCell>
+                    <TableCell className="table-cell-number">{productPosition.horas_alocadas}</TableCell>
+                    <TableCell className="table-cell">
                       {formatCurrency(
                         calculateCSP(
                           productPosition.positions.cph,
@@ -380,9 +382,9 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                 ))}
                 {/* Linha de total */}
                 <TableRow className="border-t-2 border-border bg-muted/50">
-                  <TableCell className="font-bold">TOTAL</TableCell>
-                  <TableCell className="font-bold">{totalHoras}</TableCell>
-                  <TableCell className="font-bold">{formatCurrency(totalCSP)}</TableCell>
+                  <TableCell className="text-title-sub">TOTAL</TableCell>
+                  <TableCell className="text-title-sub table-cell-number">{totalHoras}</TableCell>
+                  <TableCell className="text-title-sub">{formatCurrency(totalCSP)}</TableCell>
                   {!readOnly && <TableCell></TableCell>}
                 </TableRow>
               </TableBody>
@@ -392,11 +394,11 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
 
         {/* Campo de Markup e DRE */}
         {productPositions.length > 0 && (
-          <div className="mt-6 space-y-6">
+          <div className="spacing-section">
             {/* Campo de Markup - apenas no modo de edição */}
             {!readOnly && (
               <div className="flex items-center gap-4">
-                <Label htmlFor="markup" className="min-w-fit">Markup:</Label>
+                <Label htmlFor="markup" className="text-label min-w-fit">Markup:</Label>
                 <Input
                   id="markup"
                   type="number"
@@ -414,7 +416,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
               <Card>
                 <CollapsibleTrigger asChild>
                   <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-                    <CardTitle className="text-right bg-muted p-2 rounded flex items-center justify-between">
+                    <CardTitle className="text-title-card text-right bg-muted padding-section rounded flex items-center justify-between">
                       DRE FINAL
                       <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isDreOpen ? 'rotate-180' : ''}`} />
                     </CardTitle>
