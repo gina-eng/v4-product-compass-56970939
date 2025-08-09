@@ -43,22 +43,22 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
 
   // Top Summary (always visible)
   const TopSummary = () => (
-    <Card className="mb-8 bg-gradient-to-r from-background to-muted/30">
-      <CardContent className="pt-6 pb-6">
-        <h2 className="text-xl font-bold mb-5 text-foreground flex items-center gap-2">
+    <Card className="mb-6">
+      <CardContent className="pt-4 pb-4">
+        <h2 className="text-base font-semibold mb-3 text-foreground flex items-center gap-2">
           📋 Sumário da Página
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {sections.map((section, index) => (
             <button
               key={section.id}
               onClick={() => scrollToSection(section.id)}
-              className="flex items-center gap-3 p-3 rounded-lg bg-background hover:bg-muted/50 border border-border hover:border-primary/30 transition-all duration-200 cursor-pointer group text-left"
+              className="flex items-center gap-2 p-2 rounded border hover:bg-muted/50 transition-colors cursor-pointer text-left text-sm"
             >
-              <span className="font-mono text-primary bg-primary/10 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+              <span className="font-mono text-xs bg-muted rounded-full w-5 h-5 flex items-center justify-center">
                 {index + 1}
               </span>
-              <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+              <span className="text-sm">
                 {section.label}
               </span>
             </button>
