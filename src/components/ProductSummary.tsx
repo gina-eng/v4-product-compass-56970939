@@ -43,17 +43,17 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   // Top Summary (always visible)
   const TopSummary = () => (
     <Card className="mb-8">
-      <CardContent className="pt-6">
-        <h2 className="text-xl font-bold mb-6 text-foreground">Sumário da Página</h2>
-        <div className="space-y-3">
+      <CardContent className="pt-4 pb-4">
+        <h2 className="text-lg font-semibold mb-3 text-foreground">Sumário</h2>
+        <div className="space-y-1">
           {sections.map((section, index) => (
-            <div key={section.id} className="flex items-center gap-3">
-              <span className="text-muted-foreground font-mono text-sm min-w-[2rem]">
-                {String(index + 1).padStart(2, '0')}.
+            <div key={section.id} className="flex items-center gap-2">
+              <span className="text-muted-foreground font-mono text-xs w-6">
+                {index + 1}.
               </span>
               <button
                 onClick={() => scrollToSection(section.id)}
-                className="text-left hover:text-primary transition-colors duration-200 text-base font-medium cursor-pointer"
+                className="text-left hover:text-primary transition-colors text-sm cursor-pointer"
               >
                 {section.label}
               </button>
