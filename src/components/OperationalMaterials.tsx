@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, ExternalLink, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import ComoEntregoTable from "@/components/ComoEntregoTable";
+import ComoEntregoDisplay from "@/components/ComoEntregoDisplay";
 
 interface Material {
   id: string;
@@ -156,25 +156,11 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
       {/* Informações Operacionais */}
       {(productData?.o_que_entrego || productData?.como_entrego_dados?.length) && (
         <div className="spacing-card">
-          {productData.o_que_entrego && (
-            <div className="spacing-form">
-              <span className="text-label">"O que entrego"</span>
-              <div className="text-body mt-2 whitespace-pre-line container-section">
-                {productData.o_que_entrego}
-              </div>
-            </div>
-          )}
-          
-          {productData.como_entrego_dados && productData.como_entrego_dados.length > 0 && (
-            <div className="container-section">
-              <h4 className="text-title-card mb-4">Etapas de Entrega</h4>
-              <ComoEntregoTable 
-                data={productData.como_entrego_dados || []} 
-                readOnly={true}
-                positions={positions || []}
-              />
-            </div>
-          )}
+          <ComoEntregoDisplay 
+            description={productData.o_que_entrego || ""}
+            deliverySteps={productData.como_entrego_dados || []}
+            title="Como eu entrego?"
+          />
         </div>
       )}
 

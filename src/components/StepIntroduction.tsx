@@ -1,12 +1,9 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Brain, Package, Wrench, Rocket, ExternalLink } from "lucide-react";
+import { Brain, Package, Wrench, Rocket } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { useNavigate } from "react-router-dom";
 
 const StepIntroduction = () => {
   const { settings } = useSiteSettings();
-  const navigate = useNavigate();
 
   const stepItems = [
     {
@@ -99,19 +96,6 @@ const StepIntroduction = () => {
               </div>
             );
           })}
-        </div>
-        
-        {/* Botão de teste - remover após aprovação */}
-        <div className="mt-12 text-center">
-          <Button 
-            onClick={() => navigate('/teste-como-entrego')}
-            variant="outline"
-            size="lg"
-            className="gap-2"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Ver Teste: Nova Visualização "Como Entrego"
-          </Button>
         </div>
       </div>
     </section>
