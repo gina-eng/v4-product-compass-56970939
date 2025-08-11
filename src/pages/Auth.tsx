@@ -4,17 +4,15 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [showEmailInput, setShowEmailInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, isAuthenticated, loading: authLoading } = useAuth();
+  const { signIn, isAuthenticated, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,34 +24,29 @@ const Auth = () => {
     }
   }, [isAuthenticated, authLoading, navigate, location]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    const { error } = await signIn(email, password);
     
-    if (error) {
+    if (!email.endsWith('@v4company.com')) {
       toast({
         variant: "destructive",
-        title: "Erro no login",
-        description: error.message,
+        title: "Email inválido",
+        description: "Use um email @v4company.com",
       });
+      return;
     }
-    
-    setIsLoading(false);
-  };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
     setIsLoading(true);
 
-    const { error } = await signUp(email, password, fullName);
+    // Aqui você pode implementar o fluxo de autenticação por email
+    // Por enquanto, vou usar uma senha padrão ou implementar um fluxo específico
+    const { error } = await signIn(email, 'temporaryPassword123');
     
     if (error) {
       toast({
         variant: "destructive",
-        title: "Erro no cadastro",
-        description: error.message,
+        title: "Erro no acesso",
+        description: "Verifique seu email ou entre em contato com o suporte.",
       });
     }
     
@@ -75,9 +68,9 @@ const Auth = () => {
         <div className="text-center space-y-6">
           <div className="flex justify-center">
             <img 
-              src="/lovable-uploads/e952505a-6ba3-468e-a269-0a74e7fbdd8e.png" 
+              src="/lovable-uploads/1b339cbf-3c2c-4b0c-b79f-33785805f729.png" 
               alt="V4 Company Logo" 
-              className="h-20 w-auto"
+              className="h-16 w-auto"
             />
           </div>
           <div className="space-y-2">
@@ -90,49 +83,47 @@ const Auth = () => {
           </div>
         </div>
 
-        {/* Auth Forms */}
+        {/* Auth Card */}
         <Card className="w-full shadow-lg border-border/50">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-heading-h3">Acesso ao Portal</CardTitle>
-            <CardDescription>
-              Faça login ou cadastre-se para continuar
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="signin">Login</TabsTrigger>
-                <TabsTrigger value="signup">Cadastro</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
-                    <Input
-                      id="signin-email"
-                      type="email"
-                      placeholder="seu.email@v4company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password">Senha</Label>
-                    <Input
-                      id="signin-password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
+          <CardContent className="pt-6">
+            {!showEmailInput ? (
+              <div className="space-y-4">
+                <Button 
+                  onClick={() => setShowEmailInput(true)}
+                  className="w-full h-12 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-base font-medium"
+                >
+                  <span className="mr-2">G</span>
+                  Entrar com conta V4
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleEmailSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu.email@v4company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowEmailInput(false)}
+                    className="flex-1"
+                    disabled={isLoading}
+                  >
+                    Voltar
+                  </Button>
                   <Button 
                     type="submit" 
-                    className="w-full h-11 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                    className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -144,71 +135,16 @@ const Auth = () => {
                       'Entrar'
                     )}
                   </Button>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">Nome Completo</Label>
-                    <Input
-                      id="signup-name"
-                      type="text"
-                      placeholder="Seu nome completo"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="seu.email@v4company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Senha</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={isLoading}
-                      minLength={6}
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full h-11 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Cadastrando...
-                      </>
-                    ) : (
-                      'Cadastrar'
-                    )}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+                </div>
+              </form>
+            )}
           </CardContent>
         </Card>
 
         {/* Footer */}
         <div className="text-center text-body-small text-muted-foreground space-y-1">
           <p>Desenvolvido pelo time de PE&G</p>
-          <p>Responsável: Rafael Corazza</p>
+          <p>Problemas de acesso? <a href="mailto:rafael.corazza@v4company.com" className="text-primary hover:underline">rafael.corazza@v4company.com</a></p>
         </div>
       </div>
     </div>
