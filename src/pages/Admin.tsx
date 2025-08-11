@@ -353,7 +353,7 @@ const Admin = () => {
         dono: productForm.dono,
         valor: productForm.valor,
         status: productForm.status as "Disponível" | "Em produção" | "Em homologação",
-        o_que_entrego: productForm.o_que_entrego || null,
+        o_que_entrego: productForm.o_que_entrego || '',
         escopo: productForm.escopo || null,
         duracao_media: productForm.duracao_media || null,
         time_envolvido: productForm.time_envolvido || null,
