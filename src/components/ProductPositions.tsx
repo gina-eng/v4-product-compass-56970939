@@ -271,55 +271,10 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isPositionsOpen ? 'rotate-180' : ''}`} />
               </CardTitle>
               {!readOnly && isPositionsOpen && (
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button onClick={(e) => { e.stopPropagation(); openNewDialog(); }} size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Adicionar Posição
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>
-                        {editingPosition ? 'Editar Posição' : 'Adicionar Posição'}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="position">Posição</Label>
-                        <Select
-                          value={formData.position_id}
-                          onValueChange={(value) => setFormData({ ...formData, position_id: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione uma posição" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {positions.map((position) => (
-                              <SelectItem key={position.id} value={position.id}>
-                                {position.nome}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="horas">Horas Alocadas</Label>
-                        <Input
-                          id="horas"
-                          type="number"
-                          step="0.1"
-                          value={formData.horas_alocadas}
-                          onChange={(e) => setFormData({ ...formData, horas_alocadas: e.target.value })}
-                          placeholder="Ex: 40.0"
-                        />
-                      </div>
-                      <Button onClick={handleSubmit} className="w-full">
-                        {editingPosition ? 'Atualizar' : 'Adicionar'}
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <Button onClick={(e) => { e.stopPropagation(); openNewDialog(); }} size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Posição
+                </Button>
               )}
             </div>
           </CardHeader>
@@ -512,6 +467,51 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
           </CardContent>
         </CollapsibleContent>
       </Card>
+      
+      {/* Modal Dialog - moved outside of collapsible */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingPosition ? 'Editar Posição' : 'Adicionar Posição'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="position">Posição</Label>
+              <Select
+                value={formData.position_id}
+                onValueChange={(value) => setFormData({ ...formData, position_id: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma posição" />
+                </SelectTrigger>
+                <SelectContent>
+                  {positions.map((position) => (
+                    <SelectItem key={position.id} value={position.id}>
+                      {position.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="horas">Horas Alocadas</Label>
+              <Input
+                id="horas"
+                type="number"
+                step="0.1"
+                value={formData.horas_alocadas}
+                onChange={(e) => setFormData({ ...formData, horas_alocadas: e.target.value })}
+                placeholder="Ex: 40.0"
+              />
+            </div>
+            <Button onClick={handleSubmit} className="w-full">
+              {editingPosition ? 'Atualizar' : 'Adicionar'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Collapsible>
   );
 };
