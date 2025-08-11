@@ -294,7 +294,15 @@ const Admin = () => {
           decision: { objetivo: "", perguntas: "", observar: "" }
         },
         como_entrego_dados: (product.como_entrego_dados as unknown as ComoEntregoItem[]) || [],
-        markup: product.markup
+        markup: product.markup,
+        use_case_map_1_name: product.use_case_map_1_name,
+        use_case_map_1_data: (product.use_case_map_1_data as any) || {
+          problema: '', persona: '', alternativa: '', why: '', frequencia: ''
+        },
+        use_case_map_2_name: product.use_case_map_2_name,
+        use_case_map_2_data: (product.use_case_map_2_data as any) || {
+          problema: '', persona: '', alternativa: '', why: '', frequencia: ''
+        }
       }));
       
       setProducts(formattedProducts);
