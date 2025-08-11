@@ -219,9 +219,9 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
   );
 
   const renderSection = (title: string, materials: TrainingMaterial[], showAddButton = true) => (
-    <Card className="mb-6">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{title}</CardTitle>
+    <div className="spacing-card">
+      <div className="flex items-center justify-between mb-6">
+        <h4 className="font-semibold text-foreground">{title}</h4>
         {!readOnly && showAddButton && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
@@ -230,7 +230,7 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
                 Adicionar Material
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>
                   {editingMaterial ? 'Editar Material' : 'Novo Material'}
@@ -252,7 +252,7 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-50 bg-background">
                       <SelectItem value="comercial">Comercial</SelectItem>
                       <SelectItem value="operacional">Operacional</SelectItem>
                       <SelectItem value="treinamento">Treinamento</SelectItem>
@@ -279,7 +279,7 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
                     rows={3}
                   />
                 </div>
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-2 pt-4">
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
                     Cancelar
                   </Button>
@@ -291,19 +291,79 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
             </DialogContent>
           </Dialog>
         )}
-      </CardHeader>
-      <CardContent>
-        {materials.length === 0 ? (
-          <p className="text-content text-center py-8">
+      </div>
+      
+      {materials.length === 0 ? (
+        <div className="text-center py-6 border border-dashed border-border rounded-lg">
+          <p className="text-sm text-muted-foreground">
             Nenhum material cadastrado para esta seção.
           </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {materials.map(renderMaterialCard)}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          {materials.map((material) => (
+            <div key={material.id} className="border border-border rounded-lg p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge variant={getBadgeVariant(material.type)} className="text-xs">
+                      {getBadgeLabel(material.type)}
+                    </Badge>
+                    {material.formato && (
+                      <Badge variant="outline" className="text-xs">
+                        {material.formato === 'gravado' ? '🎥 Gravado' : '📄 Material'}
+                      </Badge>
+                    )}
+                  </div>
+                  <h5 className="font-medium text-sm leading-tight mb-2 pr-2">{material.name}</h5>
+                  {material.description && (
+                    <p className="text-xs text-content mb-3 leading-relaxed">{material.description}</p>
+                  )}
+                  <a 
+                    href={material.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline break-all"
+                  >
+                    {material.url}
+                  </a>
+                </div>
+                <div className="flex items-center space-x-1 ml-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => window.open(material.url, '_blank')}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                  {!readOnly && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => openEditDialog(material)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDelete(material.id)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 
   if (loading) {
@@ -311,9 +371,9 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
   }
 
   return (
-    <div className="space-y-6">
+    <div className="spacing-section">
       {renderSection("Materiais de Vendas", comercialMaterials)}
-      {renderSection("Informações para Operar", operacionalMaterials)}
+      {renderSection("Materiais Operacionais", operacionalMaterials)}
       {renderSection("Materiais de Treinamento", treinamentoMaterials)}
     </div>
   );
