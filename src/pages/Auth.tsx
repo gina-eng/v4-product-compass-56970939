@@ -2,17 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const [email, setEmail] = useState('');
-  const [showEmailInput, setShowEmailInput] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, isAuthenticated, loading: authLoading } = useAuth();
+  const { signInWithGoogle, isAuthenticated, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,33 +20,17 @@ const Auth = () => {
     }
   }, [isAuthenticated, authLoading, navigate, location]);
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email.endsWith('@v4company.com')) {
-      toast({
-        variant: "destructive",
-        title: "Email inválido",
-        description: "Use um email @v4company.com",
-      });
-      return;
-    }
-
+  const handleGoogleSignIn = async () => {
     setIsLoading(true);
-
-    // Aqui você pode implementar o fluxo de autenticação por email
-    // Por enquanto, vou usar uma senha padrão ou implementar um fluxo específico
-    const { error } = await signIn(email, 'temporaryPassword123');
-    
+    const { error } = await signInWithGoogle();
     if (error) {
       toast({
         variant: "destructive",
         title: "Erro no acesso",
-        description: "Verifique seu email ou entre em contato com o suporte.",
+        description: "Não foi possível iniciar o login com Google.",
       });
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   if (authLoading) {
@@ -86,58 +66,25 @@ const Auth = () => {
         {/* Auth Card */}
         <Card className="w-full shadow-lg border-border/50">
           <CardContent className="pt-6">
-            {!showEmailInput ? (
-              <div className="space-y-4">
-                <Button 
-                  onClick={() => setShowEmailInput(true)}
-                  className="w-full h-12 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-base font-medium"
-                >
-                  <span className="mr-2">G</span>
-                  Entrar com conta V4
-                </Button>
-              </div>
-            ) : (
-              <form onSubmit={handleEmailSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu.email@v4company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={isLoading}
-                    autoFocus
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowEmailInput(false)}
-                    className="flex-1"
-                    disabled={isLoading}
-                  >
-                    Voltar
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Entrando...
-                      </>
-                    ) : (
-                      'Entrar'
-                    )}
-                  </Button>
-                </div>
-              </form>
-            )}
+            <div className="space-y-4">
+              <Button 
+                onClick={handleGoogleSignIn}
+                className="w-full h-12 bg-destructive hover:bg-destructive/90 text-destructive-foreground text-base font-medium"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Redirecionando...
+                  </>
+                ) : (
+                  <>
+                    <span className="mr-2">G</span>
+                    Entrar com conta V4
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

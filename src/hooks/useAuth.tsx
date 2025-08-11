@@ -9,6 +9,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
 }
@@ -33,15 +34,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+useEffect(() => {
+  // Set up auth state listener
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    (_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    }
+  );
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -122,6 +123,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      setLoading(true);
+      const redirectUrl = `${window.location.origin}/`;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            prompt: 'select_account',
+            hd: 'v4company.com',
+          },
+        },
+      });
+      if (error) {
+        return { error };
+      }
+      return { error: null };
+    } catch (error) {
+      return { error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -137,6 +163,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     loading,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     isAuthenticated: !!session && !!user,
   };
