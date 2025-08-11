@@ -91,7 +91,7 @@ const Auth = () => {
         {/* Footer */}
         <div className="text-center text-body-small text-muted-foreground space-y-1">
           <p>Desenvolvido pelo time de PE&G</p>
-          <p>Proprietário - Rafael Corazza</p>
+          <p>Responsável da Plataforma - Rafael Corazza</p>
         </div>
       </div>
     </div>
