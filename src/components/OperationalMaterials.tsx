@@ -172,8 +172,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
       {/* Lista simples de materiais operacionais quando showDeliveryInfo for false */}
       {!showDeliveryInfo && (
         <div className="spacing-card">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-foreground">Materiais Operacionais</h4>
+          <div className="flex items-center justify-end mb-4">
             {!readOnly && (
               <Button size="sm" onClick={openAddDialog}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -189,7 +188,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {materials.map((material) => (
                 <div key={material.id} className="border border-border rounded-lg p-4">
                   <div className="flex items-start justify-between">
