@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import ProductDetails from "./pages/ProductDetails";
 import SupportMaterials from "./pages/SupportMaterials";
 import ProductStructureTest from "./pages/ProductStructureTest";
+import ComoEntregoTestPage from "./pages/ComoEntregoTestPage";
 import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient({
@@ -52,6 +53,11 @@ const App = () => {
               <Route path="/nova-estrutura" element={
                 <ProtectedRoute>
                   <ProductStructureTest />
+                </ProtectedRoute>
+              } />
+              <Route path="/teste-como-entrego" element={
+                <ProtectedRoute>
+                  <ComoEntregoTestPage />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
