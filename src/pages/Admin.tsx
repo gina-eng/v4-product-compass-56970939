@@ -1058,7 +1058,14 @@ const Admin = () => {
                               
                               <div>
                                 <h4 className="font-semibold mb-4">Materiais Operacionais</h4>
-                                <OperationalMaterials productId={editingProduct.id} readOnly={false} />
+                                <OperationalMaterials 
+                                  productId={editingProduct.id} 
+                                  readOnly={false} 
+                                  productData={{
+                                    o_que_entrego: editingProduct.o_que_entrego,
+                                    como_entrego_dados: editingProduct.como_entrego_dados
+                                  }}
+                                />
                               </div>
                               
                               <div>
