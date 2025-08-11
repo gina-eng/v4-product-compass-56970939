@@ -1061,10 +1061,7 @@ const Admin = () => {
                                 <OperationalMaterials 
                                   productId={editingProduct.id} 
                                   readOnly={false} 
-                                  productData={{
-                                    o_que_entrego: editingProduct.o_que_entrego,
-                                    como_entrego_dados: editingProduct.como_entrego_dados
-                                  }}
+                                  showDeliveryInfo={false}
                                 />
                               </div>
                               
