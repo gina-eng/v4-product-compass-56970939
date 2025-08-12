@@ -383,33 +383,13 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <CardContent className="p-0">
-                    {/* Botões de controle de desconto */}
-                    {!readOnly && (
-                      <div className="p-4 border-b bg-muted/30">
-                        <div className="flex gap-2 flex-wrap">
-                          <Button
-                            variant={aplicarDescontoPagamento ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setAplicarDescontoPagamento(!aplicarDescontoPagamento)}
-                          >
-                            {aplicarDescontoPagamento ? "✓" : "✗"} Desconto Pagamento (-17%)
-                          </Button>
-                          <Button
-                            variant={aplicarDescontoCupom ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setAplicarDescontoCupom(!aplicarDescontoCupom)}
-                          >
-                            {aplicarDescontoCupom ? "✓" : "✗"} Desconto Cupom (-20%)
-                          </Button>
-                        </div>
-                      </div>
-                    )}
                     <Table>
                       <TableBody>
                         <TableRow>
                           <TableCell className="font-medium">(=) Faturamento (MRR) - Sem Desconto</TableCell>
                           <TableCell className="text-center">R$</TableCell>
                           <TableCell className="text-right font-medium">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
@@ -419,6 +399,19 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                           <TableCell className={`text-right font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground'}`}>
                             {formatCurrency(descontoPagamento).replace('R$ ', '')}
                           </TableCell>
+                          {!readOnly && (
+                            <TableCell className="w-16">
+                              <Button
+                                variant={aplicarDescontoPagamento ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setAplicarDescontoPagamento(!aplicarDescontoPagamento)}
+                                className="h-6 w-6 p-0 text-xs"
+                              >
+                                {aplicarDescontoPagamento ? "✓" : "✗"}
+                              </Button>
+                            </TableCell>
+                          )}
+                          {readOnly && <TableCell className="w-16"></TableCell>}
                         </TableRow>
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
@@ -428,66 +421,91 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                           <TableCell className={`text-right font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>
                             {formatCurrency(descontoCupom).replace('R$ ', '')}
                           </TableCell>
+                          {!readOnly && (
+                            <TableCell className="w-16">
+                              <Button
+                                variant={aplicarDescontoCupom ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setAplicarDescontoCupom(!aplicarDescontoCupom)}
+                                className="h-6 w-6 p-0 text-xs"
+                              >
+                                {aplicarDescontoCupom ? "✓" : "✗"}
+                              </Button>
+                            </TableCell>
+                          )}
+                          {readOnly && <TableCell className="w-16"></TableCell>}
                         </TableRow>
                         <TableRow className="bg-muted/50">
                           <TableCell className="font-medium">(=) Faturamento (MRR) - Com Desconto</TableCell>
                           <TableCell className="text-center">R$</TableCell>
                           <TableCell className="text-right font-medium">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="font-medium text-red-600">(-) Royalties (-17%)</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(royalties).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="font-medium text-red-600">(-) Taxa de Pagamento (-3%)</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaPagamento).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="font-medium text-red-600">(-) Taxa de Antecipação (-10%)</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaAntecipacao).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="bg-muted/50">
                           <TableCell className="font-medium">(=) Receita Bruta (MRR)</TableCell>
                           <TableCell className="text-center">R$</TableCell>
                           <TableCell className="text-right font-medium">{formatCurrency(receitaBruta).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="font-medium text-red-600">(-) Impostos sobre Receita</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(impostosReceita).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="bg-muted/50">
                           <TableCell className="font-medium">(=) Receita Líquida</TableCell>
                           <TableCell className="text-center">R$</TableCell>
                           <TableCell className="text-right font-medium">{formatCurrency(receitaLiquida).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="font-medium text-red-600">(-) Custos diretos</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosDiretos).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="pl-6">
                           <TableCell className="font-medium text-red-600 pl-8">(-) CSP</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosCSP).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="font-medium text-red-600 pl-8">(-) Auxílio</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">-</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="bg-muted/50 border-t-2">
                           <TableCell className="font-bold">(=) Margem operacional</TableCell>
                           <TableCell className="text-center font-bold">R$</TableCell>
                           <TableCell className="text-right font-bold">{formatCurrency(margemOperacional).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell></TableCell>
                           <TableCell></TableCell>
                           <TableCell className="text-right font-bold text-sm">{margemPercentual.toFixed(2)}%</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
