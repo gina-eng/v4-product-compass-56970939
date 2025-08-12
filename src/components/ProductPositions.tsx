@@ -47,6 +47,8 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
   const [markup, setMarkup] = useState<number>(initialMarkup);
   const [isDreOpen, setIsDreOpen] = useState(false);
   const [isPositionsOpen, setIsPositionsOpen] = useState(false);
+  const [aplicarDescontoPagamento, setAplicarDescontoPagamento] = useState(true);
+  const [aplicarDescontoCupom, setAplicarDescontoCupom] = useState(true);
 
   useEffect(() => {
     fetchProductPositions();
@@ -245,8 +247,8 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
 
   // Cálculos DRE
   const faturamentoSemDesconto = totalCSP * markup;
-  const descontoPagamento = faturamentoSemDesconto * 0.17;
-  const descontoCupom = faturamentoSemDesconto * 0.20;
+  const descontoPagamento = aplicarDescontoPagamento ? faturamentoSemDesconto * 0.17 : 0;
+  const descontoCupom = aplicarDescontoCupom ? faturamentoSemDesconto * 0.20 : 0;
   const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
   const royalties = faturamentoComDesconto * 0.17;
   const taxaPagamento = faturamentoComDesconto * 0.03;
@@ -371,10 +373,30 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
               <Card>
                 <CollapsibleTrigger asChild>
                   <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-                    <CardTitle className="text-title-card text-right bg-muted padding-section rounded flex items-center justify-between">
-                      DRE FINAL
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isDreOpen ? 'rotate-180' : ''}`} />
-                    </CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-title-card text-right bg-muted padding-section rounded flex items-center justify-between">
+                        DRE FINAL
+                        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isDreOpen ? 'rotate-180' : ''}`} />
+                      </CardTitle>
+                      {isDreOpen && !readOnly && (
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                          <Button
+                            variant={aplicarDescontoPagamento ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setAplicarDescontoPagamento(!aplicarDescontoPagamento)}
+                          >
+                            Desconto Pagamento (-17%)
+                          </Button>
+                          <Button
+                            variant={aplicarDescontoCupom ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setAplicarDescontoCupom(!aplicarDescontoCupom)}
+                          >
+                            Desconto Cupom (-20%)
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
