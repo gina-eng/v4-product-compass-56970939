@@ -246,7 +246,7 @@ const TrainingMaterialsOnly = ({ productId, readOnly = false }: TrainingMaterial
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="secondary" className="text-xs">
                       Treinamento
                     </Badge>
                     {material.formato && (
