@@ -260,6 +260,8 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
   const custosDiretos = custosCSP;
   const margemOperacional = receitaLiquida - custosDiretos;
   const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
+  
+  console.log('ProductPositions rendering - Taxa de Transição updated');
 
   return (
     <Collapsible open={isPositionsOpen} onOpenChange={setIsPositionsOpen}>
