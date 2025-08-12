@@ -1,12 +1,11 @@
-import { Header } from "@/components/Header";
+import { Layout } from "@/components/Layout";
 import ProductStructurePreview from "@/components/ProductStructurePreview";
 
 const ProductStructureTest = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <Layout>
       <ProductStructurePreview />
-    </div>
+    </Layout>
   );
 };
 
