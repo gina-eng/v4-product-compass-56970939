@@ -279,7 +279,7 @@ const ProductStructurePreview = () => {
                 <span>R$ 2.626,04</span>
               </div>
               <div className="flex justify-between text-red-600">
-                <span>(-) Taxa de Pagamento (-3%)</span>
+                <span>(-) Taxa de Transição (-3%)</span>
                 <span>R$ 463,42</span>
               </div>
               <div className="flex justify-between text-red-600">

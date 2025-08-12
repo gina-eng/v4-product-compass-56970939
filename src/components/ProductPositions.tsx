@@ -251,9 +251,9 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
   const descontoCupom = aplicarDescontoCupom ? faturamentoSemDesconto * 0.20 : 0;
   const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
   const royalties = faturamentoComDesconto * 0.17;
-  const taxaPagamento = faturamentoComDesconto * 0.03;
+  const taxaTransicao = faturamentoComDesconto * 0.03;
   const taxaAntecipacao = faturamentoComDesconto * 0.10;
-  const receitaBruta = faturamentoComDesconto - royalties - taxaPagamento - taxaAntecipacao;
+  const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
   const impostosReceita = receitaBruta * 0.074;
   const receitaLiquida = receitaBruta - impostosReceita;
   const custosCSP = totalCSP; // CSP total
@@ -454,9 +454,9 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-red-600">(-) Taxa de Pagamento (-3%)</TableCell>
+                          <TableCell className="font-medium text-red-600">(-) Taxa de Transição (-3%)</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
-                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaPagamento).replace('R$ ', '')}</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaTransicao).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>

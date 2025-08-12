@@ -62,9 +62,9 @@ const ProductPortfolio = () => {
                 const descontoCupom = faturamentoSemDesconto * 0.20;
                 const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
                 const royalties = faturamentoComDesconto * 0.17;
-                const taxaPagamento = faturamentoComDesconto * 0.03;
+                const taxaTransicao = faturamentoComDesconto * 0.03;
                 const taxaAntecipacao = faturamentoComDesconto * 0.10;
-                const receitaBruta = faturamentoComDesconto - royalties - taxaPagamento - taxaAntecipacao;
+                const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
                 const impostosReceita = receitaBruta * 0.074;
                 const receitaLiquida = receitaBruta - impostosReceita;
                 const custosDiretos = totalCSP;
