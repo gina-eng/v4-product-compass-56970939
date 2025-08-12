@@ -378,29 +378,32 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                         DRE FINAL
                         <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isDreOpen ? 'rotate-180' : ''}`} />
                       </CardTitle>
-                      {isDreOpen && !readOnly && (
-                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="p-0">
+                    {/* Botões de controle de desconto */}
+                    {!readOnly && (
+                      <div className="p-4 border-b bg-muted/30">
+                        <div className="flex gap-2 flex-wrap">
                           <Button
                             variant={aplicarDescontoPagamento ? "default" : "outline"}
                             size="sm"
                             onClick={() => setAplicarDescontoPagamento(!aplicarDescontoPagamento)}
                           >
-                            Desconto Pagamento (-17%)
+                            {aplicarDescontoPagamento ? "✓" : "✗"} Desconto Pagamento (-17%)
                           </Button>
                           <Button
                             variant={aplicarDescontoCupom ? "default" : "outline"}
                             size="sm"
                             onClick={() => setAplicarDescontoCupom(!aplicarDescontoCupom)}
                           >
-                            Desconto Cupom (-20%)
+                            {aplicarDescontoCupom ? "✓" : "✗"} Desconto Cupom (-20%)
                           </Button>
                         </div>
-                      )}
-                    </div>
-                  </CardHeader>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <CardContent className="p-0">
+                      </div>
+                    )}
                     <Table>
                       <TableBody>
                         <TableRow>
@@ -409,14 +412,22 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                           <TableCell className="text-right font-medium">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-red-600">(-) Desconto de Pagamento (-17%)</TableCell>
-                          <TableCell className="text-center text-red-600">R$</TableCell>
-                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(descontoPagamento).replace('R$ ', '')}</TableCell>
+                          <TableCell className={`font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
+                            (-) Desconto de Pagamento (-17%)
+                          </TableCell>
+                          <TableCell className={`text-center ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
+                          <TableCell className={`text-right font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground'}`}>
+                            {formatCurrency(descontoPagamento).replace('R$ ', '')}
+                          </TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-red-600">(-) Desconto de Cupom (-20%)</TableCell>
-                          <TableCell className="text-center text-red-600">R$</TableCell>
-                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(descontoCupom).replace('R$ ', '')}</TableCell>
+                          <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
+                            (-) Desconto de Cupom (-20%)
+                          </TableCell>
+                          <TableCell className={`text-center ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
+                          <TableCell className={`text-right font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>
+                            {formatCurrency(descontoCupom).replace('R$ ', '')}
+                          </TableCell>
                         </TableRow>
                         <TableRow className="bg-muted/50">
                           <TableCell className="font-medium">(=) Faturamento (MRR) - Com Desconto</TableCell>
