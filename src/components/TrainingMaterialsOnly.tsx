@@ -157,11 +157,9 @@ const TrainingMaterialsOnly = ({ productId, readOnly = false }: TrainingMaterial
   }
 
   return (
-    <div className="space-y-6">
-      {/* Título da seção */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Materiais de Treinamento</h3>
-        {/* Botão de adicionar */}
+    <div className="space-y-4">
+      {/* Botão de adicionar */}
+      <div className="flex justify-end">
         {!readOnly && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
