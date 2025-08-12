@@ -86,6 +86,7 @@ const TrainingMaterials = ({ productId, readOnly = false }: TrainingMaterialsPro
             product_id: productId,
             name: formData.name,
             type: formData.type,
+            formato: formData.type, // Adding formato field as well
             url: formData.url,
             description: formData.description || null
           });
