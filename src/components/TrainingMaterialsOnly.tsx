@@ -232,16 +232,18 @@ const TrainingMaterialsOnly = ({ productId, readOnly = false }: TrainingMaterial
       
       {/* Lista de materiais */}
       {materials.length === 0 ? (
-        <p className="text-content text-center py-4 text-sm bg-muted/30 rounded-lg">
-          Nenhum material de treinamento cadastrado.
-        </p>
+        <div className="text-center py-6 border border-dashed border-border rounded-lg">
+          <p className="text-sm text-muted-foreground">
+            Nenhum material de treinamento cadastrado.
+          </p>
+        </div>
       ) : (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-4">
           {materials.map((material) => (
-            <div key={material.id} className="border border-border rounded-lg p-4 space-y-3">
-              <div className="flex items-start justify-between gap-3">
+            <div key={material.id} className="border border-border rounded-lg p-4">
+              <div className="flex items-start justify-between mb-3">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline" className="text-xs">
                       Treinamento
                     </Badge>
@@ -251,9 +253,20 @@ const TrainingMaterialsOnly = ({ productId, readOnly = false }: TrainingMaterial
                       </Badge>
                     )}
                   </div>
-                  <h5 className="font-medium text-sm leading-tight mb-2">{material.name}</h5>
+                  <h5 className="font-medium text-sm leading-tight mb-2 pr-2">{material.name}</h5>
+                  {material.description && (
+                    <p className="text-xs text-content mb-3 leading-relaxed">{material.description}</p>
+                  )}
+                  <a 
+                    href={material.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-xs text-primary hover:underline break-all"
+                  >
+                    {material.url}
+                  </a>
                 </div>
-                <div className="flex items-start gap-1 flex-shrink-0">
+                <div className="flex items-center space-x-1 ml-2">
                   <Button
                     size="sm"
                     variant="ghost"
@@ -286,19 +299,6 @@ const TrainingMaterialsOnly = ({ productId, readOnly = false }: TrainingMaterial
                     </>
                   )}
                 </div>
-              </div>
-              <div className="space-y-2">
-                {material.description && (
-                  <p className="text-xs text-content leading-relaxed">{material.description}</p>
-                )}
-                <a 
-                  href={material.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-xs text-primary hover:underline break-all block"
-                >
-                  {material.url}
-                </a>
               </div>
             </div>
           ))}
