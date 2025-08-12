@@ -14,30 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      org_members: {
-        Row: {
-          created_at: string
-          id: string
-          role: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       positions: {
         Row: {
           cph: number
@@ -399,30 +375,10 @@ export type Database = {
       }
     }
     Views: {
-      public_profiles_view: {
-        Row: {
-          created_at: string | null
-          full_name: string | null
-          id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          full_name?: string | null
-          id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          full_name?: string | null
-          id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      is_internal_user: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       categoria_produto: "saber" | "ter" | "executar" | "potencializar"
