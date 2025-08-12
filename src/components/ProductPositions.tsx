@@ -385,16 +385,16 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                   <CardContent className="p-0">
                     <Table>
                       <TableBody>
-                        <TableRow className="bg-blue-50 dark:bg-blue-950/30 border-l-4 border-l-blue-500">
+                        <TableRow className="bg-red-50 dark:bg-red-950/30 border-l-4 border-l-red-500">
                           <TableCell className="font-semibold flex items-center gap-2">
-                            <span className="text-blue-600 dark:text-blue-400">⚓</span>
+                            <span className="text-red-600 dark:text-red-400">⚓</span>
                             (=) Faturamento (MRR) - Sem Desconto
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium">
+                            <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-1 rounded-full font-medium">
                               VALOR DE ANCORAGEM
                             </span>
                           </TableCell>
-                          <TableCell className="text-center text-blue-600 dark:text-blue-400 font-medium">R$</TableCell>
-                          <TableCell className="text-right font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
+                          <TableCell className="text-center text-red-600 dark:text-red-400 font-medium">R$</TableCell>
+                          <TableCell className="text-right font-semibold text-red-600 dark:text-red-400">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
