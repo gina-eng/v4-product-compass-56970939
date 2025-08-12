@@ -113,15 +113,26 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este material operacional?')) return;
+    console.log('Tentando excluir material operacional com ID:', id);
+    
+    if (!confirm('Tem certeza que deseja excluir este material operacional?')) {
+      console.log('Exclusão cancelada pelo usuário');
+      return;
+    }
 
     try {
+      console.log('Iniciando exclusão...');
       const { error } = await supabase
         .from('training_materials')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro do Supabase:', error);
+        throw error;
+      }
+      
+      console.log('Material excluído com sucesso');
       toast.success('Material operacional excluído com sucesso');
       fetchMaterials();
     } catch (error) {

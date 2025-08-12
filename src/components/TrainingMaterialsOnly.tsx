@@ -107,15 +107,26 @@ const TrainingMaterialsOnly = ({ productId, readOnly = false }: TrainingMaterial
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este material de treinamento?')) return;
+    console.log('Tentando excluir material de treinamento com ID:', id);
+    
+    if (!confirm('Tem certeza que deseja excluir este material de treinamento?')) {
+      console.log('Exclusão cancelada pelo usuário');
+      return;
+    }
 
     try {
+      console.log('Iniciando exclusão...');
       const { error } = await supabase
         .from('training_materials')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro do Supabase:', error);
+        throw error;
+      }
+      
+      console.log('Material excluído com sucesso');
       toast.success('Material de treinamento excluído com sucesso');
       fetchMaterials();
     } catch (error) {
