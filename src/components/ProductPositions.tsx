@@ -385,10 +385,16 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                   <CardContent className="p-0">
                     <Table>
                       <TableBody>
-                        <TableRow>
-                          <TableCell className="font-medium">(=) Faturamento (MRR) - Sem Desconto</TableCell>
-                          <TableCell className="text-center">R$</TableCell>
-                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
+                        <TableRow className="bg-blue-50 dark:bg-blue-950/30 border-l-4 border-l-blue-500">
+                          <TableCell className="font-semibold flex items-center gap-2">
+                            <span className="text-blue-600 dark:text-blue-400">⚓</span>
+                            (=) Faturamento (MRR) - Sem Desconto
+                            <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium">
+                              VALOR DE ANCORAGEM
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center text-blue-600 dark:text-blue-400 font-medium">R$</TableCell>
+                          <TableCell className="text-right font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
@@ -429,10 +435,16 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                             </Button>
                           </TableCell>
                         </TableRow>
-                        <TableRow className="bg-muted/50">
-                          <TableCell className="font-medium">(=) Faturamento (MRR) - Com Desconto</TableCell>
-                          <TableCell className="text-center">R$</TableCell>
-                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
+                        <TableRow className="bg-green-50 dark:bg-green-950/30 border-l-4 border-l-green-500 border-t-2 border-t-green-200 dark:border-t-green-800">
+                          <TableCell className="font-semibold flex items-center gap-2">
+                            <span className="text-green-600 dark:text-green-400">💰</span>
+                            (=) Faturamento (MRR) - Com Desconto
+                            <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-medium">
+                              VALOR COBRADO AO CLIENTE
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center text-green-600 dark:text-green-400 font-medium">R$</TableCell>
+                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
