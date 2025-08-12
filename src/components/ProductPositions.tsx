@@ -456,7 +456,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-red-600">(-) Taxa de Transição (-3%)</TableCell>
+                          <TableCell className="font-medium text-red-600">(-) Taxa de Transação (-3%)</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaTransicao).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
