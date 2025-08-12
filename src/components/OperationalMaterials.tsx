@@ -190,10 +190,10 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
           ) : (
             <div className="grid grid-cols-3 gap-3">
               {materials.map((material) => (
-                <div key={material.id} className="border border-border rounded-lg p-4">
-                  <div className="flex items-start justify-between">
+                <div key={material.id} className="border border-border rounded-lg p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <Badge variant="secondary" className="text-xs">
                           Operacional
                         </Badge>
@@ -203,25 +203,15 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
                           </Badge>
                         )}
                       </div>
-                      <h5 className="font-medium text-sm leading-tight mb-2 pr-2">{material.name}</h5>
-                      {material.description && (
-                        <p className="text-xs text-content mb-2 leading-relaxed">{material.description}</p>
-                      )}
-                      <a 
-                        href={material.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-xs text-primary hover:underline break-all"
-                      >
-                        {material.url}
-                      </a>
+                      <h5 className="font-medium text-sm leading-tight mb-2">{material.name}</h5>
                     </div>
-                    <div className="flex items-center space-x-1 ml-2">
+                    <div className="flex items-start gap-1 flex-shrink-0">
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => window.open(material.url, '_blank')}
                         className="h-8 w-8 p-0"
+                        title="Abrir material"
                       >
                         <ExternalLink className="h-3 w-3" />
                       </Button>
@@ -232,6 +222,7 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
                             variant="ghost"
                             onClick={() => openEditDialog(material)}
                             className="h-8 w-8 p-0"
+                            title="Editar material"
                           >
                             <Edit className="h-3 w-3" />
                           </Button>
@@ -240,12 +231,26 @@ const OperationalMaterials = ({ productId, readOnly = false, productData, positi
                             variant="ghost"
                             onClick={() => handleDelete(material.id)}
                             className="h-8 w-8 p-0"
+                            title="Excluir material"
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </>
                       )}
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    {material.description && (
+                      <p className="text-xs text-content leading-relaxed">{material.description}</p>
+                    )}
+                    <a 
+                      href={material.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline break-all block"
+                    >
+                      {material.url}
+                    </a>
                   </div>
                 </div>
               ))}
