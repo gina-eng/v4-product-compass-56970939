@@ -31,6 +31,7 @@ const Auth = () => {
       });
       setIsLoading(false);
     }
+    // Don't set loading to false on success - the redirect handles this
   };
 
   if (authLoading) {

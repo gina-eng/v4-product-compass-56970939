@@ -125,7 +125,6 @@ useEffect(() => {
 
   const signInWithGoogle = async () => {
     try {
-      setLoading(true);
       const redirectUrl = `${window.location.origin}/`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -137,14 +136,17 @@ useEffect(() => {
           },
         },
       });
+      
       if (error) {
+        setLoading(false);
         return { error };
       }
+      
+      // Don't set loading to false here as the redirect is happening
       return { error: null };
     } catch (error) {
-      return { error };
-    } finally {
       setLoading(false);
+      return { error };
     }
   };
 
