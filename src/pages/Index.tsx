@@ -1,7 +1,6 @@
 import { Layout } from "@/components/Layout";
 import StepIntroduction from "@/components/StepIntroduction"; 
 import ProductPortfolio from "@/components/ProductPortfolio";
-import StatusReport from "@/components/StatusReport";
 
 const Index = () => {
   return (
@@ -9,7 +8,6 @@ const Index = () => {
       <div className="space-y-8 animate-fade-in">
         <StepIntroduction />
         <ProductPortfolio />
-        <StatusReport />
       </div>
     </Layout>
   );
