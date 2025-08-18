@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -64,7 +65,11 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
         .eq('id', productId)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar markup do produto:', error);
+        return;
+      }
+      
       if (data && data.markup) {
         setMarkup(data.markup);
       }
@@ -75,12 +80,20 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
 
   const updateProductMarkup = async (newMarkup: number) => {
     try {
-      const { error } = await supabase
+      console.log('Tentando atualizar markup para:', newMarkup, 'no produto:', productId);
+      
+      const { data, error } = await supabase
         .from('products')
         .update({ markup: newMarkup })
-        .eq('id', productId);
+        .eq('id', productId)
+        .select();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro detalhado ao atualizar markup:', error);
+        throw error;
+      }
+      
+      console.log('Markup atualizado com sucesso:', data);
       
       toast({
         title: "Sucesso",
@@ -94,7 +107,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
       console.error('Erro ao atualizar markup:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível atualizar o markup.",
+        description: `Não foi possível atualizar o markup: ${error?.message || 'Erro desconhecido'}`,
         variant: "destructive",
       });
     }
@@ -117,7 +130,11 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
         `)
         .eq('product_id', productId);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar posições do produto:', error);
+        return;
+      }
+      
       setProductPositions(data || []);
     } catch (error) {
       console.error('Erro ao buscar posições do produto:', error);
@@ -131,7 +148,11 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
         .select('*')
         .order('nome');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar posições:', error);
+        return;
+      }
+      
       setPositions(data || []);
     } catch (error) {
       console.error('Erro ao buscar posições:', error);
@@ -146,24 +167,38 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
         horas_alocadas: parseFloat(formData.horas_alocadas)
       };
 
+      console.log('Tentando salvar posição:', positionData);
+
       if (editingPosition) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('product_positions')
           .update(positionData)
-          .eq('id', editingPosition.id);
+          .eq('id', editingPosition.id)
+          .select();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro detalhado ao atualizar posição:', error);
+          throw error;
+        }
+        
+        console.log('Posição atualizada com sucesso:', data);
         
         toast({
           title: "Sucesso",
           description: "Posição atualizada com sucesso!",
         });
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('product_positions')
-          .insert([positionData]);
+          .insert([positionData])
+          .select();
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro detalhado ao inserir posição:', error);
+          throw error;
+        }
+        
+        console.log('Posição inserida com sucesso:', data);
         
         toast({
           title: "Sucesso",
@@ -184,7 +219,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
       console.error('Erro ao salvar posição:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível salvar a posição.",
+        description: `Não foi possível salvar a posição: ${error?.message || 'Erro desconhecido'}`,
         variant: "destructive",
       });
     }
@@ -201,12 +236,20 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
 
   const handleDelete = async (id: string) => {
     try {
-      const { error } = await supabase
+      console.log('Tentando excluir posição:', id);
+      
+      const { data, error } = await supabase
         .from('product_positions')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro detalhado ao excluir posição:', error);
+        throw error;
+      }
+      
+      console.log('Posição excluída com sucesso:', data);
       
       toast({
         title: "Sucesso",
@@ -223,7 +266,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
       console.error('Erro ao excluir posição:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível remover a posição.",
+        description: `Não foi possível remover a posição: ${error?.message || 'Erro desconhecido'}`,
         variant: "destructive",
       });
     }
@@ -256,7 +299,7 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
   const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
   const impostosReceita = receitaBruta * 0.074;
   const receitaLiquida = receitaBruta - impostosReceita;
-  const custosCSP = totalCSP; // CSP total
+  const custosCSP = totalCSP;
   const custosDiretos = custosCSP;
   const margemOperacional = receitaLiquida - custosDiretos;
   const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
