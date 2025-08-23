@@ -64,6 +64,7 @@ interface Product {
   case_2_documento_url?: string;
   como_vendo: string;
   spiced_data: any;
+  spiced_data_2: any;
   como_entrego_dados: any[];
   markup?: number;
   use_case_map_1_name?: string;
@@ -152,6 +153,7 @@ const ProductDetails = () => {
         case_2_documento_url: data.case_2_documento_url,
         como_vendo: data.como_vendo,
         spiced_data: data.spiced_data,
+        spiced_data_2: data.spiced_data_2,
         como_entrego_dados: Array.isArray(data.como_entrego_dados) ? data.como_entrego_dados : [],
         markup: data.markup,
         use_case_map_1_name: data.use_case_map_1_name,
@@ -421,39 +423,47 @@ const ProductDetails = () => {
               </div>
             </div>
             
-            {/* Use Case Maps */}
+            {/* Use Case Map 1 com SPICED 1 */}
             {product.use_case_map_1_data && (
-              <UseCaseMap 
-                title={product.use_case_map_1_name || "Use Case Map 1"}
-                data={product.use_case_map_1_data || {
-                  problema: '',
-                  persona: '',
-                  alternativa: '',
-                  why: '',
-                  frequencia: ''
-                }}
-                readOnly={true}
-              />
+              <div className="container-section">
+                <UseCaseMap 
+                  title={product.use_case_map_1_name || "Use Case Map 1"}
+                  data={product.use_case_map_1_data || {
+                    problema: '',
+                    persona: '',
+                    alternativa: '',
+                    why: '',
+                    frequencia: ''
+                  }}
+                  readOnly={true}
+                />
+                <div className="mt-6">
+                  <h4 className="text-title-card mb-4">SPICED para {product.use_case_map_1_name || "Use Case Map 1"}</h4>
+                  <SpicedTable data={product.spiced_data} readOnly />
+                </div>
+              </div>
             )}
 
+            {/* Use Case Map 2 com SPICED 2 */}
             {product.use_case_map_2_data && (
-              <UseCaseMap 
-                title={product.use_case_map_2_name || "Use Case Map 2"}
-                data={product.use_case_map_2_data || {
-                  problema: '',
-                  persona: '',
-                  alternativa: '',
-                  why: '',
-                  frequencia: ''
-                }}
-                readOnly={true}
-              />
+              <div className="container-section">
+                <UseCaseMap 
+                  title={product.use_case_map_2_name || "Use Case Map 2"}
+                  data={product.use_case_map_2_data || {
+                    problema: '',
+                    persona: '',
+                    alternativa: '',
+                    why: '',
+                    frequencia: ''
+                  }}
+                  readOnly={true}
+                />
+                <div className="mt-6">
+                  <h4 className="text-title-card mb-4">SPICED para {product.use_case_map_2_name || "Use Case Map 2"}</h4>
+                  <SpicedTable data={product.spiced_data_2 || {}} readOnly />
+                </div>
+              </div>
             )}
-            
-            <div className="container-section">
-              <h4 className="text-title-card mb-4">Metodologia SPICED</h4>
-              <SpicedTable data={product.spiced_data} readOnly />
-            </div>
 
             {/* Materiais de Vendas integrados */}
             <div className="mt-6">

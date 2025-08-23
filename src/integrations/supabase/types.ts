@@ -152,6 +152,7 @@ export type Database = {
           pricing_url: string | null
           produto: string
           spiced_data: Json
+          spiced_data_2: Json | null
           stack_digital: string | null
           status: Database["public"]["Enums"]["status_produto"]
           tempo_meta_kpi: Database["public"]["Enums"]["tempo_meta"] | null
@@ -207,6 +208,7 @@ export type Database = {
           pricing_url?: string | null
           produto: string
           spiced_data?: Json
+          spiced_data_2?: Json | null
           stack_digital?: string | null
           status?: Database["public"]["Enums"]["status_produto"]
           tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
@@ -262,6 +264,7 @@ export type Database = {
           pricing_url?: string | null
           produto?: string
           spiced_data?: Json
+          spiced_data_2?: Json | null
           stack_digital?: string | null
           status?: Database["public"]["Enums"]["status_produto"]
           tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
