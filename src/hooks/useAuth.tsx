@@ -35,24 +35,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { toast } = useToast();
 
 useEffect(() => {
-  // Set up auth state listener
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(
-    (_event, session) => {
+  let mounted = true;
+  
+  // Check for existing session first
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (mounted) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     }
+  });
+
+  // Set up auth state listener
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    (_event, session) => {
+      if (mounted) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    }
   );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  return () => {
+    mounted = false;
+    subscription.unsubscribe();
+  };
+}, []);
 
   const signIn = async (email: string, password: string) => {
     try {
