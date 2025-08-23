@@ -996,22 +996,6 @@ const Admin = () => {
                           </div>
                           
                           <div>
-                            <Label>Metodologia SPICED para Use Case Map 1</Label>
-                            <SpicedTable 
-                              data={spicedData} 
-                              onChange={setSpicedData}
-                            />
-                          </div>
-                          
-                          <div>
-                            <Label>Metodologia SPICED para Use Case Map 2</Label>
-                            <SpicedTable 
-                              data={spicedData2} 
-                              onChange={setSpicedData2}
-                            />
-                          </div>
-                          
-                          <div>
                             <Label htmlFor="description">Como eu entrego?</Label>
                             <Textarea
                               id="description"
@@ -1042,40 +1026,66 @@ const Admin = () => {
                         </TabsContent>
 
                         <TabsContent value="use-cases" className="space-y-4">
-                          <div className="space-y-6">
-                            <div>
-                              <Label htmlFor="use_case_map_1_name">Nome do Primeiro Use Case Map</Label>
-                              <Input
-                                id="use_case_map_1_name"
-                                value={productForm.use_case_map_1_name}
-                                onChange={(e) => setProductForm({...productForm, use_case_map_1_name: e.target.value})}
-                                placeholder="Ex: Use Case Map - Cliente sem Investimento"
+                          <div className="space-y-8">
+                            {/* Use Case Map 1 e SPICED 1 Unificados */}
+                            <div className="space-y-4 p-4 border rounded-lg bg-slate-50 dark:bg-slate-900">
+                              <h3 className="font-semibold text-lg">Use Case Map 1 e SPICED</h3>
+                              
+                              <div>
+                                <Label htmlFor="use_case_map_1_name">Nome do Primeiro Use Case Map</Label>
+                                <Input
+                                  id="use_case_map_1_name"
+                                  value={productForm.use_case_map_1_name}
+                                  onChange={(e) => setProductForm({...productForm, use_case_map_1_name: e.target.value})}
+                                  placeholder="Ex: Use Case Map - Cliente sem Investimento"
+                                />
+                              </div>
+                              
+                              <UseCaseMap
+                                title={productForm.use_case_map_1_name}
+                                data={useCaseMap1Data}
+                                onChange={setUseCaseMap1Data}
+                                readOnly={false}
                               />
+                              
+                              <div>
+                                <Label>Metodologia SPICED para {productForm.use_case_map_1_name}</Label>
+                                <SpicedTable 
+                                  data={spicedData} 
+                                  onChange={setSpicedData}
+                                />
+                              </div>
                             </div>
-                            
-                            <UseCaseMap
-                              title={productForm.use_case_map_1_name}
-                              data={useCaseMap1Data}
-                              onChange={setUseCaseMap1Data}
-                              readOnly={false}
-                            />
-                            
-                            <div>
-                              <Label htmlFor="use_case_map_2_name">Nome do Segundo Use Case Map</Label>
-                              <Input
-                                id="use_case_map_2_name"
-                                value={productForm.use_case_map_2_name}
-                                onChange={(e) => setProductForm({...productForm, use_case_map_2_name: e.target.value})}
-                                placeholder="Ex: Use Case Map - Cliente com Investimento"
+
+                            {/* Use Case Map 2 e SPICED 2 Unificados */}
+                            <div className="space-y-4 p-4 border rounded-lg bg-slate-50 dark:bg-slate-900">
+                              <h3 className="font-semibold text-lg">Use Case Map 2 e SPICED</h3>
+                              
+                              <div>
+                                <Label htmlFor="use_case_map_2_name">Nome do Segundo Use Case Map</Label>
+                                <Input
+                                  id="use_case_map_2_name"
+                                  value={productForm.use_case_map_2_name}
+                                  onChange={(e) => setProductForm({...productForm, use_case_map_2_name: e.target.value})}
+                                  placeholder="Ex: Use Case Map - Cliente com Investimento"
+                                />
+                              </div>
+                              
+                              <UseCaseMap
+                                title={productForm.use_case_map_2_name}
+                                data={useCaseMap2Data}
+                                onChange={setUseCaseMap2Data}
+                                readOnly={false}
                               />
+                              
+                              <div>
+                                <Label>Metodologia SPICED para {productForm.use_case_map_2_name}</Label>
+                                <SpicedTable 
+                                  data={spicedData2} 
+                                  onChange={setSpicedData2}
+                                />
+                              </div>
                             </div>
-                            
-                            <UseCaseMap
-                              title={productForm.use_case_map_2_name}
-                              data={useCaseMap2Data}
-                              onChange={setUseCaseMap2Data}
-                              readOnly={false}
-                            />
                           </div>
                         </TabsContent>
 

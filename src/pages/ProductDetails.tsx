@@ -429,7 +429,7 @@ const ProductDetails = () => {
               <Collapsible defaultOpen={false}>
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" className="w-full justify-between p-4 h-auto">
-                    <span className="text-title-card">{product.use_case_map_1_name || "Use Case Map 1"}</span>
+                    <span className="text-title-card">{product.use_case_map_1_name || "Use Case Map 1"} e SPICED</span>
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </CollapsibleTrigger>
@@ -460,7 +460,7 @@ const ProductDetails = () => {
               <Collapsible defaultOpen={false}>
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" className="w-full justify-between p-4 h-auto">
-                    <span className="text-title-card">{product.use_case_map_2_name || "Use Case Map 2"}</span>
+                    <span className="text-title-card">{product.use_case_map_2_name || "Use Case Map 2"} e SPICED</span>
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </CollapsibleTrigger>
