@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import ProductDetails from "./pages/ProductDetails";
 import SupportMaterials from "./pages/SupportMaterials";
 import ProductStructureTest from "./pages/ProductStructureTest";
+import NewPricingStructure from "./pages/NewPricingStructure";
 import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient({
@@ -52,6 +53,11 @@ const App = () => {
               <Route path="/nova-estrutura" element={
                 <ProtectedRoute>
                   <ProductStructureTest />
+                </ProtectedRoute>
+              } />
+              <Route path="/nova-precificacao" element={
+                <ProtectedRoute>
+                  <NewPricingStructure />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

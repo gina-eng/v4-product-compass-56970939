@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Home, Building2, FileText, Settings, Package, BarChart3 } from "lucide-react";
+import { Home, Building2, FileText, Settings, Package, BarChart3, DollarSign } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -19,6 +19,7 @@ const navigationItems = [
   { title: "Produtos", url: "/", icon: Package, badge: "principal" },
   { title: "Administração", url: "/admin", icon: Settings },
   { title: "Materiais de Apoio", url: "/materiais-apoio", icon: FileText },
+  { title: "Nova Precificação", url: "/nova-precificacao", icon: DollarSign, badge: "novo" },
   { title: "Relatórios", url: "/nova-estrutura", icon: BarChart3 },
 ];
 
