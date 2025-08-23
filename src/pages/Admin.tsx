@@ -93,6 +93,7 @@ interface Product {
   case_2_responsavel_projeto?: string;
   case_2_documento_url?: string;
   spiced_data: SpicedData;
+  spiced_data_2?: SpicedData;
   como_entrego_dados: ComoEntregoItem[];
   markup?: number;
   use_case_map_1_name?: string;
@@ -301,6 +302,13 @@ const Admin = () => {
           criticalEvent: { objetivo: "", perguntas: "", observar: "" },
           decision: { objetivo: "", perguntas: "", observar: "" }
         },
+        spiced_data_2: (product.spiced_data_2 as unknown as SpicedData) || {
+          situation: { objetivo: "", perguntas: "", observar: "" },
+          pain: { objetivo: "", perguntas: "", observar: "" },
+          impact: { objetivo: "", perguntas: "", observar: "" },
+          criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+          decision: { objetivo: "", perguntas: "", observar: "" }
+        },
         como_entrego_dados: (product.como_entrego_dados as unknown as ComoEntregoItem[]) || [],
         markup: product.markup,
         use_case_map_1_name: product.use_case_map_1_name,
@@ -496,7 +504,7 @@ const Admin = () => {
       criticalEvent: { objetivo: "", perguntas: "", observar: "" },
       decision: { objetivo: "", perguntas: "", observar: "" }
     });
-    setSpicedData2((product as any).spiced_data_2 || {
+    setSpicedData2(product.spiced_data_2 || {
       situation: { objetivo: "", perguntas: "", observar: "" },
       pain: { objetivo: "", perguntas: "", observar: "" },
       impact: { objetivo: "", perguntas: "", observar: "" },
