@@ -202,6 +202,14 @@ const Admin = () => {
     decision: { objetivo: "", perguntas: "", observar: "" }
   });
 
+  const [spicedData2, setSpicedData2] = useState<SpicedData>({
+    situation: { objetivo: "", perguntas: "", observar: "" },
+    pain: { objetivo: "", perguntas: "", observar: "" },
+    impact: { objetivo: "", perguntas: "", observar: "" },
+    criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+    decision: { objetivo: "", perguntas: "", observar: "" }
+  });
+
   const [comoEntregoDados, setComoEntregoDados] = useState<ComoEntregoItem[]>([]);
   
   // Estados para Use Case Maps
@@ -388,6 +396,7 @@ const Admin = () => {
         case_2_responsavel_projeto: productForm.case_2_responsavel_projeto || null,
         case_2_documento_url: productForm.case_2_documento_url || null,
         spiced_data: spicedData,
+        spiced_data_2: spicedData2,
         como_entrego_dados: comoEntregoDados,
         markup: productForm.markup,
         use_case_map_1_name: productForm.use_case_map_1_name,
@@ -481,6 +490,13 @@ const Admin = () => {
       use_case_map_2_name: product.use_case_map_2_name || 'Use Case Map - Cliente com Investimento'
     });
     setSpicedData(product.spiced_data || {
+      situation: { objetivo: "", perguntas: "", observar: "" },
+      pain: { objetivo: "", perguntas: "", observar: "" },
+      impact: { objetivo: "", perguntas: "", observar: "" },
+      criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+      decision: { objetivo: "", perguntas: "", observar: "" }
+    });
+    setSpicedData2((product as any).spiced_data_2 || {
       situation: { objetivo: "", perguntas: "", observar: "" },
       pain: { objetivo: "", perguntas: "", observar: "" },
       impact: { objetivo: "", perguntas: "", observar: "" },
@@ -662,6 +678,13 @@ const Admin = () => {
       use_case_map_2_name: 'Use Case Map - Cliente com Investimento'
     });
     setSpicedData({
+      situation: { objetivo: "", perguntas: "", observar: "" },
+      pain: { objetivo: "", perguntas: "", observar: "" },
+      impact: { objetivo: "", perguntas: "", observar: "" },
+      criticalEvent: { objetivo: "", perguntas: "", observar: "" },
+      decision: { objetivo: "", perguntas: "", observar: "" }
+    });
+    setSpicedData2({
       situation: { objetivo: "", perguntas: "", observar: "" },
       pain: { objetivo: "", perguntas: "", observar: "" },
       impact: { objetivo: "", perguntas: "", observar: "" },
@@ -973,10 +996,18 @@ const Admin = () => {
                           </div>
                           
                           <div>
-                            <Label>Metodologia SPICED</Label>
+                            <Label>Metodologia SPICED para Use Case Map 1</Label>
                             <SpicedTable 
                               data={spicedData} 
                               onChange={setSpicedData}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label>Metodologia SPICED para Use Case Map 2</Label>
+                            <SpicedTable 
+                              data={spicedData2} 
+                              onChange={setSpicedData2}
                             />
                           </div>
                           

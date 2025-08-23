@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { LoadingSpinner } from "@/components/LoadingStates";
 import SpicedTable from "@/components/SpicedTable";
@@ -423,46 +424,66 @@ const ProductDetails = () => {
               </div>
             </div>
             
-            {/* Use Case Map 1 com SPICED 1 */}
+            {/* Use Case Map 1 com SPICED 1 - Colapsível */}
             {product.use_case_map_1_data && (
-              <div className="container-section">
-                <UseCaseMap 
-                  title={product.use_case_map_1_name || "Use Case Map 1"}
-                  data={product.use_case_map_1_data || {
-                    problema: '',
-                    persona: '',
-                    alternativa: '',
-                    why: '',
-                    frequencia: ''
-                  }}
-                  readOnly={true}
-                />
-                <div className="mt-6">
-                  <h4 className="text-title-card mb-4">SPICED para {product.use_case_map_1_name || "Use Case Map 1"}</h4>
-                  <SpicedTable data={product.spiced_data} readOnly />
-                </div>
-              </div>
+              <Collapsible defaultOpen={false}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between p-4 h-auto">
+                    <span className="text-title-card">{product.use_case_map_1_name || "Use Case Map 1"}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-6">
+                  <div className="container-section">
+                    <UseCaseMap 
+                      title={product.use_case_map_1_name || "Use Case Map 1"}
+                      data={product.use_case_map_1_data || {
+                        problema: '',
+                        persona: '',
+                        alternativa: '',
+                        why: '',
+                        frequencia: ''
+                      }}
+                      readOnly={true}
+                    />
+                    <div className="mt-6">
+                      <h4 className="text-title-card mb-4">SPICED para {product.use_case_map_1_name || "Use Case Map 1"}</h4>
+                      <SpicedTable data={product.spiced_data} readOnly />
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             )}
 
-            {/* Use Case Map 2 com SPICED 2 */}
+            {/* Use Case Map 2 com SPICED 2 - Colapsível */}
             {product.use_case_map_2_data && (
-              <div className="container-section">
-                <UseCaseMap 
-                  title={product.use_case_map_2_name || "Use Case Map 2"}
-                  data={product.use_case_map_2_data || {
-                    problema: '',
-                    persona: '',
-                    alternativa: '',
-                    why: '',
-                    frequencia: ''
-                  }}
-                  readOnly={true}
-                />
-                <div className="mt-6">
-                  <h4 className="text-title-card mb-4">SPICED para {product.use_case_map_2_name || "Use Case Map 2"}</h4>
-                  <SpicedTable data={product.spiced_data_2 || {}} readOnly />
-                </div>
-              </div>
+              <Collapsible defaultOpen={false}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-between p-4 h-auto">
+                    <span className="text-title-card">{product.use_case_map_2_name || "Use Case Map 2"}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-6">
+                  <div className="container-section">
+                    <UseCaseMap 
+                      title={product.use_case_map_2_name || "Use Case Map 2"}
+                      data={product.use_case_map_2_data || {
+                        problema: '',
+                        persona: '',
+                        alternativa: '',
+                        why: '',
+                        frequencia: ''
+                      }}
+                      readOnly={true}
+                    />
+                    <div className="mt-6">
+                      <h4 className="text-title-card mb-4">SPICED para {product.use_case_map_2_name || "Use Case Map 2"}</h4>
+                      <SpicedTable data={product.spiced_data_2 || {}} readOnly />
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             )}
 
             {/* Materiais de Vendas integrados */}
