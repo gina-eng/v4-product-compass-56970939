@@ -357,6 +357,78 @@ const Admin = () => {
     }
   };
 
+  // Handlers para posições
+  const handleEditPosition = (position: Position) => {
+    setEditingPosition(position);
+    setPositionForm({
+      nome: position.nome,
+      cph: position.cph.toString(),
+      investimento_total: position.investimento_total.toString()
+    });
+    setIsPositionDialogOpen(true);
+  };
+
+  const handleDeletePosition = async (positionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('positions')
+        .delete()
+        .eq('id', positionId);
+
+      if (error) throw error;
+      await fetchPositions();
+      toast({
+        title: "Posição excluída com sucesso!",
+      });
+    } catch (error) {
+      console.error('Erro ao excluir posição:', error);
+      toast({
+        title: "Erro ao excluir posição",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSavePosition = async () => {
+    try {
+      const positionData = {
+        nome: positionForm.nome,
+        cph: parseFloat(positionForm.cph),
+        investimento_total: parseFloat(positionForm.investimento_total)
+      };
+
+      if (editingPosition) {
+        const { error } = await supabase
+          .from('positions')
+          .update(positionData)
+          .eq('id', editingPosition.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('positions')
+          .insert([positionData]);
+
+        if (error) throw error;
+      }
+
+      await fetchPositions();
+      setIsPositionDialogOpen(false);
+      setEditingPosition(null);
+      setPositionForm({ nome: '', cph: '', investimento_total: '' });
+      
+      toast({
+        title: editingPosition ? "Posição atualizada com sucesso!" : "Posição criada com sucesso!",
+      });
+    } catch (error) {
+      console.error('Erro ao salvar posição:', error);
+      toast({
+        title: "Erro ao salvar posição",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSaveProduct = async () => {
     try {
       const productData = {
@@ -1413,7 +1485,11 @@ const Admin = () => {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Posições</CardTitle>
-                  <Button>
+                  <Button onClick={() => {
+                    setEditingPosition(null);
+                    setPositionForm({ nome: '', cph: '', investimento_total: '' });
+                    setIsPositionDialogOpen(true);
+                  }}>
                     <Plus className="h-4 w-4 mr-2" />
                     Nova Posição
                   </Button>
@@ -1432,10 +1508,18 @@ const Admin = () => {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleEditPosition(position)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleDeletePosition(position.id)}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -1509,6 +1593,55 @@ const Admin = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dialog para Posições */}
+        <Dialog open={isPositionDialogOpen} onOpenChange={setIsPositionDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>
+                {editingPosition ? 'Editar Posição' : 'Nova Posição'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="nome">Nome da Posição</Label>
+                <Input
+                  id="nome"
+                  value={positionForm.nome}
+                  onChange={(e) => setPositionForm({...positionForm, nome: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="cph">CPH (Custo por Hora)</Label>
+                <Input
+                  id="cph"
+                  type="number"
+                  step="0.01"
+                  value={positionForm.cph}
+                  onChange={(e) => setPositionForm({...positionForm, cph: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="investimento_total">Investimento Total</Label>
+                <Input
+                  id="investimento_total"
+                  type="number"
+                  step="0.01"
+                  value={positionForm.investimento_total}
+                  onChange={(e) => setPositionForm({...positionForm, investimento_total: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button variant="outline" onClick={() => setIsPositionDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSavePosition}>
+                {editingPosition ? 'Atualizar' : 'Criar'} Posição
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
