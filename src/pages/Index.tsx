@@ -46,13 +46,23 @@ const Index = () => {
                     <li>• Compatível com a estrutura atual de produtos</li>
                   </ul>
                 </div>
-                <Button 
-                  onClick={() => navigate('/nova-precificacao')}
-                  className="flex items-center gap-2 hover:scale-105 transition-all"
-                >
-                  Visualizar Estrutura
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+                <div className="flex flex-col gap-2">
+                  <Button 
+                    onClick={() => navigate('/nova-precificacao')}
+                    className="flex items-center gap-2 hover:scale-105 transition-all"
+                  >
+                    Estrutura de Preços
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/produto-novo/1')}
+                    variant="outline"
+                    className="flex items-center gap-2 hover:scale-105 transition-all"
+                  >
+                    Página de Produto
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
