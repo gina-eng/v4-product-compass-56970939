@@ -342,7 +342,7 @@ const ProductPositions = ({
   const totalCSP = totalCSPDireto + totalCSPOverhead;
 
   // Cálculos DRE - Nova estrutura
-  const faturamentoAncoragem = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
+  const faturamentoAncoragem = (totalCSPDireto + totalCSPOverhead) * markup;
   const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
   const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
   const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoMedio * 0.06 : 0;
@@ -517,7 +517,7 @@ const ProductPositions = ({
                             <span className="text-red-600 dark:text-red-400">⚓</span>
                             (=) Faturamento Ancoragem
                             <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-1 rounded-full font-medium">
-                              CSP direto + CSP Overhead × markup
+                              (CSP direto + CSP Overhead) × markup direto
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-red-600 dark:text-red-400 font-medium">R$</TableCell>
@@ -596,13 +596,13 @@ const ProductPositions = ({
                         <TableRow className="bg-green-50 dark:bg-green-950/30 border-l-4 border-l-green-500 border-t-2 border-t-green-200 dark:border-t-green-800">
                           <TableCell className="font-semibold flex items-center gap-2">
                             <span className="text-green-600 dark:text-green-400">💰</span>
-                            (=) Faturamento (MRR) - Com Desconto
+                            (=) Faturamento Mínimo
                             <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-medium">
-                              VALOR COBRADO AO CLIENTE
+                              VALOR BASE MÍNIMO
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-green-600 dark:text-green-400 font-medium">R$</TableCell>
-                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
+                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">{formatCurrency(faturamentoMinimo).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
