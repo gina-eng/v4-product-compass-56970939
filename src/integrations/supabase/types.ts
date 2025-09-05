@@ -142,7 +142,9 @@ export type Database = {
           id: string
           kpi_principal: Database["public"]["Enums"]["kpi_tipo"] | null
           markup: number | null
+          markup_overhead: number | null
           o_que_entrego: string
+          outros: number | null
           para_quem_serve: string | null
           pitch: boolean
           pitch_url: string | null
@@ -198,7 +200,9 @@ export type Database = {
           id?: string
           kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
           markup?: number | null
+          markup_overhead?: number | null
           o_que_entrego: string
+          outros?: number | null
           para_quem_serve?: string | null
           pitch?: boolean
           pitch_url?: string | null
@@ -254,7 +258,9 @@ export type Database = {
           id?: string
           kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
           markup?: number | null
+          markup_overhead?: number | null
           o_que_entrego?: string
+          outros?: number | null
           para_quem_serve?: string | null
           pitch?: boolean
           pitch_url?: string | null

@@ -32,11 +32,25 @@ interface ProductPositionsProps {
   productId: string;
   readOnly?: boolean;
   initialMarkup?: number;
+  initialMarkupOverhead?: number;
+  initialOutros?: number;
   onMarkupChange?: (markup: number) => void;
+  onMarkupOverheadChange?: (markupOverhead: number) => void;
+  onOutrosChange?: (outros: number) => void;
   onPositionsChange?: () => void;
 }
 
-const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMarkupChange, onPositionsChange }: ProductPositionsProps) => {
+const ProductPositions = ({ 
+  productId, 
+  readOnly = false, 
+  initialMarkup = 1, 
+  initialMarkupOverhead = 1,
+  initialOutros = 0,
+  onMarkupChange, 
+  onMarkupOverheadChange,
+  onOutrosChange,
+  onPositionsChange 
+}: ProductPositionsProps) => {
   const [productPositions, setProductPositions] = useState<ProductPosition[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -46,68 +60,84 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
     horas_alocadas: ''
   });
   const [markup, setMarkup] = useState<number>(initialMarkup);
+  const [markupOverhead, setMarkupOverhead] = useState<number>(initialMarkupOverhead);
+  const [outros, setOutros] = useState<number>(initialOutros);
   const [isDreOpen, setIsDreOpen] = useState(false);
   const [isPositionsOpen, setIsPositionsOpen] = useState(false);
   const [aplicarDescontoPagamento, setAplicarDescontoPagamento] = useState(true);
   const [aplicarDescontoCupom, setAplicarDescontoCupom] = useState(true);
+  const [aplicarDescontoComprometimento, setAplicarDescontoComprometimento] = useState(true);
 
   useEffect(() => {
     fetchProductPositions();
     fetchPositions();
-    fetchProductMarkup();
+    fetchProductData();
   }, [productId]);
 
-  const fetchProductMarkup = async () => {
+  const fetchProductData = async () => {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('markup')
+        .select('markup, markup_overhead, outros')
         .eq('id', productId)
         .single();
       
       if (error) {
-        console.error('Erro ao buscar markup do produto:', error);
+        console.error('Erro ao buscar dados do produto:', error);
         return;
       }
       
-      if (data && data.markup) {
-        setMarkup(data.markup);
+      if (data) {
+        if (data.markup) setMarkup(data.markup);
+        if (data.markup_overhead) setMarkupOverhead(data.markup_overhead);
+        if (data.outros !== null) setOutros(data.outros);
       }
     } catch (error) {
-      console.error('Erro ao buscar markup do produto:', error);
+      console.error('Erro ao buscar dados do produto:', error);
     }
   };
 
-  const updateProductMarkup = async (newMarkup: number) => {
+  const updateProductData = async (field: 'markup' | 'markup_overhead' | 'outros', value: number) => {
     try {
-      console.log('Tentando atualizar markup para:', newMarkup, 'no produto:', productId);
+      console.log(`Tentando atualizar ${field} para:`, value, 'no produto:', productId);
       
       const { data, error } = await supabase
         .from('products')
-        .update({ markup: newMarkup })
+        .update({ [field]: value })
         .eq('id', productId)
         .select();
       
       if (error) {
-        console.error('Erro detalhado ao atualizar markup:', error);
+        console.error(`Erro detalhado ao atualizar ${field}:`, error);
         throw error;
       }
       
-      console.log('Markup atualizado com sucesso:', data);
+      console.log(`${field} atualizado com sucesso:`, data);
+      
+      const fieldLabels = {
+        markup: 'Markup Direto',
+        markup_overhead: 'Markup Overhead', 
+        outros: 'Outros'
+      };
       
       toast({
         title: "Sucesso",
-        description: "Markup atualizado com sucesso!",
+        description: `${fieldLabels[field]} atualizado com sucesso!`,
       });
       
-      if (onMarkupChange) {
-        onMarkupChange(newMarkup);
+      // Chamar callbacks apropriados
+      if (field === 'markup' && onMarkupChange) {
+        onMarkupChange(value);
+      } else if (field === 'markup_overhead' && onMarkupOverheadChange) {
+        onMarkupOverheadChange(value);
+      } else if (field === 'outros' && onOutrosChange) {
+        onOutrosChange(value);
       }
     } catch (error) {
-      console.error('Erro ao atualizar markup:', error);
+      console.error(`Erro ao atualizar ${field}:`, error);
       toast({
         title: "Erro",
-        description: `Não foi possível atualizar o markup: ${error?.message || 'Erro desconhecido'}`,
+        description: `Não foi possível atualizar: ${error?.message || 'Erro desconhecido'}`,
         variant: "destructive",
       });
     }
@@ -116,7 +146,21 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
   const handleMarkupChange = (newMarkup: number) => {
     setMarkup(newMarkup);
     if (!readOnly) {
-      updateProductMarkup(newMarkup);
+      updateProductData('markup', newMarkup);
+    }
+  };
+
+  const handleMarkupOverheadChange = (newMarkupOverhead: number) => {
+    setMarkupOverhead(newMarkupOverhead);
+    if (!readOnly) {
+      updateProductData('markup_overhead', newMarkupOverhead);
+    }
+  };
+
+  const handleOutrosChange = (newOutros: number) => {
+    setOutros(newOutros);
+    if (!readOnly) {
+      updateProductData('outros', newOutros);
     }
   };
 
@@ -282,25 +326,37 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
     return horasAlocadas * cph;
   };
 
+  // Separar posições normais das overhead
+  const overheadPositions = ['Gerente de PE&G', 'Coordenador de PE&G'];
+  const posicoesDiretas = productPositions.filter(pp => !overheadPositions.includes(pp.positions.nome));
+  const posicoesOverhead = productPositions.filter(pp => overheadPositions.includes(pp.positions.nome));
+
   // Calcular totais
   const totalHoras = productPositions.reduce((total, pp) => total + pp.horas_alocadas, 0);
-  const totalCSP = productPositions.reduce((total, pp) => {
+  const totalCSPDireto = posicoesDiretas.reduce((total, pp) => {
     return total + calculateCSP(pp.positions.cph, pp.horas_alocadas);
   }, 0);
+  const totalCSPOverhead = posicoesOverhead.reduce((total, pp) => {
+    return total + calculateCSP(pp.positions.cph, pp.horas_alocadas);
+  }, 0);
+  const totalCSP = totalCSPDireto + totalCSPOverhead;
 
-  // Cálculos DRE
-  const faturamentoSemDesconto = totalCSP * markup;
-  const descontoPagamento = aplicarDescontoPagamento ? faturamentoSemDesconto * 0.17 : 0;
-  const descontoCupom = aplicarDescontoCupom ? faturamentoSemDesconto * 0.20 : 0;
-  const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
+  // Cálculos DRE - Nova estrutura
+  const faturamentoAncoragem = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
+  const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
+  const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
+  const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoMedio * 0.06 : 0;
+  const faturamentoMinimo = faturamentoMedio - descontoComprometimento;
+  const descontoCupom = aplicarDescontoCupom ? faturamentoMinimo * 0.20 : 0;
+  const faturamentoComDesconto = faturamentoMinimo - descontoCupom;
+  
   const royalties = faturamentoComDesconto * 0.17;
   const taxaTransicao = faturamentoComDesconto * 0.03;
   const taxaAntecipacao = faturamentoComDesconto * 0.10;
   const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
   const impostosReceita = receitaBruta * 0.074;
   const receitaLiquida = receitaBruta - impostosReceita;
-  const custosCSP = totalCSP;
-  const custosDiretos = custosCSP;
+  const custosDiretos = totalCSPDireto + totalCSPOverhead + outros;
   const margemOperacional = receitaLiquida - custosDiretos;
   const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
   
@@ -394,22 +450,48 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
           </>
         )}
 
-        {/* Campo de Markup e DRE */}
+        {/* Campos de Markup e Outros - DRE */}
         {productPositions.length > 0 && (
           <div className="spacing-section">
-            {/* Campo de Markup - apenas no modo de edição */}
+            {/* Campos de controle - apenas no modo de edição */}
             {!readOnly && (
-              <div className="flex items-center gap-4">
-                <Label htmlFor="markup" className="text-label min-w-fit">Markup:</Label>
-                <Input
-                  id="markup"
-                  type="number"
-                  step="0.1"
-                  value={markup}
-                  onChange={(e) => handleMarkupChange(parseFloat(e.target.value) || 1)}
-                  className="w-32"
-                  placeholder="Ex: 1.5"
-                />
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="markup" className="text-label min-w-fit">Markup Direto:</Label>
+                  <Input
+                    id="markup"
+                    type="number"
+                    step="0.1"
+                    value={markup}
+                    onChange={(e) => handleMarkupChange(parseFloat(e.target.value) || 1)}
+                    className="w-32"
+                    placeholder="Ex: 1.5"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="markupOverhead" className="text-label min-w-fit">Markup Overhead:</Label>
+                  <Input
+                    id="markupOverhead"
+                    type="number"
+                    step="0.1"
+                    value={markupOverhead}
+                    onChange={(e) => handleMarkupOverheadChange(parseFloat(e.target.value) || 1)}
+                    className="w-32"
+                    placeholder="Ex: 1.5"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="outros" className="text-label min-w-fit">(-) Outros:</Label>
+                  <Input
+                    id="outros"
+                    type="number"
+                    step="0.01"
+                    value={outros}
+                    onChange={(e) => handleOutrosChange(parseFloat(e.target.value) || 0)}
+                    className="w-32"
+                    placeholder="Ex: 100.00"
+                  />
+                </div>
               </div>
             )}
 
@@ -433,18 +515,18 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                         <TableRow className="bg-red-50 dark:bg-red-950/30 border-l-4 border-l-red-500">
                           <TableCell className="font-semibold flex items-center gap-2">
                             <span className="text-red-600 dark:text-red-400">⚓</span>
-                            (=) Faturamento (MRR) - Sem Desconto
+                            (=) Faturamento Ancoragem
                             <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-1 rounded-full font-medium">
-                              VALOR DE ANCORAGEM
+                              CSP direto + CSP Overhead × markup
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-red-600 dark:text-red-400 font-medium">R$</TableCell>
-                          <TableCell className="text-right font-semibold text-red-600 dark:text-red-400">{formatCurrency(faturamentoSemDesconto).replace('R$ ', '')}</TableCell>
+                          <TableCell className="text-right font-semibold text-red-600 dark:text-red-400">{formatCurrency(faturamentoAncoragem).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
-                            (-) Desconto de Pagamento (-17%)
+                            (-) Desconto de pagamento (-11%)
                           </TableCell>
                           <TableCell className={`text-center ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
                           <TableCell className={`text-right font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground'}`}>
@@ -460,6 +542,37 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                               {aplicarDescontoPagamento ? "✓" : "✗"}
                             </Button>
                           </TableCell>
+                        </TableRow>
+                        <TableRow className="bg-muted/50">
+                          <TableCell className="font-medium">(=) Faturamento Médio</TableCell>
+                          <TableCell className="text-center">R$</TableCell>
+                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoMedio).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className={`font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
+                            (-) Desconto de Comprometimento (-6%)
+                          </TableCell>
+                          <TableCell className={`text-center ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
+                          <TableCell className={`text-right font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground'}`}>
+                            {formatCurrency(descontoComprometimento).replace('R$ ', '')}
+                          </TableCell>
+                          <TableCell className="w-16">
+                            <Button
+                              variant={aplicarDescontoComprometimento ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setAplicarDescontoComprometimento(!aplicarDescontoComprometimento)}
+                              className="h-6 w-6 p-0 text-xs"
+                            >
+                              {aplicarDescontoComprometimento ? "✓" : "✗"}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow className="bg-muted/50">
+                          <TableCell className="font-medium">(=) Faturamento Mínimo</TableCell>
+                          <TableCell className="text-center">R$</TableCell>
+                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoMinimo).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
@@ -535,15 +648,21 @@ const ProductPositions = ({ productId, readOnly = false, initialMarkup = 1, onMa
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="pl-6">
-                          <TableCell className="font-medium text-red-600 pl-8">(-) CSP</TableCell>
+                          <TableCell className="font-medium text-red-600 pl-8">(-) CSP Direto</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
-                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(custosCSP).replace('R$ ', '')}</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(totalCSPDireto).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
+                        </TableRow>
+                        <TableRow className="pl-6">
+                          <TableCell className="font-medium text-red-600 pl-8">(-) CSP Overhead</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(totalCSPOverhead).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-red-600 pl-8">(-) Auxílio</TableCell>
+                          <TableCell className="font-medium text-red-600 pl-8">(-) Outros</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
-                          <TableCell className="text-right font-medium text-red-600">-</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(outros).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="bg-muted/50 border-t-2">
