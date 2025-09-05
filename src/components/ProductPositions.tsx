@@ -568,31 +568,25 @@ const ProductPositions = ({
                             </Button>
                           </TableCell>
                         </TableRow>
-                        <TableRow className="bg-muted/50">
-                          <TableCell className="font-medium">(=) Faturamento Mínimo</TableCell>
-                          <TableCell className="text-center">R$</TableCell>
-                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoMinimo).replace('R$ ', '')}</TableCell>
-                          <TableCell className="w-16"></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
-                            (-) Desconto de Cupom (-20%)
-                          </TableCell>
-                          <TableCell className={`text-center ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
-                          <TableCell className={`text-right font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>
-                            {formatCurrency(descontoCupom).replace('R$ ', '')}
-                          </TableCell>
-                          <TableCell className="w-16">
-                            <Button
-                              variant={aplicarDescontoCupom ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setAplicarDescontoCupom(!aplicarDescontoCupom)}
-                              className="h-6 w-6 p-0 text-xs"
-                            >
-                              {aplicarDescontoCupom ? "✓" : "✗"}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
+                         <TableRow>
+                           <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
+                             (-) Desconto de Cupom (-20%)
+                           </TableCell>
+                           <TableCell className={`text-center ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
+                           <TableCell className={`text-right font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>
+                             {formatCurrency(descontoCupom).replace('R$ ', '')}
+                           </TableCell>
+                           <TableCell className="w-16">
+                             <Button
+                               variant={aplicarDescontoCupom ? "default" : "outline"}
+                               size="sm"
+                               onClick={() => setAplicarDescontoCupom(!aplicarDescontoCupom)}
+                               className="h-6 w-6 p-0 text-xs"
+                             >
+                               {aplicarDescontoCupom ? "✓" : "✗"}
+                             </Button>
+                           </TableCell>
+                         </TableRow>
                         <TableRow className="bg-green-50 dark:bg-green-950/30 border-l-4 border-l-green-500 border-t-2 border-t-green-200 dark:border-t-green-800">
                           <TableCell className="font-semibold flex items-center gap-2">
                             <span className="text-green-600 dark:text-green-400">💰</span>
