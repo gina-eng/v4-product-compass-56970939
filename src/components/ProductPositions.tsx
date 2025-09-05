@@ -62,6 +62,7 @@ const ProductPositions = ({
   const [markup, setMarkup] = useState<number>(initialMarkup);
   const [markupOverhead, setMarkupOverhead] = useState<number>(initialMarkupOverhead);
   const [outros, setOutros] = useState<number>(initialOutros);
+  const [categoria, setCategoria] = useState<string>('');
   const [isDreOpen, setIsDreOpen] = useState(false);
   const [isPositionsOpen, setIsPositionsOpen] = useState(false);
   const [aplicarDescontoPagamento, setAplicarDescontoPagamento] = useState(true);
@@ -78,7 +79,7 @@ const ProductPositions = ({
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('markup, markup_overhead, outros')
+        .select('markup, markup_overhead, outros, categoria')
         .eq('id', productId)
         .single();
       
@@ -91,6 +92,13 @@ const ProductPositions = ({
         if (data.markup) setMarkup(data.markup);
         if (data.markup_overhead) setMarkupOverhead(data.markup_overhead);
         if (data.outros !== null) setOutros(data.outros);
+        if (data.categoria) {
+          setCategoria(data.categoria);
+          // Desabilitar desconto de comprometimento para categorias SABER e TER
+          if (data.categoria === 'saber' || data.categoria === 'ter') {
+            setAplicarDescontoComprometimento(false);
+          }
+        }
       }
     } catch (error) {
       console.error('Erro ao buscar dados do produto:', error);
@@ -552,6 +560,11 @@ const ProductPositions = ({
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
                             (-) Desconto de Comprometimento (-6%)
+                            {(categoria === 'saber' || categoria === 'ter') && (
+                              <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full font-medium ml-2">
+                                N/A para {categoria.toUpperCase()}
+                              </span>
+                            )}
                           </TableCell>
                           <TableCell className={`text-center ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
                           <TableCell className={`text-right font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground'}`}>
@@ -562,6 +575,7 @@ const ProductPositions = ({
                               variant={aplicarDescontoComprometimento ? "default" : "outline"}
                               size="sm"
                               onClick={() => setAplicarDescontoComprometimento(!aplicarDescontoComprometimento)}
+                              disabled={categoria === 'saber' || categoria === 'ter'}
                               className="h-6 w-6 p-0 text-xs"
                             >
                               {aplicarDescontoComprometimento ? "✓" : "✗"}
