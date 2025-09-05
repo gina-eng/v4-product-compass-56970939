@@ -68,6 +68,16 @@ const ProductPositions = ({
   const [aplicarDescontoPagamento, setAplicarDescontoPagamento] = useState(true);
   const [aplicarDescontoCupom, setAplicarDescontoCupom] = useState(true);
   const [aplicarDescontoComprometimento, setAplicarDescontoComprometimento] = useState(false); // Iniciar como false
+  const [nivelDedicacao, setNivelDedicacao] = useState<number>(1); // 100% por padrão
+
+  // Opções de dedicação
+  const opcoesDedicacao = [
+    { label: "Compartilhado 1 (10%)", value: 0.1 },
+    { label: "Compartilhado 2 (15%)", value: 0.15 },
+    { label: "Semi Dedicado 1 (25%)", value: 0.25 },
+    { label: "Semi Dedicado 2 (50%)", value: 0.5 },
+    { label: "Dedicado (100%)", value: 1 }
+  ];
 
   useEffect(() => {
     fetchProductPositions();
@@ -333,7 +343,9 @@ const ProductPositions = ({
   };
 
   const calculateCSP = (cph: number, horasAlocadas: number) => {
-    return horasAlocadas * cph;
+    // Para categoria EXECUTAR, aplicar o fator de dedicação
+    const horasEfetivas = categoria === 'executar' ? horasAlocadas * nivelDedicacao : horasAlocadas;
+    return horasEfetivas * cph;
   };
 
   // Separar posições normais das overhead
@@ -342,7 +354,12 @@ const ProductPositions = ({
   const posicoesOverhead = productPositions.filter(pp => overheadPositions.includes(pp.positions.nome));
 
   // Calcular totais
-  const totalHoras = productPositions.reduce((total, pp) => total + pp.horas_alocadas, 0);
+  const totalHoras = productPositions.reduce((total, pp) => {
+    // Para categoria EXECUTAR, mostrar horas efetivas
+    return categoria === 'executar' 
+      ? total + (pp.horas_alocadas * nivelDedicacao)
+      : total + pp.horas_alocadas;
+  }, 0);
   const totalCSPDireto = posicoesDiretas.reduce((total, pp) => {
     return total + calculateCSP(pp.positions.cph, pp.horas_alocadas);
   }, 0);
@@ -417,7 +434,12 @@ const ProductPositions = ({
                     <TableCell className="table-cell font-medium">
                       {productPosition.positions.nome}
                     </TableCell>
-                    <TableCell className="table-cell-number">{productPosition.horas_alocadas}</TableCell>
+                     <TableCell className="table-cell-number">
+                       {categoria === 'executar' 
+                         ? `${productPosition.horas_alocadas} (${(productPosition.horas_alocadas * nivelDedicacao).toFixed(1)}h efetivas)`
+                         : productPosition.horas_alocadas
+                       }
+                     </TableCell>
                     <TableCell className="table-cell">
                       {formatCurrency(
                         calculateCSP(
@@ -466,6 +488,24 @@ const ProductPositions = ({
             {/* Campos de controle - apenas no modo de edição */}
             {!readOnly && (
               <div className="space-y-4">
+                {/* Seletor de Dedicação - apenas para categoria EXECUTAR */}
+                {categoria === 'executar' && (
+                  <div className="flex items-center gap-4">
+                    <Label htmlFor="dedicacao" className="text-label min-w-fit">Nível de Dedicação:</Label>
+                    <Select value={nivelDedicacao.toString()} onValueChange={(value) => setNivelDedicacao(parseFloat(value))}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue placeholder="Selecione o nível de dedicação" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {opcoesDedicacao.map((opcao) => (
+                          <SelectItem key={opcao.value} value={opcao.value.toString()}>
+                            {opcao.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <div className="flex items-center gap-4">
                   <Label htmlFor="markup" className="text-label min-w-fit">Markup Direto:</Label>
                   <Input
