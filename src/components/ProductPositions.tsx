@@ -67,7 +67,7 @@ const ProductPositions = ({
   const [isPositionsOpen, setIsPositionsOpen] = useState(false);
   const [aplicarDescontoPagamento, setAplicarDescontoPagamento] = useState(true);
   const [aplicarDescontoCupom, setAplicarDescontoCupom] = useState(true);
-  const [aplicarDescontoComprometimento, setAplicarDescontoComprometimento] = useState(true);
+  const [aplicarDescontoComprometimento, setAplicarDescontoComprometimento] = useState(false); // Iniciar como false
 
   useEffect(() => {
     fetchProductPositions();
@@ -94,9 +94,11 @@ const ProductPositions = ({
         if (data.outros !== null) setOutros(data.outros);
         if (data.categoria) {
           setCategoria(data.categoria);
-          // Desabilitar desconto de comprometimento para categorias SABER e TER
+          // Configurar desconto de comprometimento baseado na categoria
           if (data.categoria === 'saber' || data.categoria === 'ter') {
             setAplicarDescontoComprometimento(false);
+          } else {
+            setAplicarDescontoComprometimento(true);
           }
         }
       }
