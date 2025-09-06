@@ -378,22 +378,21 @@ const ProductPositions = ({
   
   const totalCSP = totalCSPDireto + totalCSPOverhead;
 
-  // Cálculos DRE - Nova estrutura - TODOS OS DESCONTOS SOBRE FATURAMENTO ANCORAGEM
+  // Cálculos DRE - Estrutura correta
   // EXECUTAR: (CSP Direto × markup) + (CSP Overhead × markup overhead)
   // Demais categorias: (CSP Direto + CSP Overhead) × markup
   const faturamentoAncoragem = categoria === 'executar'
     ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
     : (totalCSPDireto + totalCSPOverhead) * markup;
     
-  // TODOS os descontos são aplicados sobre o Faturamento de Ancoragem
+  // Estrutura hierárquica correta
   const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
-  const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoAncoragem * 0.06 : 0;
-  const descontoCupom = aplicarDescontoCupom ? faturamentoAncoragem * 0.20 : 0;
-  
-  // Exibição intermediária
   const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
-  // Faturamento mínimo deve considerar TODOS os descontos aplicáveis (inclui cupom)
-  const faturamentoMinimo = faturamentoAncoragem - descontoPagamento - descontoComprometimento - descontoCupom;
+  
+  const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoMedio * 0.06 : 0;
+  const descontoCupom = aplicarDescontoCupom ? faturamentoMedio * 0.20 : 0;
+  const faturamentoMinimo = faturamentoMedio - descontoComprometimento - descontoCupom;
+  
   const faturamentoComDesconto = faturamentoMinimo;
   
   const royalties = faturamentoComDesconto * 0.17;
@@ -632,11 +631,17 @@ const ProductPositions = ({
                             </Button>
                           </TableCell>
                         </TableRow>
+                        <TableRow className="bg-muted/50">
+                          <TableCell className="font-medium">(=) Faturamento Médio</TableCell>
+                          <TableCell className="text-center">R$</TableCell>
+                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoMedio).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
+                        </TableRow>
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
                             (-) Desconto de Comprometimento (-6%)
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium ml-2">
-                              sobre Faturamento Ancoragem
+                            <span className="text-xs bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full font-medium ml-2">
+                              sobre Faturamento Médio
                             </span>
                             {(categoria === 'saber' || categoria === 'ter') && (
                               <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full font-medium ml-2">
@@ -663,8 +668,8 @@ const ProductPositions = ({
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
                             (-) Desconto de Cupom (-20%)
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium ml-2">
-                              sobre Faturamento Ancoragem
+                            <span className="text-xs bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full font-medium ml-2">
+                              sobre Faturamento Médio
                             </span>
                           </TableCell>
                           <TableCell className={`text-center ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
@@ -687,7 +692,7 @@ const ProductPositions = ({
                             <span className="text-green-600 dark:text-green-400">💰</span>
                             (=) Faturamento Mínimo
                             <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-medium">
-                              Ancoragem - Todos os Descontos
+                              Médio - Comprometimento - Cupom
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-green-600 dark:text-green-400 font-medium">R$</TableCell>

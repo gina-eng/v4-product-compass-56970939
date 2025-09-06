@@ -105,11 +105,16 @@ const ProductPortfolio = () => {
                   ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
                   : (totalCSPDireto + totalCSPOverhead) * markup;
                 
-                // Cálculo DRE correto - TODOS os descontos sobre Faturamento Ancoragem
-                // Aplicar apenas os descontos principais que normalmente estão ativos
-                const descontoPagamento = faturamentoSemDesconto * 0.11;  // 11% sempre aplicado
-                const descontoCupom = faturamentoSemDesconto * 0.20;       // 20% sempre aplicado
-                const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
+                // Cálculo DRE correto - Estrutura hierárquica
+                const descontoPagamento = faturamentoSemDesconto * 0.11;  // sobre ancoragem
+                const faturamentoMedio = faturamentoSemDesconto - descontoPagamento;
+                
+                // Descontos sobre faturamento médio
+                const descontoComprometimento = faturamentoMedio * 0.06;   // sobre médio  
+                const descontoCupom = faturamentoMedio * 0.20;             // sobre médio
+                const faturamentoMinimo = faturamentoMedio - descontoComprometimento - descontoCupom;
+                
+                const faturamentoComDesconto = faturamentoMinimo;
                 const royalties = faturamentoComDesconto * 0.17;
                 const taxaTransicao = faturamentoComDesconto * 0.03;
                 const taxaAntecipacao = faturamentoComDesconto * 0.10;
