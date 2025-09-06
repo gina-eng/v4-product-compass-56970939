@@ -32,114 +32,112 @@ const ProductPortfolio = () => {
           return;
         }
 
-        // Inicializar níveis de dedicação
-        const initialDedicacao: {[key: string]: number} = {};
-        data.forEach(product => {
-          if (product.usa_dedicacao) {
-            initialDedicacao[product.id] = 1; // 100% por padrão
-          }
+        // Inicializar níveis de dedicação apenas se estiver vazio
+        setNiveisDedicacao(prev => {
+          const newDedicacao = { ...prev };
+          data.forEach(product => {
+            if (product.usa_dedicacao && !newDedicacao[product.id]) {
+              newDedicacao[product.id] = 1; // 100% por padrão
+            }
+          });
+          return newDedicacao;
         });
-        setNiveisDedicacao(initialDedicacao);
 
-        // Função para calcular produtos com margem
-        const calculateProductsWithMargin = async () => {
-          const productsWithMargin = await Promise.all(
-            data.map(async (product) => {
-              const { data: positions, error: positionsError } = await supabase
-                .from('product_positions')
-                .select(`
-                  *,
-                  positions (*)
-                `)
-                .eq('product_id', product.id);
+        // Calcular produtos com margem
+        const productsWithMargin = await Promise.all(
+          data.map(async (product) => {
+            const { data: positions, error: positionsError } = await supabase
+              .from('product_positions')
+              .select(`
+                *,
+                positions (*)
+              `)
+              .eq('product_id', product.id);
 
-              if (positionsError) {
-                console.error('Error fetching positions:', positionsError);
-              }
+            if (positionsError) {
+              console.error('Error fetching positions:', positionsError);
+            }
 
-              // Calcular valores DRE
-              let margemOperacional: number | string = "A definir";
-              let faturamentoSemDesconto = 0;
-              
-              if (positions && positions.length > 0) {
-                const markup = Number(product.markup) || 1;
-                const markupOverhead = Number(product.markup_overhead) || 1;
-                const categoria = product.categoria;
-                const nivelDedicacao = niveisDedicacao[product.id] || 1;
+            // Calcular valores DRE
+            let margemOperacional: number | string = "A definir";
+            let faturamentoSemDesconto = 0;
+            
+            if (positions && positions.length > 0) {
+              const markup = Number(product.markup) || 1;
+              const markupOverhead = Number(product.markup_overhead) || 1;
+              const categoria = product.categoria;
+              const nivelDedicacao = niveisDedicacao[product.id] || 1;
 
-                // Classificação de overhead por categoria
-                const overheadPositions = categoria === 'executar'
-                  ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
-                  : ['Gerente de PE&G', 'Coordenador de PE&G'];
+              // Classificação de overhead por categoria
+              const overheadPositions = categoria === 'executar'
+                ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
+                : ['Gerente de PE&G', 'Coordenador de PE&G'];
 
-                // Função para calcular CSP com dedicação
-                const calculateCSP = (cph: number, horasAlocadas: number) => {
-                  const horasEfetivas = (categoria === 'executar' && product.usa_dedicacao) 
-                    ? horasAlocadas * nivelDedicacao 
-                    : horasAlocadas;
-                  return horasEfetivas * cph;
-                };
-
-                // Totais CSP
-                let totalCSPDireto = 0;
-                let totalCSPOverhead = 0;
-
-                positions.forEach((pp: any) => {
-                  const horas = Number(pp.horas_alocadas) || 0;
-                  const cph = Number(pp.positions?.cph) || 0;
-                  const nome = pp.positions?.nome || '';
-                  const csp = calculateCSP(cph, horas);
-                  if (overheadPositions.includes(nome)) {
-                    totalCSPOverhead += csp;
-                  } else {
-                    totalCSPDireto += csp;
-                  }
-                });
-
-                const totalCSP = totalCSPDireto + totalCSPOverhead;
-
-                if (totalCSP > 0) {
-                  // Faturamento Ancoragem (Mesma regra da tela de posições)
-                  faturamentoSemDesconto = categoria === 'executar'
-                    ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
-                    : (totalCSPDireto + totalCSPOverhead) * markup;
-                  
-                  // Cálculo simplificado de margem (mantido como antes)
-                  const descontoPagamento = faturamentoSemDesconto * 0.17;
-                  const descontoCupom = faturamentoSemDesconto * 0.20;
-                  const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
-                  const royalties = faturamentoComDesconto * 0.17;
-                  const taxaTransicao = faturamentoComDesconto * 0.03;
-                  const taxaAntecipacao = faturamentoComDesconto * 0.10;
-                  const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
-                  const impostosReceita = receitaBruta * 0.074;
-                  const receitaLiquida = receitaBruta - impostosReceita;
-                  const custosDiretos = totalCSPDireto + totalCSPOverhead;
-                  const margemOperacionalValor = receitaLiquida - custosDiretos;
-                  
-                  margemOperacional = receitaLiquida > 0 ? (margemOperacionalValor / receitaLiquida) * 100 : 0;
-                }
-              }
-
-              const productData = {
-                id: product.id,
-                name: product.produto,
-                description: product.descricao_card && product.descricao_card.trim() ? product.descricao_card.trim() : "",
-                category: product.categoria,
-                status: product.status,
-                valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
-                margemOperacional: margemOperacional,
-                usaDedicacao: product.usa_dedicacao || false
+              // Função para calcular CSP com dedicação
+              const calculateCSP = (cph: number, horasAlocadas: number) => {
+                const horasEfetivas = (categoria === 'executar' && product.usa_dedicacao) 
+                  ? horasAlocadas * nivelDedicacao 
+                  : horasAlocadas;
+                return horasEfetivas * cph;
               };
-              
-              return productData;
-            })
-          );
-          
-          setProducts(productsWithMargin);
-        };
 
-        await calculateProductsWithMargin();
+              // Totais CSP
+              let totalCSPDireto = 0;
+              let totalCSPOverhead = 0;
+
+              positions.forEach((pp: any) => {
+                const horas = Number(pp.horas_alocadas) || 0;
+                const cph = Number(pp.positions?.cph) || 0;
+                const nome = pp.positions?.nome || '';
+                const csp = calculateCSP(cph, horas);
+                if (overheadPositions.includes(nome)) {
+                  totalCSPOverhead += csp;
+                } else {
+                  totalCSPDireto += csp;
+                }
+              });
+
+              const totalCSP = totalCSPDireto + totalCSPOverhead;
+
+              if (totalCSP > 0) {
+                // Faturamento Ancoragem (Mesma regra da tela de posições)
+                faturamentoSemDesconto = categoria === 'executar'
+                  ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
+                  : (totalCSPDireto + totalCSPOverhead) * markup;
+                
+                // Cálculo simplificado de margem (mantido como antes)
+                const descontoPagamento = faturamentoSemDesconto * 0.17;
+                const descontoCupom = faturamentoSemDesconto * 0.20;
+                const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
+                const royalties = faturamentoComDesconto * 0.17;
+                const taxaTransicao = faturamentoComDesconto * 0.03;
+                const taxaAntecipacao = faturamentoComDesconto * 0.10;
+                const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
+                const impostosReceita = receitaBruta * 0.074;
+                const receitaLiquida = receitaBruta - impostosReceita;
+                const custosDiretos = totalCSPDireto + totalCSPOverhead;
+                const margemOperacionalValor = receitaLiquida - custosDiretos;
+                
+                margemOperacional = receitaLiquida > 0 ? (margemOperacionalValor / receitaLiquida) * 100 : 0;
+              }
+            }
+
+            const productData = {
+              id: product.id,
+              name: product.produto,
+              description: product.descricao_card && product.descricao_card.trim() ? product.descricao_card.trim() : "",
+              category: product.categoria,
+              status: product.status,
+              valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
+              margemOperacional: margemOperacional,
+              usaDedicacao: product.usa_dedicacao || false
+            };
+            
+            return productData;
+          })
+        );
+        
+        setProducts(productsWithMargin);
       } catch (error) {
         console.error('Error:', error);
       } finally {
@@ -148,13 +146,94 @@ const ProductPortfolio = () => {
     };
 
     fetchProducts();
+  }, []);
+
+  // UseEffect separado para recalcular quando a dedicação muda
+  useEffect(() => {
+    console.log('UseEffect recalculateProducts triggered with niveisDedicacao:', niveisDedicacao);
+    
+    if (products.length > 0) {
+      const recalculateProducts = async () => {
+        console.log('Starting recalculation for', products.length, 'products');
+        
+        const updatedProducts = await Promise.all(
+          products.map(async (product) => {
+            if (!product.usaDedicacao || product.category !== 'executar') {
+              return product; // Não recalcula se não usa dedicação ou não é EXECUTAR
+            }
+
+            console.log('Recalculating product:', product.id, 'with dedicacao:', niveisDedicacao[product.id]);
+
+            const { data: positions } = await supabase
+              .from('product_positions')
+              .select(`
+                *,
+                positions (*)
+              `)
+              .eq('product_id', product.id);
+
+            if (!positions || positions.length === 0) {
+              return product;
+            }
+
+            const { data: productData } = await supabase
+              .from('products')
+              .select('markup, markup_overhead')
+              .eq('id', product.id)
+              .single();
+
+            const markup = Number(productData?.markup) || 1;
+            const markupOverhead = Number(productData?.markup_overhead) || 1;
+            const nivelDedicacao = niveisDedicacao[product.id] || 1;
+
+            // Recalcular apenas o valor base com a nova dedicação
+            const overheadPositions = ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager'];
+            
+            let totalCSPDireto = 0;
+            let totalCSPOverhead = 0;
+
+            positions.forEach((pp: any) => {
+              const horas = Number(pp.horas_alocadas) || 0;
+              const cph = Number(pp.positions?.cph) || 0;
+              const nome = pp.positions?.nome || '';
+              const horasEfetivas = horas * nivelDedicacao;
+              const csp = horasEfetivas * cph;
+              
+              if (overheadPositions.includes(nome)) {
+                totalCSPOverhead += csp;
+              } else {
+                totalCSPDireto += csp;
+              }
+            });
+
+            const faturamentoSemDesconto = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
+
+            return {
+              ...product,
+              valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir"
+            };
+          })
+        );
+        
+        setProducts(updatedProducts);
+      };
+
+      recalculateProducts();
+    }
   }, [niveisDedicacao]);
 
   const handleDedicacaoChange = (productId: string, nivel: number) => {
-    setNiveisDedicacao(prev => ({
-      ...prev,
-      [productId]: nivel
-    }));
+    console.log('handleDedicacaoChange called:', { productId, nivel });
+    console.log('Current niveisDedicacao:', niveisDedicacao);
+    
+    setNiveisDedicacao(prev => {
+      const newState = {
+        ...prev,
+        [productId]: nivel
+      };
+      console.log('New niveisDedicacao state:', newState);
+      return newState;
+    });
   };
 
   const filters = [

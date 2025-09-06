@@ -103,7 +103,10 @@ const ProductCard = ({
               <Label className="text-xs font-medium text-muted-foreground">Nível de Dedicação:</Label>
               <Select 
                 value={nivelDedicacao.toString()} 
-                onValueChange={(value) => onDedicacaoChange?.(id, parseFloat(value))}
+                onValueChange={(value) => {
+                  console.log('ProductCard Select onChange:', { id, value, nivelDedicacao });
+                  onDedicacaoChange?.(id, parseFloat(value));
+                }}
               >
                 <SelectTrigger className="w-full text-xs">
                   <SelectValue />
