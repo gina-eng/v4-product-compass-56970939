@@ -390,10 +390,11 @@ const ProductPositions = ({
   const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoAncoragem * 0.06 : 0;
   const descontoCupom = aplicarDescontoCupom ? faturamentoAncoragem * 0.20 : 0;
   
-  // Cálculos intermediários para exibição
+  // Exibição intermediária
   const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
-  const faturamentoMinimo = faturamentoMedio - descontoComprometimento;
-  const faturamentoComDesconto = faturamentoAncoragem - descontoPagamento - descontoComprometimento - descontoCupom;
+  // Faturamento mínimo deve considerar TODOS os descontos aplicáveis (inclui cupom)
+  const faturamentoMinimo = faturamentoAncoragem - descontoPagamento - descontoComprometimento - descontoCupom;
+  const faturamentoComDesconto = faturamentoMinimo;
   
   const royalties = faturamentoComDesconto * 0.17;
   const taxaTransicao = faturamentoComDesconto * 0.03;
@@ -684,13 +685,13 @@ const ProductPositions = ({
                         <TableRow className="bg-green-50 dark:bg-green-950/30 border-l-4 border-l-green-500 border-t-2 border-t-green-200 dark:border-t-green-800">
                           <TableCell className="font-semibold flex items-center gap-2">
                             <span className="text-green-600 dark:text-green-400">💰</span>
-                            (=) Faturamento Final (após descontos)
+                            (=) Faturamento Mínimo
                             <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-medium">
-                              Ancoragem - Descontos
+                              Ancoragem - Todos os Descontos
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-green-600 dark:text-green-400 font-medium">R$</TableCell>
-                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
+                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">{formatCurrency(faturamentoMinimo).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
