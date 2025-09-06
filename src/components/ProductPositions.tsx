@@ -388,6 +388,19 @@ const ProductPositions = ({
   const custosDiretos = totalCSPDireto + totalCSPOverhead + outros;
   const margemOperacional = receitaLiquida - custosDiretos;
   const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
+
+  // Debug logs
+  console.log('=== DEBUG CÁLCULOS ===');
+  console.log('Categoria:', categoria);
+  console.log('Nível Dedicação:', nivelDedicacao);
+  console.log('Total CSP Direto:', totalCSPDireto);
+  console.log('Total CSP Overhead:', totalCSPOverhead);
+  console.log('Total CSP:', totalCSP);
+  console.log('Markup:', markup);
+  console.log('Faturamento Ancoragem:', faturamentoAncoragem);
+  console.log('Receita Líquida:', receitaLiquida);
+  console.log('Margem Operacional:', margemOperacional);
+  console.log('======================');
   
   console.log('ProductPositions rendering - Taxa de Transição updated');
 
