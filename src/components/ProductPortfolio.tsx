@@ -48,7 +48,8 @@ const ProductPortfolio = () => {
           const newDedicacao = { ...prev };
           data.forEach(product => {
             if (product.usa_dedicacao && !newDedicacao[product.id]) {
-              newDedicacao[product.id] = 1; // 100% por padrão até o usuário selecionar outro nível
+              // EXECUTAR inicia como "Compartilhado 1" (10%), demais permanecem 100%
+              newDedicacao[product.id] = product.categoria === 'executar' ? 0.1 : 1;
             }
           });
           return newDedicacao;
@@ -77,7 +78,9 @@ const ProductPortfolio = () => {
               const markup = Number(product.markup) || 1;
               const markupOverhead = Number(product.markup_overhead) || 1;
               const categoria = product.categoria;
-              const nivelDedicacao = product.usa_dedicacao ? (niveisDedicacao[product.id] ?? 1) : 1; // 100% se não usa dedicação
+              const nivelDedicacao = product.usa_dedicacao
+                ? (niveisDedicacao[product.id] ?? (categoria === 'executar' ? 0.1 : 1))
+                : 1; // 100% se não usa dedicação
 
               // Classificação de overhead por categoria
               const overheadPositions = categoria === 'executar'
@@ -198,7 +201,9 @@ const ProductPortfolio = () => {
 
             const markup = Number(productData?.markup) || 1;
             const markupOverhead = Number(productData?.markup_overhead) || 1;
-            const nivelDedicacao = product.usaDedicacao ? (niveisDedicacao[product.id] ?? 1) : 1; // 100% se não usa dedicação
+            const nivelDedicacao = product.usaDedicacao
+              ? (niveisDedicacao[product.id] ?? (product.category === 'executar' ? 0.1 : 1))
+              : 1; // 100% se não usa dedicação
 
             // Recalcular apenas o valor base com a nova dedicação
             const overheadPositions = ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager'];
@@ -329,7 +334,7 @@ const ProductPortfolio = () => {
                 valor={product.valorBase}
                 margemOperacional={product.margemOperacional}
                 usaDedicacao={product.usaDedicacao}
-                nivelDedicacao={niveisDedicacao[product.id] ?? 1}
+                nivelDedicacao={niveisDedicacao[product.id] ?? (product.usaDedicacao && product.category === 'executar' ? 0.1 : 1)}
                 onDedicacaoChange={handleDedicacaoChange}
               />
             ))}

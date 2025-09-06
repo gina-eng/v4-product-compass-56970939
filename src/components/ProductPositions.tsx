@@ -103,7 +103,8 @@ const ProductPositions = ({
         if (data.markup) setMarkup(data.markup);
         if (data.markup_overhead) setMarkupOverhead(data.markup_overhead);
         if (data.outros !== null) setOutros(data.outros);
-        setUsaDedicacao(data.usa_dedicacao || false); // Armazenar se usa dedicação
+        const usa = !!data.usa_dedicacao;
+        setUsaDedicacao(usa); // Armazenar se usa dedicação
         if (data.categoria) {
           setCategoria(data.categoria);
           // Configurar desconto de comprometimento baseado na categoria
@@ -112,6 +113,10 @@ const ProductPositions = ({
           } else {
             setAplicarDescontoComprometimento(true);
           }
+        }
+        // Padrão: EXECUTAR com dedicação inicia em "Compartilhado 1" (10%)
+        if (usa && data.categoria === 'executar') {
+          setNivelDedicacao(0.1);
         }
       }
     } catch (error) {
