@@ -630,36 +630,60 @@ const Admin = () => {
   };
 
   // Função para calcular faturamento sem desconto
-  const calculateFaturamentoSemDesconto = async (productId: string, productMarkup?: number): Promise<number> => {
+  const calculateFaturamentoSemDesconto = async (productId: string, _productMarkup?: number): Promise<number> => {
     try {
       const { data: positions, error: positionsError } = await supabase
         .from('product_positions')
         .select(`
           *,
-          positions (cph)
+          positions (cph, nome)
         `)
         .eq('product_id', productId);
       
       if (positionsError) throw positionsError;
+
+      // Buscar markups e categoria do produto
+      const { data: product, error: productError } = await supabase
+        .from('products')
+        .select('markup, markup_overhead, categoria')
+        .eq('id', productId)
+        .single();
       
-      // Buscar markup do produto se não foi fornecido
-      let markup = productMarkup;
-      if (!markup) {
-        const { data: product, error: productError } = await supabase
-          .from('products')
-          .select('markup')
-          .eq('id', productId)
-          .single();
-        
-        if (productError) throw productError;
-        markup = product?.markup || 1;
-      }
-      
-      const totalCSP = positions?.reduce((total, pp) => {
-        return total + (pp.horas_alocadas * (pp.positions?.cph || 0));
-      }, 0) || 0;
-      
-      return totalCSP * markup;
+      if (productError) throw productError;
+
+      const markup = Number(product?.markup) || 1;
+      const markupOverhead = Number(product?.markup_overhead) || 1;
+      const categoria = (product?.categoria || '').toLowerCase();
+
+      // Classificação de Overhead consistente com o front
+      const isOverheadPosition = (nome: string) => {
+        const normalized = (nome || '').toLowerCase();
+        const isGestaoPeG = normalized === 'gerente de pe&g' || normalized === 'coordenador de pe&g';
+        const isAccount = normalized.includes('account manager') || normalized === 'am' || normalized.includes('account');
+        if (categoria === 'executar') {
+          return isGestaoPeG || isAccount;
+        }
+        return isGestaoPeG;
+      };
+
+      let totalCSPDireto = 0;
+      let totalCSPOverhead = 0;
+
+      (positions || []).forEach((pp: any) => {
+        const horas = Number(pp.horas_alocadas) || 0;
+        const cph = Number(pp.positions?.cph) || 0;
+        const nome = pp.positions?.nome || '';
+        const csp = horas * cph;
+        if (isOverheadPosition(nome)) {
+          totalCSPOverhead += csp;
+        } else {
+          totalCSPDireto += csp;
+        }
+      });
+
+      // Faturamento Ancoragem = (CSP Direto × markup direto) + (CSP Overhead × markup overhead)
+      const faturamentoAncoragem = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
+      return faturamentoAncoragem;
     } catch (error) {
       console.error('Erro ao calcular faturamento sem desconto:', error);
       return 0;
