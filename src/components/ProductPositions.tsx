@@ -378,18 +378,22 @@ const ProductPositions = ({
   
   const totalCSP = totalCSPDireto + totalCSPOverhead;
 
-  // Cálculos DRE - Nova estrutura
+  // Cálculos DRE - Nova estrutura - TODOS OS DESCONTOS SOBRE FATURAMENTO ANCORAGEM
   // EXECUTAR: (CSP Direto × markup) + (CSP Overhead × markup overhead)
   // Demais categorias: (CSP Direto + CSP Overhead) × markup
   const faturamentoAncoragem = categoria === 'executar'
     ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
     : (totalCSPDireto + totalCSPOverhead) * markup;
+    
+  // TODOS os descontos são aplicados sobre o Faturamento de Ancoragem
   const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
+  const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoAncoragem * 0.06 : 0;
+  const descontoCupom = aplicarDescontoCupom ? faturamentoAncoragem * 0.20 : 0;
+  
+  // Cálculos intermediários para exibição
   const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
-  const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoMedio * 0.06 : 0;
   const faturamentoMinimo = faturamentoMedio - descontoComprometimento;
-  const descontoCupom = aplicarDescontoCupom ? faturamentoMinimo * 0.20 : 0;
-  const faturamentoComDesconto = faturamentoMinimo - descontoCupom;
+  const faturamentoComDesconto = faturamentoAncoragem - descontoPagamento - descontoComprometimento - descontoCupom;
   
   const royalties = faturamentoComDesconto * 0.17;
   const taxaTransicao = faturamentoComDesconto * 0.03;

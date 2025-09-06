@@ -105,9 +105,10 @@ const ProductPortfolio = () => {
                   ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
                   : (totalCSPDireto + totalCSPOverhead) * markup;
                 
-                // Cálculo simplificado de margem (mantido como antes)
-                const descontoPagamento = faturamentoSemDesconto * 0.17;
-                const descontoCupom = faturamentoSemDesconto * 0.20;
+                // Cálculo DRE correto - TODOS os descontos sobre Faturamento Ancoragem
+                // Aplicar apenas os descontos principais que normalmente estão ativos
+                const descontoPagamento = faturamentoSemDesconto * 0.11;  // 11% sempre aplicado
+                const descontoCupom = faturamentoSemDesconto * 0.20;       // 20% sempre aplicado
                 const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
                 const royalties = faturamentoComDesconto * 0.17;
                 const taxaTransicao = faturamentoComDesconto * 0.03;
@@ -150,19 +151,13 @@ const ProductPortfolio = () => {
 
   // UseEffect separado para recalcular quando a dedicação muda
   useEffect(() => {
-    console.log('UseEffect recalculateProducts triggered with niveisDedicacao:', niveisDedicacao);
-    
     if (products.length > 0) {
       const recalculateProducts = async () => {
-        console.log('Starting recalculation for', products.length, 'products');
-        
         const updatedProducts = await Promise.all(
           products.map(async (product) => {
             if (!product.usaDedicacao || product.category !== 'executar') {
               return product; // Não recalcula se não usa dedicação ou não é EXECUTAR
             }
-
-            console.log('Recalculating product:', product.id, 'with dedicacao:', niveisDedicacao[product.id]);
 
             const { data: positions } = await supabase
               .from('product_positions')
@@ -223,17 +218,10 @@ const ProductPortfolio = () => {
   }, [niveisDedicacao]);
 
   const handleDedicacaoChange = (productId: string, nivel: number) => {
-    console.log('handleDedicacaoChange called:', { productId, nivel });
-    console.log('Current niveisDedicacao:', niveisDedicacao);
-    
-    setNiveisDedicacao(prev => {
-      const newState = {
-        ...prev,
-        [productId]: nivel
-      };
-      console.log('New niveisDedicacao state:', newState);
-      return newState;
-    });
+    setNiveisDedicacao(prev => ({
+      ...prev,
+      [productId]: nivel
+    }));
   };
 
   const filters = [
