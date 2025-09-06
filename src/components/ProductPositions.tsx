@@ -68,7 +68,7 @@ const ProductPositions = ({
   const [aplicarDescontoPagamento, setAplicarDescontoPagamento] = useState(true);
   const [aplicarDescontoCupom, setAplicarDescontoCupom] = useState(true);
   const [aplicarDescontoComprometimento, setAplicarDescontoComprometimento] = useState(false); // Iniciar como false
-  const [nivelDedicacao, setNivelDedicacao] = useState<number>(1); // 100% por padrão
+  const [nivelDedicacao, setNivelDedicacao] = useState<number>(0.1); // Compartilhado 1 (10%) por padrão
 
   // Opções de dedicação
   const opcoesDedicacao = [

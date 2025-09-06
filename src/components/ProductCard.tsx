@@ -30,7 +30,7 @@ const ProductCard = ({
   descricao_card,
   margemOperacional,
   usaDedicacao = false,
-  nivelDedicacao = 1,
+  nivelDedicacao = 0.1,
   onDedicacaoChange
 }: ProductCardProps) => {
   const navigate = useNavigate();

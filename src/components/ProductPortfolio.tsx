@@ -66,7 +66,7 @@ const ProductPortfolio = () => {
               const markup = Number(product.markup) || 1;
               const markupOverhead = Number(product.markup_overhead) || 1;
               const categoria = product.categoria;
-              const nivelDedicacao = niveisDedicacao[product.id] || 1;
+              const nivelDedicacao = niveisDedicacao[product.id] || 0.1;
 
               // Classificação de overhead por categoria
               const overheadPositions = categoria === 'executar'
@@ -183,7 +183,7 @@ const ProductPortfolio = () => {
 
             const markup = Number(productData?.markup) || 1;
             const markupOverhead = Number(productData?.markup_overhead) || 1;
-            const nivelDedicacao = niveisDedicacao[product.id] || 1;
+            const nivelDedicacao = niveisDedicacao[product.id] || 0.1;
 
             // Recalcular apenas o valor base com a nova dedicação
             const overheadPositions = ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager'];
@@ -314,7 +314,7 @@ const ProductPortfolio = () => {
                 valor={product.valorBase}
                 margemOperacional={product.margemOperacional}
                 usaDedicacao={product.usaDedicacao}
-                nivelDedicacao={niveisDedicacao[product.id] || 1}
+                nivelDedicacao={niveisDedicacao[product.id] || 0.1}
                 onDedicacaoChange={handleDedicacaoChange}
               />
             ))}
