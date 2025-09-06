@@ -39,7 +39,7 @@ const TestPositions = () => {
               <li><strong>Campo "(-) Outros":</strong> Substitui "(-) Auxílio" e é editável no banco de dados</li>
               <li><strong>Nova estrutura DRE:</strong></li>
               <ul className="list-disc pl-6 space-y-1">
-                <li>Faturamento Ancoragem (CSP direto + CSP Overhead × markup)</li>
+                <li>Faturamento Ancoragem (CSP direto × markup direto) + (CSP Overhead × markup overhead)</li>
                 <li>Desconto de pagamento alterado para -11%</li>
                 <li>Faturamento Médio (Ancoragem - desconto de pagamento)</li>
                 <li>Novo: Desconto de Comprometimento (-6%)</li>

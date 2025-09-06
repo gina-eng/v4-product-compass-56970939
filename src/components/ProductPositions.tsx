@@ -616,10 +616,7 @@ const ProductPositions = ({
                             <span className="text-red-600 dark:text-red-400">⚓</span>
                             (=) Faturamento Ancoragem
                             <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-1 rounded-full font-medium">
-                              {categoria === 'executar' 
-                                ? "(CSP direto × markup) + (CSP Overhead × markup overhead)"
-                                : "(CSP direto + CSP Overhead) × markup direto"
-                              }
+                              (CSP direto × markup direto) + (CSP Overhead × markup overhead)
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-red-600 dark:text-red-400 font-medium">R$</TableCell>
