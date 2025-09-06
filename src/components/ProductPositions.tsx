@@ -408,19 +408,28 @@ const ProductPositions = ({
   const margemOperacional = receitaLiquida - custosDiretos;
   const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
 
-  // Debug logs
-  console.log('=== DEBUG CÁLCULOS ===');
+  // Debug logs detalhados
+  console.log('=== DEBUG CÁLCULOS DETALHADO ===');
   console.log('Categoria:', categoria);
-  console.log('Nível Dedicação:', nivelDedicacao);
+  console.log('Overhead Positions Array:', overheadPositions);
+  console.log('Product Positions:', productPositions.map(pp => ({ nome: pp.positions.nome, horas: pp.horas_alocadas, cph: pp.positions.cph })));
+  console.log('Posições Diretas:', posicoesDiretas.map(pp => ({ nome: pp.positions.nome, csp: calculateCSP(pp.positions.cph, pp.horas_alocadas) })));
+  console.log('Posições Overhead:', posicoesOverhead.map(pp => ({ nome: pp.positions.nome, csp: calculateCSP(pp.positions.cph, pp.horas_alocadas) })));
   console.log('Total CSP Direto:', totalCSPDireto);
   console.log('Total CSP Overhead:', totalCSPOverhead);
-  console.log('Total CSP:', totalCSP);
   console.log('Markup:', markup);
   console.log('Markup Overhead:', markupOverhead);
-  console.log('Faturamento Ancoragem:', faturamentoAncoragem);
-  console.log('Receita Líquida:', receitaLiquida);
-  console.log('Margem Operacional:', margemOperacional);
-  console.log('======================');
+  console.log('Cálculo Faturamento - Categoria EXECUTAR?', categoria === 'executar');
+  if (categoria === 'executar') {
+    console.log('Faturamento = (CSP Direto × markup) + (CSP Overhead × markup overhead)');
+    console.log(`Faturamento = (${totalCSPDireto} × ${markup}) + (${totalCSPOverhead} × ${markupOverhead})`);
+    console.log(`Faturamento = ${totalCSPDireto * markup} + ${totalCSPOverhead * markupOverhead} = ${faturamentoAncoragem}`);
+  } else {
+    console.log('Faturamento = (CSP Direto + CSP Overhead) × markup');
+    console.log(`Faturamento = (${totalCSPDireto} + ${totalCSPOverhead}) × ${markup}`);
+    console.log(`Faturamento = ${totalCSPDireto + totalCSPOverhead} × ${markup} = ${faturamentoAncoragem}`);
+  }
+  console.log('================================');
   
   console.log('ProductPositions rendering - Taxa de Transição updated');
 
