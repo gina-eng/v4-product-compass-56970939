@@ -15,6 +15,17 @@ const ProductPortfolio = () => {
   // Nível de dedicação por produto (objeto com productId como chave)
   const [niveisDedicacao, setNiveisDedicacao] = useState<{[key: string]: number}>({});
 
+  // Identifica se uma posição é considerada Overhead conforme a categoria
+  const isOverheadPosition = (nome: string, categoria: string) => {
+    const normalized = (nome || '').toLowerCase();
+    const isGestaoPeG = normalized === 'gerente de pe&g' || normalized === 'coordenador de pe&g';
+    const isAccount = normalized.includes('account manager') || normalized === 'am' || normalized.includes('account');
+    if (categoria === 'executar') {
+      return isGestaoPeG || isAccount;
+    }
+    return isGestaoPeG;
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -90,7 +101,7 @@ const ProductPortfolio = () => {
                 const cph = Number(pp.positions?.cph) || 0;
                 const nome = pp.positions?.nome || '';
                 const csp = calculateCSP(cph, horas);
-                if (overheadPositions.includes(nome)) {
+                if (isOverheadPosition(nome, categoria)) {
                   totalCSPOverhead += csp;
                 } else {
                   totalCSPDireto += csp;
@@ -104,6 +115,12 @@ const ProductPortfolio = () => {
                 faturamentoSemDesconto = categoria === 'executar'
                   ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
                   : (totalCSPDireto + totalCSPOverhead) * markup;
+
+                console.log('[PORTFOLIO] Produto:', product.produto);
+                console.log('[PORTFOLIO] Categoria:', categoria);
+                console.log('[PORTFOLIO] Totais CSP -> Direto:', totalCSPDireto, 'Overhead:', totalCSPOverhead);
+                console.log('[PORTFOLIO] Markups -> direto:', markup, 'overhead:', markupOverhead);
+                console.log('[PORTFOLIO] Faturamento Ancoragem:', faturamentoSemDesconto);
                 
                 // Cálculo DRE correto - Estrutura hierárquica
                 const descontoPagamento = faturamentoSemDesconto * 0.11;  // sobre ancoragem
@@ -198,7 +215,7 @@ const ProductPortfolio = () => {
               const horasEfetivas = product.usaDedicacao ? (horas * nivelDedicacao) : horas; // 100% se não usa dedicação
               const csp = horasEfetivas * cph;
               
-              if (overheadPositions.includes(nome)) {
+              if (isOverheadPosition(nome, 'executar')) {
                 totalCSPOverhead += csp;
               } else {
                 totalCSPDireto += csp;
