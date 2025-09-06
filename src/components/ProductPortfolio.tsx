@@ -32,12 +32,12 @@ const ProductPortfolio = () => {
           return;
         }
 
-        // Inicializar níveis de dedicação apenas se estiver vazio
+        // Inicializar níveis de dedicação apenas para produtos que usam dedicação
         setNiveisDedicacao(prev => {
           const newDedicacao = { ...prev };
           data.forEach(product => {
             if (product.usa_dedicacao && !newDedicacao[product.id]) {
-              newDedicacao[product.id] = 0.1; // 10% (Compartilhado 1) por padrão
+              newDedicacao[product.id] = 0.1; // 10% (Compartilhado 1) por padrão para produtos com dedicação
             }
           });
           return newDedicacao;
@@ -66,18 +66,18 @@ const ProductPortfolio = () => {
               const markup = Number(product.markup) || 1;
               const markupOverhead = Number(product.markup_overhead) || 1;
               const categoria = product.categoria;
-              const nivelDedicacao = niveisDedicacao[product.id] || 0.1;
+              const nivelDedicacao = product.usa_dedicacao ? (niveisDedicacao[product.id] || 0.1) : 1; // 100% se não usa dedicação
 
               // Classificação de overhead por categoria
               const overheadPositions = categoria === 'executar'
                 ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
                 : ['Gerente de PE&G', 'Coordenador de PE&G'];
 
-              // Função para calcular CSP com dedicação
+              // Função para calcular CSP com dedicação APENAS se usa_dedicacao estiver habilitado
               const calculateCSP = (cph: number, horasAlocadas: number) => {
                 const horasEfetivas = (categoria === 'executar' && product.usa_dedicacao) 
                   ? horasAlocadas * nivelDedicacao 
-                  : horasAlocadas;
+                  : horasAlocadas; // Sempre 100% se não usa dedicação
                 return horasEfetivas * cph;
               };
 
@@ -183,7 +183,7 @@ const ProductPortfolio = () => {
 
             const markup = Number(productData?.markup) || 1;
             const markupOverhead = Number(productData?.markup_overhead) || 1;
-            const nivelDedicacao = niveisDedicacao[product.id] || 0.1;
+            const nivelDedicacao = product.usaDedicacao ? (niveisDedicacao[product.id] || 0.1) : 1; // 100% se não usa dedicação
 
             // Recalcular apenas o valor base com a nova dedicação
             const overheadPositions = ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager'];
@@ -195,7 +195,7 @@ const ProductPortfolio = () => {
               const horas = Number(pp.horas_alocadas) || 0;
               const cph = Number(pp.positions?.cph) || 0;
               const nome = pp.positions?.nome || '';
-              const horasEfetivas = horas * nivelDedicacao;
+              const horasEfetivas = product.usaDedicacao ? (horas * nivelDedicacao) : horas; // 100% se não usa dedicação
               const csp = horasEfetivas * cph;
               
               if (overheadPositions.includes(nome)) {

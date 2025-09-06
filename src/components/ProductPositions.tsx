@@ -69,6 +69,7 @@ const ProductPositions = ({
   const [aplicarDescontoCupom, setAplicarDescontoCupom] = useState(true);
   const [aplicarDescontoComprometimento, setAplicarDescontoComprometimento] = useState(false); // Iniciar como false
   const [nivelDedicacao, setNivelDedicacao] = useState<number>(0.1); // Compartilhado 1 (10%) por padrão
+  const [usaDedicacao, setUsaDedicacao] = useState<boolean>(false); // Controla se deve aplicar dedicação
 
   // Opções de dedicação
   const opcoesDedicacao = [
@@ -89,7 +90,7 @@ const ProductPositions = ({
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('markup, markup_overhead, outros, categoria')
+        .select('markup, markup_overhead, outros, categoria, usa_dedicacao')
         .eq('id', productId)
         .single();
       
@@ -102,6 +103,7 @@ const ProductPositions = ({
         if (data.markup) setMarkup(data.markup);
         if (data.markup_overhead) setMarkupOverhead(data.markup_overhead);
         if (data.outros !== null) setOutros(data.outros);
+        setUsaDedicacao(data.usa_dedicacao || false); // Armazenar se usa dedicação
         if (data.categoria) {
           setCategoria(data.categoria);
           // Configurar desconto de comprometimento baseado na categoria
@@ -343,8 +345,10 @@ const ProductPositions = ({
   };
 
   const calculateCSP = (cph: number, horasAlocadas: number) => {
-    // Para categoria EXECUTAR, aplicar o fator de dedicação
-    const horasEfetivas = categoria === 'executar' ? horasAlocadas * nivelDedicacao : horasAlocadas;
+    // Aplicar fator de dedicação APENAS se usa_dedicacao estiver habilitado E categoria for EXECUTAR
+    const horasEfetivas = (categoria === 'executar' && usaDedicacao) 
+      ? horasAlocadas * nivelDedicacao 
+      : horasAlocadas; // 100% se não usa dedicação
     return horasEfetivas * cph;
   };
 
@@ -362,10 +366,10 @@ const ProductPositions = ({
 
   // Calcular totais
   const totalHoras = productPositions.reduce((total, pp) => {
-    // Para categoria EXECUTAR, mostrar horas efetivas
-    return categoria === 'executar' 
+    // Aplicar horas efetivas APENAS se usa_dedicacao estiver habilitado E categoria for EXECUTAR
+    return (categoria === 'executar' && usaDedicacao)
       ? total + (pp.horas_alocadas * nivelDedicacao)
-      : total + pp.horas_alocadas;
+      : total + pp.horas_alocadas; // 100% se não usa dedicação
   }, 0);
   
   const totalCSPDireto = posicoesDiretas.reduce((total, pp) => {
@@ -466,7 +470,7 @@ const ProductPositions = ({
                       {productPosition.positions.nome}
                     </TableCell>
                      <TableCell className="table-cell-number">
-                       {categoria === 'executar' 
+                       {(categoria === 'executar' && usaDedicacao) 
                          ? `${productPosition.horas_alocadas} (${(productPosition.horas_alocadas * nivelDedicacao).toFixed(1)}h efetivas)`
                          : productPosition.horas_alocadas
                        }
@@ -519,8 +523,8 @@ const ProductPositions = ({
             {/* Campos de controle - apenas no modo de edição */}
             {!readOnly && (
               <div className="space-y-4">
-                {/* Seletor de Dedicação - apenas para categoria EXECUTAR */}
-                {categoria === 'executar' && (
+                {/* Seletor de Dedicação - apenas para categoria EXECUTAR E se usa_dedicacao estiver habilitado */}
+                {categoria === 'executar' && usaDedicacao && (
                   <div className="flex items-center gap-4">
                     <Label htmlFor="dedicacao" className="text-label min-w-fit">Nível de Dedicação:</Label>
                     <Select value={nivelDedicacao.toString()} onValueChange={(value) => setNivelDedicacao(parseFloat(value))}>
