@@ -51,11 +51,18 @@ const ProductPortfolio = () => {
               const markup = Number(product.markup) || 1;
               const markupOverhead = Number(product.markup_overhead) || 1;
               const categoria = product.categoria;
+              const nivelDedicacao = 1; // 100% por padrão para os cards
 
               // Classificação de overhead por categoria
               const overheadPositions = categoria === 'executar'
                 ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
                 : ['Gerente de PE&G', 'Coordenador de PE&G'];
+
+              // Função para calcular CSP com dedicação
+              const calculateCSP = (cph: number, horasAlocadas: number) => {
+                const horasEfetivas = categoria === 'executar' ? horasAlocadas * nivelDedicacao : horasAlocadas;
+                return horasEfetivas * cph;
+              };
 
               // Totais CSP
               let totalCSPDireto = 0;
@@ -65,7 +72,7 @@ const ProductPortfolio = () => {
                 const horas = Number(pp.horas_alocadas) || 0;
                 const cph = Number(pp.positions?.cph) || 0;
                 const nome = pp.positions?.nome || '';
-                const csp = horas * cph;
+                const csp = calculateCSP(cph, horas);
                 if (overheadPositions.includes(nome)) {
                   totalCSPOverhead += csp;
                 } else {
