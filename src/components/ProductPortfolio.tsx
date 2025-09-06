@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { supabase } from "@/integrations/supabase/client";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const ProductPortfolio = () => {
   const navigate = useNavigate();
@@ -10,6 +12,17 @@ const ProductPortfolio = () => {
   const [statusFilter, setStatusFilter] = useState<string>("Disponível");
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  // Nível de dedicação (aplicado apenas para produtos EXECUTAR)
+  const [nivelDedicacao, setNivelDedicacao] = useState<number>(1);
+  const opcoesDedicacao = [
+    { label: "Compartilhado 1 (10%)", value: 0.1 },
+    { label: "Compartilhado 2 (15%)", value: 0.15 },
+    { label: "Semi Dedicado 1 (25%)", value: 0.25 },
+    { label: "Semi Dedicado 2 (35%)", value: 0.35 },
+    { label: "Dedicado 1 (50%)", value: 0.5 },
+    { label: "Dedicado 2 (75%)", value: 0.75 },
+    { label: "100% (100%)", value: 1 },
+  ];
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -51,7 +64,6 @@ const ProductPortfolio = () => {
               const markup = Number(product.markup) || 1;
               const markupOverhead = Number(product.markup_overhead) || 1;
               const categoria = product.categoria;
-              const nivelDedicacao = 1; // 100% por padrão para os cards
 
               // Classificação de overhead por categoria
               const overheadPositions = categoria === 'executar'
@@ -136,7 +148,7 @@ const ProductPortfolio = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [nivelDedicacao]);
 
   const filters = [
     { key: "all", label: "Todos", color: "default" },
@@ -167,7 +179,7 @@ const ProductPortfolio = () => {
           <h2 className="text-3xl font-bold mb-8">Portfólio de Produtos e Serviços V4</h2>
           
           {/* Filtros lado a lado */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Filtros por Categoria */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Filtrar por Categoria</h3>
@@ -201,6 +213,25 @@ const ProductPortfolio = () => {
                     {filter.label}
                   </Button>
                 ))}
+              </div>
+            </div>
+
+            {/* Seletor de Dedicação (aplicado aos produtos EXECUTAR) */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Nível de Dedicação (EXECUTAR)</h3>
+              <div className="flex justify-center">
+                <Select value={nivelDedicacao.toString()} onValueChange={(value) => setNivelDedicacao(parseFloat(value))}>
+                  <SelectTrigger className="w-56">
+                    <SelectValue placeholder="Selecione o nível de dedicação" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {opcoesDedicacao.map((opcao) => (
+                      <SelectItem key={opcao.value} value={opcao.value.toString()}>
+                        {opcao.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
