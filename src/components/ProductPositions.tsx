@@ -612,6 +612,9 @@ const ProductPositions = ({
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
                             (-) Desconto de pagamento (-11%)
+                            <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium ml-2">
+                              sobre Faturamento Ancoragem
+                            </span>
                           </TableCell>
                           <TableCell className={`text-center ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
                           <TableCell className={`text-right font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground'}`}>
@@ -628,15 +631,12 @@ const ProductPositions = ({
                             </Button>
                           </TableCell>
                         </TableRow>
-                        <TableRow className="bg-muted/50">
-                          <TableCell className="font-medium">(=) Faturamento Médio</TableCell>
-                          <TableCell className="text-center">R$</TableCell>
-                          <TableCell className="text-right font-medium">{formatCurrency(faturamentoMedio).replace('R$ ', '')}</TableCell>
-                          <TableCell className="w-16"></TableCell>
-                        </TableRow>
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
                             (-) Desconto de Comprometimento (-6%)
+                            <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium ml-2">
+                              sobre Faturamento Ancoragem
+                            </span>
                             {(categoria === 'saber' || categoria === 'ter') && (
                               <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full font-medium ml-2">
                                 N/A para {categoria.toUpperCase()}
@@ -659,35 +659,38 @@ const ProductPositions = ({
                             </Button>
                           </TableCell>
                         </TableRow>
-                         <TableRow>
-                           <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
-                             (-) Desconto de Cupom (-20%)
-                           </TableCell>
-                           <TableCell className={`text-center ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
-                           <TableCell className={`text-right font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>
-                             {formatCurrency(descontoCupom).replace('R$ ', '')}
-                           </TableCell>
-                           <TableCell className="w-16">
-                             <Button
-                               variant={aplicarDescontoCupom ? "default" : "outline"}
-                               size="sm"
-                               onClick={() => setAplicarDescontoCupom(!aplicarDescontoCupom)}
-                               className="h-6 w-6 p-0 text-xs"
-                             >
-                               {aplicarDescontoCupom ? "✓" : "✗"}
-                             </Button>
-                           </TableCell>
-                         </TableRow>
+                        <TableRow>
+                          <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
+                            (-) Desconto de Cupom (-20%)
+                            <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium ml-2">
+                              sobre Faturamento Ancoragem
+                            </span>
+                          </TableCell>
+                          <TableCell className={`text-center ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
+                          <TableCell className={`text-right font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>
+                            {formatCurrency(descontoCupom).replace('R$ ', '')}
+                          </TableCell>
+                          <TableCell className="w-16">
+                            <Button
+                              variant={aplicarDescontoCupom ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setAplicarDescontoCupom(!aplicarDescontoCupom)}
+                              className="h-6 w-6 p-0 text-xs"
+                            >
+                              {aplicarDescontoCupom ? "✓" : "✗"}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
                         <TableRow className="bg-green-50 dark:bg-green-950/30 border-l-4 border-l-green-500 border-t-2 border-t-green-200 dark:border-t-green-800">
                           <TableCell className="font-semibold flex items-center gap-2">
                             <span className="text-green-600 dark:text-green-400">💰</span>
-                            (=) Faturamento Mínimo
+                            (=) Faturamento Final (após descontos)
                             <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-medium">
-                              VALOR BASE MÍNIMO
+                              Ancoragem - Descontos
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-green-600 dark:text-green-400 font-medium">R$</TableCell>
-                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">{formatCurrency(faturamentoMinimo).replace('R$ ', '')}</TableCell>
+                          <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">{formatCurrency(faturamentoComDesconto).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
