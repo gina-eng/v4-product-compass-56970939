@@ -397,9 +397,8 @@ const ProductPositions = ({
   
   const royalties = faturamentoComDesconto * 0.17;
   const taxaTransicao = faturamentoComDesconto * 0.03;
-  const taxaAntecipacao = faturamentoComDesconto * 0.10;
-  const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
-  const impostosReceita = receitaBruta * 0.074;
+  const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao;
+  const impostosReceita = receitaBruta * 0.0925;
   const receitaLiquida = receitaBruta - impostosReceita;
   const custosDiretos = totalCSPDireto + totalCSPOverhead + outros;
   const margemOperacional = receitaLiquida - custosDiretos;
@@ -705,12 +704,6 @@ const ProductPositions = ({
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaTransicao).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium text-red-600">(-) Taxa de Antecipação (-10%)</TableCell>
-                          <TableCell className="text-center text-red-600">R$</TableCell>
-                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaAntecipacao).replace('R$ ', '')}</TableCell>
-                          <TableCell className="w-16"></TableCell>
-                        </TableRow>
                         <TableRow className="bg-muted/50">
                           <TableCell className="font-medium">(=) Receita Bruta (MRR)</TableCell>
                           <TableCell className="text-center">R$</TableCell>
@@ -718,7 +711,7 @@ const ProductPositions = ({
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-red-600">(-) Impostos sobre Receita</TableCell>
+                          <TableCell className="font-medium text-red-600">(-) Impostos sobre Receita (-9,25%)</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(impostosReceita).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>

@@ -117,9 +117,8 @@ const ProductPortfolio = () => {
                 const faturamentoComDesconto = faturamentoMinimo;
                 const royalties = faturamentoComDesconto * 0.17;
                 const taxaTransicao = faturamentoComDesconto * 0.03;
-                const taxaAntecipacao = faturamentoComDesconto * 0.10;
-                const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
-                const impostosReceita = receitaBruta * 0.074;
+                const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao;
+                const impostosReceita = receitaBruta * 0.0925;
                 const receitaLiquida = receitaBruta - impostosReceita;
                 const custosDiretos = totalCSPDireto + totalCSPOverhead;
                 const margemOperacionalValor = receitaLiquida - custosDiretos;
