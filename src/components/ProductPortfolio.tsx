@@ -37,7 +37,7 @@ const ProductPortfolio = () => {
           const newDedicacao = { ...prev };
           data.forEach(product => {
             if (product.usa_dedicacao && !newDedicacao[product.id]) {
-              newDedicacao[product.id] = 1; // 100% por padrão
+              newDedicacao[product.id] = 0.1; // 10% (Compartilhado 1) por padrão
             }
           });
           return newDedicacao;
