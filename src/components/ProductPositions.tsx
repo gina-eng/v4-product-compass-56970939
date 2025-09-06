@@ -348,12 +348,20 @@ const ProductPositions = ({
     return horasEfetivas * cph;
   };
 
-  // Separar posições normais das overhead
-  const overheadPositions = categoria === 'executar' 
-    ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
-    : ['Gerente de PE&G', 'Coordenador de PE&G'];
-  const posicoesDiretas = productPositions.filter(pp => !overheadPositions.includes(pp.positions.nome));
-  const posicoesOverhead = productPositions.filter(pp => overheadPositions.includes(pp.positions.nome));
+  // Separar posições por tipo
+  const overheadPositions = ['Gerente de PE&G', 'Coordenador de PE&G'];
+  const accountManagerPositions = ['Account Manager'];
+  
+  const posicoesDiretas = productPositions.filter(pp => 
+    !overheadPositions.includes(pp.positions.nome) && 
+    !accountManagerPositions.includes(pp.positions.nome)
+  );
+  const posicoesOverhead = productPositions.filter(pp => 
+    overheadPositions.includes(pp.positions.nome)
+  );
+  const posicoesAccountManager = productPositions.filter(pp => 
+    accountManagerPositions.includes(pp.positions.nome)
+  );
 
   // Calcular totais
   const totalHoras = productPositions.reduce((total, pp) => {
@@ -362,16 +370,27 @@ const ProductPositions = ({
       ? total + (pp.horas_alocadas * nivelDedicacao)
       : total + pp.horas_alocadas;
   }, 0);
+  
   const totalCSPDireto = posicoesDiretas.reduce((total, pp) => {
     return total + calculateCSP(pp.positions.cph, pp.horas_alocadas);
   }, 0);
+  
   const totalCSPOverhead = posicoesOverhead.reduce((total, pp) => {
     return total + calculateCSP(pp.positions.cph, pp.horas_alocadas);
   }, 0);
-  const totalCSP = totalCSPDireto + totalCSPOverhead;
+  
+  const totalCSPAccountManager = posicoesAccountManager.reduce((total, pp) => {
+    return total + calculateCSP(pp.positions.cph, pp.horas_alocadas);
+  }, 0);
+  
+  const totalCSP = totalCSPDireto + totalCSPOverhead + totalCSPAccountManager;
 
   // Cálculos DRE - Nova estrutura
-  const faturamentoAncoragem = (totalCSPDireto + totalCSPOverhead) * markup;
+  // Para EXECUTAR: Account Manager é multiplicado pelo markup overhead (2.0)
+  // Para outras categorias: Account Manager é somado normalmente
+  const faturamentoAncoragem = categoria === 'executar' 
+    ? (totalCSPDireto * markup) + totalCSPOverhead + (totalCSPAccountManager * markupOverhead)
+    : (totalCSPDireto + totalCSPOverhead + totalCSPAccountManager) * markup;
   const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
   const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
   const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoMedio * 0.06 : 0;
@@ -385,7 +404,7 @@ const ProductPositions = ({
   const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
   const impostosReceita = receitaBruta * 0.074;
   const receitaLiquida = receitaBruta - impostosReceita;
-  const custosDiretos = totalCSPDireto + totalCSPOverhead + outros;
+  const custosDiretos = totalCSPDireto + totalCSPOverhead + totalCSPAccountManager + outros;
   const margemOperacional = receitaLiquida - custosDiretos;
   const margemPercentual = receitaLiquida > 0 ? (margemOperacional / receitaLiquida) * 100 : 0;
 
@@ -395,8 +414,10 @@ const ProductPositions = ({
   console.log('Nível Dedicação:', nivelDedicacao);
   console.log('Total CSP Direto:', totalCSPDireto);
   console.log('Total CSP Overhead:', totalCSPOverhead);
+  console.log('Total CSP Account Manager:', totalCSPAccountManager);
   console.log('Total CSP:', totalCSP);
   console.log('Markup:', markup);
+  console.log('Markup Overhead:', markupOverhead);
   console.log('Faturamento Ancoragem:', faturamentoAncoragem);
   console.log('Receita Líquida:', receitaLiquida);
   console.log('Margem Operacional:', margemOperacional);
@@ -582,7 +603,10 @@ const ProductPositions = ({
                             <span className="text-red-600 dark:text-red-400">⚓</span>
                             (=) Faturamento Ancoragem
                             <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-1 rounded-full font-medium">
-                              (CSP direto + CSP Overhead) × markup direto
+                              {categoria === 'executar' 
+                                ? "(CSP direto × markup) + CSP Overhead + (Account Manager × markup overhead)"
+                                : "(CSP direto + CSP Overhead + Account Manager) × markup direto"
+                              }
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-red-600 dark:text-red-400 font-medium">R$</TableCell>
@@ -724,6 +748,14 @@ const ProductPositions = ({
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(totalCSPOverhead).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
+                        {categoria === 'executar' && (
+                          <TableRow className="pl-6">
+                            <TableCell className="font-medium text-red-600 pl-8">(-) CSP Account Manager</TableCell>
+                            <TableCell className="text-center text-red-600">R$</TableCell>
+                            <TableCell className="text-right font-medium text-red-600">{formatCurrency(totalCSPAccountManager).replace('R$ ', '')}</TableCell>
+                            <TableCell className="w-16"></TableCell>
+                          </TableRow>
+                        )}
                         <TableRow>
                           <TableCell className="font-medium text-red-600 pl-8">(-) Outros</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
