@@ -352,16 +352,23 @@ const ProductPositions = ({
     return horasEfetivas * cph;
   };
 
-  // Separar posições por tipo conforme categoria
-  const overheadPositions = categoria === 'executar'
-    ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
-    : ['Gerente de PE&G', 'Coordenador de PE&G'];
+  // Função para identificar se uma posição é Overhead
+  const isOverheadPosition = (nome: string) => {
+    const normalized = (nome || '').toLowerCase().trim();
+    const isGestaoPeG = normalized === 'gerente de pe&g' || normalized === 'coordenador de pe&g';
+    const isAccount = normalized.includes('account manager') || normalized === 'account' || normalized === 'am';
+    
+    if (categoria === 'executar') {
+      return isGestaoPeG || isAccount; // Account Manager é overhead em EXECUTAR
+    }
+    return isGestaoPeG; // Account Manager é direto em TER/SABER
+  };
 
   const posicoesDiretas = productPositions.filter(pp =>
-    !overheadPositions.includes(pp.positions.nome)
+    !isOverheadPosition(pp.positions.nome)
   );
   const posicoesOverhead = productPositions.filter(pp =>
-    overheadPositions.includes(pp.positions.nome)
+    isOverheadPosition(pp.positions.nome)
   );
 
   // Calcular totais
@@ -411,8 +418,15 @@ const ProductPositions = ({
   // Debug logs detalhados
   console.log('=== DEBUG CÁLCULOS DETALHADO ===');
   console.log('Categoria:', categoria);
-  console.log('Overhead Positions Array:', overheadPositions);
-  console.log('Product Positions:', productPositions.map(pp => ({ nome: pp.positions.nome, horas: pp.horas_alocadas, cph: pp.positions.cph })));
+  console.log('Função isOverheadPosition aplicada');
+  console.log('Product Positions:', productPositions.map(pp => ({ 
+    nome: pp.positions.nome, 
+    horas: pp.horas_alocadas, 
+    cph: pp.positions.cph,
+    csp: calculateCSP(pp.positions.cph, pp.horas_alocadas),
+    isOverhead: isOverheadPosition(pp.positions.nome),
+    categoria: categoria
+  })));
   console.log('Posições Diretas:', posicoesDiretas.map(pp => ({ nome: pp.positions.nome, csp: calculateCSP(pp.positions.cph, pp.horas_alocadas) })));
   console.log('Posições Overhead:', posicoesOverhead.map(pp => ({ nome: pp.positions.nome, csp: calculateCSP(pp.positions.cph, pp.horas_alocadas) })));
   console.log('Total CSP Direto:', totalCSPDireto);
