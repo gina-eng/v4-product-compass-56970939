@@ -349,7 +349,9 @@ const ProductPositions = ({
   };
 
   // Separar posições normais das overhead
-  const overheadPositions = ['Gerente de PE&G', 'Coordenador de PE&G'];
+  const overheadPositions = categoria === 'executar' 
+    ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
+    : ['Gerente de PE&G', 'Coordenador de PE&G'];
   const posicoesDiretas = productPositions.filter(pp => !overheadPositions.includes(pp.positions.nome));
   const posicoesOverhead = productPositions.filter(pp => overheadPositions.includes(pp.positions.nome));
 
