@@ -389,12 +389,9 @@ const ProductPositions = ({
   
   const totalCSP = totalCSPDireto + totalCSPOverhead;
 
-  // Cálculos DRE - Estrutura correta
-  // EXECUTAR: (CSP Direto × markup) + (CSP Overhead × markup overhead)
-  // Demais categorias: (CSP Direto + CSP Overhead) × markup
-  const faturamentoAncoragem = categoria === 'executar'
-    ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
-    : (totalCSPDireto + totalCSPOverhead) * markup;
+  // Cálculos DRE - Fórmula consistente para todas as categorias
+  // Faturamento Ancoragem = (CSP Direto × markup direto) + (CSP Overhead × markup overhead)
+  const faturamentoAncoragem = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
     
   // Estrutura hierárquica correta
   const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
@@ -434,15 +431,9 @@ const ProductPositions = ({
   console.log('Markup:', markup);
   console.log('Markup Overhead:', markupOverhead);
   console.log('Cálculo Faturamento - Categoria EXECUTAR?', categoria === 'executar');
-  if (categoria === 'executar') {
-    console.log('Faturamento = (CSP Direto × markup) + (CSP Overhead × markup overhead)');
-    console.log(`Faturamento = (${totalCSPDireto} × ${markup}) + (${totalCSPOverhead} × ${markupOverhead})`);
-    console.log(`Faturamento = ${totalCSPDireto * markup} + ${totalCSPOverhead * markupOverhead} = ${faturamentoAncoragem}`);
-  } else {
-    console.log('Faturamento = (CSP Direto + CSP Overhead) × markup');
-    console.log(`Faturamento = (${totalCSPDireto} + ${totalCSPOverhead}) × ${markup}`);
-    console.log(`Faturamento = ${totalCSPDireto + totalCSPOverhead} × ${markup} = ${faturamentoAncoragem}`);
-  }
+  console.log('Faturamento = (CSP Direto × markup) + (CSP Overhead × markup overhead) - TODAS as categorias');
+  console.log(`Faturamento = (${totalCSPDireto} × ${markup}) + (${totalCSPOverhead} × ${markupOverhead})`);
+  console.log(`Faturamento = ${totalCSPDireto * markup} + ${totalCSPOverhead * markupOverhead} = ${faturamentoAncoragem}`);
   console.log('================================');
   
   console.log('ProductPositions rendering - Taxa de Transição updated');

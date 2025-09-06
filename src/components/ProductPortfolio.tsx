@@ -111,10 +111,8 @@ const ProductPortfolio = () => {
               const totalCSP = totalCSPDireto + totalCSPOverhead;
 
               if (totalCSP > 0) {
-                // Faturamento Ancoragem (Mesma regra da tela de posições)
-                faturamentoSemDesconto = categoria === 'executar'
-                  ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
-                  : (totalCSPDireto + totalCSPOverhead) * markup;
+                // Faturamento Ancoragem (Fórmula consistente para todas as categorias)
+                faturamentoSemDesconto = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
 
                 console.log('[PORTFOLIO] Produto:', product.produto);
                 console.log('[PORTFOLIO] Categoria:', categoria);
