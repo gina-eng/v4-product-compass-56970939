@@ -39,10 +39,8 @@ const ProductCard = ({
     { label: "Compartilhado 1 (10%)", value: 0.1 },
     { label: "Compartilhado 2 (15%)", value: 0.15 },
     { label: "Semi Dedicado 1 (25%)", value: 0.25 },
-    { label: "Semi Dedicado 2 (35%)", value: 0.35 },
-    { label: "Dedicado 1 (50%)", value: 0.5 },
-    { label: "Dedicado 2 (75%)", value: 0.75 },
-    { label: "100% (100%)", value: 1 },
+    { label: "Semi Dedicado 2 (50%)", value: 0.5 },
+    { label: "Dedicado (100%)", value: 1 },
   ];
 
   const getCategoryColor = (category: string) => {
