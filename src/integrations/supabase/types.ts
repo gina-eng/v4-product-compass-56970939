@@ -160,6 +160,7 @@ export type Database = {
           tempo_meta_kpi: Database["public"]["Enums"]["tempo_meta"] | null
           time_envolvido: string | null
           updated_at: string
+          usa_dedicacao: boolean
           use_case_map_1_data: Json | null
           use_case_map_1_name: string | null
           use_case_map_2_data: Json | null
@@ -218,6 +219,7 @@ export type Database = {
           tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
           time_envolvido?: string | null
           updated_at?: string
+          usa_dedicacao?: boolean
           use_case_map_1_data?: Json | null
           use_case_map_1_name?: string | null
           use_case_map_2_data?: Json | null
@@ -276,6 +278,7 @@ export type Database = {
           tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
           time_envolvido?: string | null
           updated_at?: string
+          usa_dedicacao?: boolean
           use_case_map_1_data?: Json | null
           use_case_map_1_name?: string | null
           use_case_map_2_data?: Json | null

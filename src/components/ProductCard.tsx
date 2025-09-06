@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "@/lib/formatters";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface ProductCardProps {
   id: string;
@@ -13,6 +15,9 @@ interface ProductCardProps {
   description?: string;
   descricao_card?: string;
   margemOperacional?: number | string;
+  usaDedicacao?: boolean;
+  nivelDedicacao?: number;
+  onDedicacaoChange?: (productId: string, nivel: number) => void;
 }
 
 const ProductCard = ({ 
@@ -23,9 +28,22 @@ const ProductCard = ({
   status, 
   description, 
   descricao_card,
-  margemOperacional 
+  margemOperacional,
+  usaDedicacao = false,
+  nivelDedicacao = 1,
+  onDedicacaoChange
 }: ProductCardProps) => {
   const navigate = useNavigate();
+
+  const opcoesDedicacao = [
+    { label: "Compartilhado 1 (10%)", value: 0.1 },
+    { label: "Compartilhado 2 (15%)", value: 0.15 },
+    { label: "Semi Dedicado 1 (25%)", value: 0.25 },
+    { label: "Semi Dedicado 2 (35%)", value: 0.35 },
+    { label: "Dedicado 1 (50%)", value: 0.5 },
+    { label: "Dedicado 2 (75%)", value: 0.75 },
+    { label: "100% (100%)", value: 1 },
+  ];
 
   const getCategoryColor = (category: string) => {
     const colors = {
@@ -79,6 +97,28 @@ const ProductCard = ({
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
               {descricao_card || description}
             </p>
+          )}
+
+          {/* Seletor de Dedicação - específico para este produto */}
+          {usaDedicacao && (
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">Nível de Dedicação:</Label>
+              <Select 
+                value={nivelDedicacao.toString()} 
+                onValueChange={(value) => onDedicacaoChange?.(id, parseFloat(value))}
+              >
+                <SelectTrigger className="w-full text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {opcoesDedicacao.map((opcao) => (
+                    <SelectItem key={opcao.value} value={opcao.value.toString()}>
+                      {opcao.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           )}
         </div>
         

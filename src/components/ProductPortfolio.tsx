@@ -12,17 +12,8 @@ const ProductPortfolio = () => {
   const [statusFilter, setStatusFilter] = useState<string>("Disponível");
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  // Nível de dedicação (aplicado apenas para produtos EXECUTAR)
-  const [nivelDedicacao, setNivelDedicacao] = useState<number>(1);
-  const opcoesDedicacao = [
-    { label: "Compartilhado 1 (10%)", value: 0.1 },
-    { label: "Compartilhado 2 (15%)", value: 0.15 },
-    { label: "Semi Dedicado 1 (25%)", value: 0.25 },
-    { label: "Semi Dedicado 2 (35%)", value: 0.35 },
-    { label: "Dedicado 1 (50%)", value: 0.5 },
-    { label: "Dedicado 2 (75%)", value: 0.75 },
-    { label: "100% (100%)", value: 1 },
-  ];
+  // Nível de dedicação por produto (objeto com productId como chave)
+  const [niveisDedicacao, setNiveisDedicacao] = useState<{[key: string]: number}>({});
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -41,105 +32,114 @@ const ProductPortfolio = () => {
           return;
         }
 
-        // Buscar posições para cada produto
-        const productsWithMargin = await Promise.all(
-          data.map(async (product) => {
-            const { data: positions, error: positionsError } = await supabase
-              .from('product_positions')
-              .select(`
-                *,
-                positions (*)
-              `)
-              .eq('product_id', product.id);
+        // Inicializar níveis de dedicação
+        const initialDedicacao: {[key: string]: number} = {};
+        data.forEach(product => {
+          if (product.usa_dedicacao) {
+            initialDedicacao[product.id] = 1; // 100% por padrão
+          }
+        });
+        setNiveisDedicacao(initialDedicacao);
 
-            if (positionsError) {
-              console.error('Error fetching positions:', positionsError);
-            }
+        // Função para calcular produtos com margem
+        const calculateProductsWithMargin = async () => {
+          const productsWithMargin = await Promise.all(
+            data.map(async (product) => {
+              const { data: positions, error: positionsError } = await supabase
+                .from('product_positions')
+                .select(`
+                  *,
+                  positions (*)
+                `)
+                .eq('product_id', product.id);
 
-            // Calcular valores DRE
-            let margemOperacional: number | string = "A definir";
-            let faturamentoSemDesconto = 0;
-            
-            if (positions && positions.length > 0) {
-              const markup = Number(product.markup) || 1;
-              const markupOverhead = Number(product.markup_overhead) || 1;
-              const categoria = product.categoria;
-
-              // Classificação de overhead por categoria
-              const overheadPositions = categoria === 'executar'
-                ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
-                : ['Gerente de PE&G', 'Coordenador de PE&G'];
-
-              // Função para calcular CSP com dedicação
-              const calculateCSP = (cph: number, horasAlocadas: number) => {
-                const horasEfetivas = categoria === 'executar' ? horasAlocadas * nivelDedicacao : horasAlocadas;
-                return horasEfetivas * cph;
-              };
-
-              // Totais CSP
-              let totalCSPDireto = 0;
-              let totalCSPOverhead = 0;
-
-              positions.forEach((pp: any) => {
-                const horas = Number(pp.horas_alocadas) || 0;
-                const cph = Number(pp.positions?.cph) || 0;
-                const nome = pp.positions?.nome || '';
-                const csp = calculateCSP(cph, horas);
-                if (overheadPositions.includes(nome)) {
-                  totalCSPOverhead += csp;
-                } else {
-                  totalCSPDireto += csp;
-                }
-              });
-
-              const totalCSP = totalCSPDireto + totalCSPOverhead;
-
-              if (totalCSP > 0) {
-                // Faturamento Ancoragem (Mesma regra da tela de posições)
-                faturamentoSemDesconto = categoria === 'executar'
-                  ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
-                  : (totalCSPDireto + totalCSPOverhead) * markup;
-                
-                // Cálculo simplificado de margem (mantido como antes)
-                const descontoPagamento = faturamentoSemDesconto * 0.17;
-                const descontoCupom = faturamentoSemDesconto * 0.20;
-                const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
-                const royalties = faturamentoComDesconto * 0.17;
-                const taxaTransicao = faturamentoComDesconto * 0.03;
-                const taxaAntecipacao = faturamentoComDesconto * 0.10;
-                const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
-                const impostosReceita = receitaBruta * 0.074;
-                const receitaLiquida = receitaBruta - impostosReceita;
-                const custosDiretos = totalCSPDireto + totalCSPOverhead;
-                const margemOperacionalValor = receitaLiquida - custosDiretos;
-                
-                margemOperacional = receitaLiquida > 0 ? (margemOperacionalValor / receitaLiquida) * 100 : 0;
+              if (positionsError) {
+                console.error('Error fetching positions:', positionsError);
               }
-            }
 
-            const productData = {
-              id: product.id,
-              name: product.produto,
-              description: product.descricao_card && product.descricao_card.trim() ? product.descricao_card.trim() : "",
-              category: product.categoria,
-              status: product.status,
-              valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
-              margemOperacional: margemOperacional
-            };
-            
-            console.log('Produto processado:', {
-              id: product.id,
-              nome: product.produto,
-              descricao_card_original: product.descricao_card,
-              descricao_final: productData.description,
-              tem_descricao: !!productData.description
-            });
+              // Calcular valores DRE
+              let margemOperacional: number | string = "A definir";
+              let faturamentoSemDesconto = 0;
+              
+              if (positions && positions.length > 0) {
+                const markup = Number(product.markup) || 1;
+                const markupOverhead = Number(product.markup_overhead) || 1;
+                const categoria = product.categoria;
+                const nivelDedicacao = niveisDedicacao[product.id] || 1;
 
-            return productData;
-          })
-        );
-        
-        setProducts(productsWithMargin);
+                // Classificação de overhead por categoria
+                const overheadPositions = categoria === 'executar'
+                  ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
+                  : ['Gerente de PE&G', 'Coordenador de PE&G'];
+
+                // Função para calcular CSP com dedicação
+                const calculateCSP = (cph: number, horasAlocadas: number) => {
+                  const horasEfetivas = (categoria === 'executar' && product.usa_dedicacao) 
+                    ? horasAlocadas * nivelDedicacao 
+                    : horasAlocadas;
+                  return horasEfetivas * cph;
+                };
+
+                // Totais CSP
+                let totalCSPDireto = 0;
+                let totalCSPOverhead = 0;
+
+                positions.forEach((pp: any) => {
+                  const horas = Number(pp.horas_alocadas) || 0;
+                  const cph = Number(pp.positions?.cph) || 0;
+                  const nome = pp.positions?.nome || '';
+                  const csp = calculateCSP(cph, horas);
+                  if (overheadPositions.includes(nome)) {
+                    totalCSPOverhead += csp;
+                  } else {
+                    totalCSPDireto += csp;
+                  }
+                });
+
+                const totalCSP = totalCSPDireto + totalCSPOverhead;
+
+                if (totalCSP > 0) {
+                  // Faturamento Ancoragem (Mesma regra da tela de posições)
+                  faturamentoSemDesconto = categoria === 'executar'
+                    ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
+                    : (totalCSPDireto + totalCSPOverhead) * markup;
+                  
+                  // Cálculo simplificado de margem (mantido como antes)
+                  const descontoPagamento = faturamentoSemDesconto * 0.17;
+                  const descontoCupom = faturamentoSemDesconto * 0.20;
+                  const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
+                  const royalties = faturamentoComDesconto * 0.17;
+                  const taxaTransicao = faturamentoComDesconto * 0.03;
+                  const taxaAntecipacao = faturamentoComDesconto * 0.10;
+                  const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
+                  const impostosReceita = receitaBruta * 0.074;
+                  const receitaLiquida = receitaBruta - impostosReceita;
+                  const custosDiretos = totalCSPDireto + totalCSPOverhead;
+                  const margemOperacionalValor = receitaLiquida - custosDiretos;
+                  
+                  margemOperacional = receitaLiquida > 0 ? (margemOperacionalValor / receitaLiquida) * 100 : 0;
+                }
+              }
+
+              const productData = {
+                id: product.id,
+                name: product.produto,
+                description: product.descricao_card && product.descricao_card.trim() ? product.descricao_card.trim() : "",
+                category: product.categoria,
+                status: product.status,
+                valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
+                margemOperacional: margemOperacional,
+                usaDedicacao: product.usa_dedicacao || false
+              };
+              
+              return productData;
+            })
+          );
+          
+          setProducts(productsWithMargin);
+        };
+
+        await calculateProductsWithMargin();
       } catch (error) {
         console.error('Error:', error);
       } finally {
@@ -148,7 +148,14 @@ const ProductPortfolio = () => {
     };
 
     fetchProducts();
-  }, [nivelDedicacao]);
+  }, [niveisDedicacao]);
+
+  const handleDedicacaoChange = (productId: string, nivel: number) => {
+    setNiveisDedicacao(prev => ({
+      ...prev,
+      [productId]: nivel
+    }));
+  };
 
   const filters = [
     { key: "all", label: "Todos", color: "default" },
@@ -179,7 +186,7 @@ const ProductPortfolio = () => {
           <h2 className="text-3xl font-bold mb-8">Portfólio de Produtos e Serviços V4</h2>
           
           {/* Filtros lado a lado */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Filtros por Categoria */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Filtrar por Categoria</h3>
@@ -215,25 +222,6 @@ const ProductPortfolio = () => {
                 ))}
               </div>
             </div>
-
-            {/* Seletor de Dedicação (aplicado aos produtos EXECUTAR) */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Nível de Dedicação (EXECUTAR)</h3>
-              <div className="flex justify-center">
-                <Select value={nivelDedicacao.toString()} onValueChange={(value) => setNivelDedicacao(parseFloat(value))}>
-                  <SelectTrigger className="w-56">
-                    <SelectValue placeholder="Selecione o nível de dedicação" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {opcoesDedicacao.map((opcao) => (
-                      <SelectItem key={opcao.value} value={opcao.value.toString()}>
-                        {opcao.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -254,6 +242,9 @@ const ProductPortfolio = () => {
                 status={product.status}
                 valor={product.valorBase}
                 margemOperacional={product.margemOperacional}
+                usaDedicacao={product.usaDedicacao}
+                nivelDedicacao={niveisDedicacao[product.id] || 1}
+                onDedicacaoChange={handleDedicacaoChange}
               />
             ))}
           </div>

@@ -21,6 +21,7 @@ import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Plus, Edit, Trash2, Upload } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
+import { Checkbox } from "@/components/ui/checkbox";
 import UseCaseMap from "@/components/UseCaseMap";
 
 interface SpicedData {
@@ -185,6 +186,7 @@ const Admin = () => {
     case_2_responsavel_projeto: '',
     case_2_documento_url: '',
     markup: 1,
+    usa_dedicacao: false,
     use_case_map_1_name: 'Use Case Map - Cliente sem Investimento',
     use_case_map_2_name: 'Use Case Map - Cliente com Investimento'
   });
@@ -311,6 +313,7 @@ const Admin = () => {
         },
         como_entrego_dados: (product.como_entrego_dados as unknown as ComoEntregoItem[]) || [],
         markup: product.markup,
+        usa_dedicacao: product.usa_dedicacao || false,
         use_case_map_1_name: product.use_case_map_1_name,
         use_case_map_1_data: (product.use_case_map_1_data as any) || {
           problema: '', persona: '', alternativa: '', why: '', frequencia: ''
@@ -479,6 +482,7 @@ const Admin = () => {
         spiced_data_2: spicedData2,
         como_entrego_dados: comoEntregoDados,
         markup: productForm.markup,
+        usa_dedicacao: productForm.usa_dedicacao,
         use_case_map_1_name: productForm.use_case_map_1_name,
         use_case_map_1_data: useCaseMap1Data,
         use_case_map_2_name: productForm.use_case_map_2_name,
@@ -566,6 +570,7 @@ const Admin = () => {
       case_2_responsavel_projeto: (product as any).case_2_responsavel_projeto || '',
       case_2_documento_url: (product as any).case_2_documento_url || '',
       markup: product.markup || 1,
+      usa_dedicacao: (product as any).usa_dedicacao || false,
       use_case_map_1_name: product.use_case_map_1_name || 'Use Case Map - Cliente sem Investimento',
       use_case_map_2_name: product.use_case_map_2_name || 'Use Case Map - Cliente com Investimento'
     });
@@ -754,6 +759,7 @@ const Admin = () => {
       case_2_responsavel_projeto: '',
       case_2_documento_url: '',
       markup: 1,
+      usa_dedicacao: false,
       use_case_map_1_name: 'Use Case Map - Cliente sem Investimento',
       use_case_map_2_name: 'Use Case Map - Cliente com Investimento'
     });
@@ -885,6 +891,31 @@ const Admin = () => {
                                 </SelectContent>
                               </Select>
                             </div>
+                            
+                            {/* Campo Usa Dedicação */}
+                            <div className="col-span-2">
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id="usa_dedicacao"
+                                  checked={productForm.usa_dedicacao}
+                                  onCheckedChange={(checked) => 
+                                    setProductForm({...productForm, usa_dedicacao: checked as boolean})
+                                  }
+                                />
+                                <div className="grid gap-1.5 leading-none">
+                                  <Label 
+                                    htmlFor="usa_dedicacao" 
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    Permite configurar nível de dedicação
+                                  </Label>
+                                  <p className="text-xs text-muted-foreground">
+                                    Habilita o seletor de dedicação nos cards e na DRE (recomendado para produtos EXECUTAR)
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            
                             <div>
                               <Label htmlFor="valor">Valor (Automático)</Label>
                               <Input
