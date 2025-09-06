@@ -48,16 +48,40 @@ const ProductPortfolio = () => {
             let faturamentoSemDesconto = 0;
             
             if (positions && positions.length > 0) {
-              const markup = product.markup || 1;
-              const totalCSP = positions.reduce((total: number, pp: any) => {
-                return total + (pp.horas_alocadas * pp.positions.cph);
-              }, 0);
+              const markup = Number(product.markup) || 1;
+              const markupOverhead = Number(product.markup_overhead) || 1;
+              const categoria = product.categoria;
+
+              // Classificação de overhead por categoria
+              const overheadPositions = categoria === 'executar'
+                ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
+                : ['Gerente de PE&G', 'Coordenador de PE&G'];
+
+              // Totais CSP
+              let totalCSPDireto = 0;
+              let totalCSPOverhead = 0;
+
+              positions.forEach((pp: any) => {
+                const horas = Number(pp.horas_alocadas) || 0;
+                const cph = Number(pp.positions?.cph) || 0;
+                const nome = pp.positions?.nome || '';
+                const csp = horas * cph;
+                if (overheadPositions.includes(nome)) {
+                  totalCSPOverhead += csp;
+                } else {
+                  totalCSPDireto += csp;
+                }
+              });
+
+              const totalCSP = totalCSPDireto + totalCSPOverhead;
 
               if (totalCSP > 0) {
-                // Faturamento (MRR) - Sem Desconto
-                faturamentoSemDesconto = totalCSP * markup;
+                // Faturamento Ancoragem (Mesma regra da tela de posições)
+                faturamentoSemDesconto = categoria === 'executar'
+                  ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead)
+                  : (totalCSPDireto + totalCSPOverhead) * markup;
                 
-                // Continuando os cálculos para margem operacional
+                // Cálculo simplificado de margem (mantido como antes)
                 const descontoPagamento = faturamentoSemDesconto * 0.17;
                 const descontoCupom = faturamentoSemDesconto * 0.20;
                 const faturamentoComDesconto = faturamentoSemDesconto - descontoPagamento - descontoCupom;
@@ -67,7 +91,7 @@ const ProductPortfolio = () => {
                 const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao - taxaAntecipacao;
                 const impostosReceita = receitaBruta * 0.074;
                 const receitaLiquida = receitaBruta - impostosReceita;
-                const custosDiretos = totalCSP;
+                const custosDiretos = totalCSPDireto + totalCSPOverhead;
                 const margemOperacionalValor = receitaLiquida - custosDiretos;
                 
                 margemOperacional = receitaLiquida > 0 ? (margemOperacionalValor / receitaLiquida) * 100 : 0;
