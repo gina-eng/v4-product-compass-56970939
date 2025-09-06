@@ -386,10 +386,10 @@ const ProductPositions = ({
   const totalCSP = totalCSPDireto + totalCSPOverhead + totalCSPAccountManager;
 
   // Cálculos DRE - Nova estrutura
-  // Para EXECUTAR: Account Manager é multiplicado pelo markup overhead (2.0)
-  // Para outras categorias: Account Manager é somado normalmente
+  // Para EXECUTAR: CSP Overhead (todas as posições) é multiplicado pelo markup overhead (2.0)
+  // Para outras categorias: Todas as posições são somadas e multiplicadas pelo markup normal
   const faturamentoAncoragem = categoria === 'executar' 
-    ? (totalCSPDireto * markup) + totalCSPOverhead + (totalCSPAccountManager * markupOverhead)
+    ? (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead) + (totalCSPAccountManager * markupOverhead)
     : (totalCSPDireto + totalCSPOverhead + totalCSPAccountManager) * markup;
   const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
   const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
@@ -604,7 +604,7 @@ const ProductPositions = ({
                             (=) Faturamento Ancoragem
                             <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-1 rounded-full font-medium">
                               {categoria === 'executar' 
-                                ? "(CSP direto × markup) + CSP Overhead + (Account Manager × markup overhead)"
+                                ? "(CSP direto × markup) + (CSP Overhead × markup overhead) + (Account Manager × markup overhead)"
                                 : "(CSP direto + CSP Overhead + Account Manager) × markup direto"
                               }
                             </span>
