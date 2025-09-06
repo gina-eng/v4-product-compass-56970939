@@ -389,8 +389,8 @@ const ProductPositions = ({
   const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
   const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
   
-  const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoMedio * 0.06 : 0;
-  const descontoCupom = aplicarDescontoCupom ? faturamentoMedio * 0.20 : 0;
+  const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoAncoragem * 0.06 : 0;
+  const descontoCupom = aplicarDescontoCupom ? faturamentoAncoragem * 0.20 : 0;
   const faturamentoMinimo = faturamentoMedio - descontoComprometimento - descontoCupom;
   
   const faturamentoComDesconto = faturamentoMinimo;
@@ -640,9 +640,6 @@ const ProductPositions = ({
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
                             (-) Desconto de Comprometimento (-6%)
-                            <span className="text-xs bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full font-medium ml-2">
-                              sobre Faturamento Médio
-                            </span>
                             {(categoria === 'saber' || categoria === 'ter') && (
                               <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full font-medium ml-2">
                                 N/A para {categoria.toUpperCase()}
@@ -668,9 +665,6 @@ const ProductPositions = ({
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
                             (-) Desconto de Cupom (-20%)
-                            <span className="text-xs bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full font-medium ml-2">
-                              sobre Faturamento Médio
-                            </span>
                           </TableCell>
                           <TableCell className={`text-center ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
                           <TableCell className={`text-right font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>

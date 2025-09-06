@@ -109,9 +109,9 @@ const ProductPortfolio = () => {
                 const descontoPagamento = faturamentoSemDesconto * 0.11;  // sobre ancoragem
                 const faturamentoMedio = faturamentoSemDesconto - descontoPagamento;
                 
-                // Descontos sobre faturamento médio
-                const descontoComprometimento = faturamentoMedio * 0.06;   // sobre médio  
-                const descontoCupom = faturamentoMedio * 0.20;             // sobre médio
+                // Descontos sobre faturamento ancoragem
+                const descontoComprometimento = faturamentoSemDesconto * 0.06;   // sobre ancoragem  
+                const descontoCupom = faturamentoSemDesconto * 0.20;             // sobre ancoragem
                 const faturamentoMinimo = faturamentoMedio - descontoComprometimento - descontoCupom;
                 
                 const faturamentoComDesconto = faturamentoMinimo;
