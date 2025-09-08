@@ -669,8 +669,8 @@ const Admin = () => {
         [productId]: faturamentoSemDesconto
       }));
       
-      // Recarregar produtos para atualizar a lista
-      fetchProducts();
+      // Recalcular produtos para atualizar valores
+      await fetchProducts();
     }
   };
 

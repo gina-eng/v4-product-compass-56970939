@@ -165,11 +165,20 @@ const ProductDetails = () => {
         use_case_map_2_data: data.use_case_map_2_data
       };
       
-      setProduct(mappedProduct);
+      // Atualizar o valor do produto no banco se necessário
+      const valorCalculado = await calculateFaturamentoAncoragem(data.id);
+      if (valorCalculado > 0 && data.valor !== valorCalculado.toFixed(2)) {
+        await supabase
+          .from('products')
+          .update({ valor: valorCalculado.toFixed(2) })
+          .eq('id', data.id);
+          
+        // Atualizar o produto mapeado com o novo valor
+        mappedProduct.valor = valorCalculado.toFixed(2);
+      }
       
-      // Calcular valor base atualizado
-      const valorBase = await calculateFaturamentoAncoragem(data.id);
-      setValorCalculado(valorBase > 0 ? valorBase.toString() : "A definir");
+      setProduct(mappedProduct);
+      setValorCalculado(valorCalculado > 0 ? valorCalculado.toString() : "A definir");
     } catch (error) {
       console.error('Erro ao buscar produto:', error);
     } finally {
