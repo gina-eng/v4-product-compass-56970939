@@ -21,6 +21,7 @@ import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Plus, Edit, Trash2, Upload } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
+import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 import { Checkbox } from "@/components/ui/checkbox";
 import UseCaseMap from "@/components/UseCaseMap";
 
@@ -332,6 +333,14 @@ const Admin = () => {
       for (const product of formattedProducts) {
         const calculatedValue = await calculateFaturamentoSemDesconto(product.id, product.markup || 1.0);
         calculatedVals[product.id] = calculatedValue;
+        
+        // Atualizar o campo valor no banco se estiver desatualizado
+        if (product.valor !== calculatedValue.toFixed(2)) {
+          await supabase
+            .from('products')
+            .update({ valor: calculatedValue.toFixed(2) })
+            .eq('id', product.id);
+        }
       }
       setCalculatedValues(calculatedVals);
     } catch (error) {
@@ -629,65 +638,9 @@ const Admin = () => {
     }
   };
 
-  // Função para calcular faturamento sem desconto
+  // Função para calcular faturamento sem desconto (DEPRECATED - usar calculateFaturamentoAncoragem)
   const calculateFaturamentoSemDesconto = async (productId: string, _productMarkup?: number): Promise<number> => {
-    try {
-      const { data: positions, error: positionsError } = await supabase
-        .from('product_positions')
-        .select(`
-          *,
-          positions (cph, nome)
-        `)
-        .eq('product_id', productId);
-      
-      if (positionsError) throw positionsError;
-
-      // Buscar markups e categoria do produto
-      const { data: product, error: productError } = await supabase
-        .from('products')
-        .select('markup, markup_overhead, categoria')
-        .eq('id', productId)
-        .single();
-      
-      if (productError) throw productError;
-
-      const markup = Number(product?.markup) || 1;
-      const markupOverhead = Number(product?.markup_overhead) || 1;
-      const categoria = (product?.categoria || '').toLowerCase();
-
-      // Classificação de Overhead consistente com o front
-      const isOverheadPosition = (nome: string) => {
-        const normalized = (nome || '').toLowerCase();
-        const isGestaoPeG = normalized === 'gerente de pe&g' || normalized === 'coordenador de pe&g';
-        const isAccount = normalized.includes('account manager') || normalized === 'am' || normalized.includes('account');
-        if (categoria === 'executar') {
-          return isGestaoPeG || isAccount;
-        }
-        return isGestaoPeG;
-      };
-
-      let totalCSPDireto = 0;
-      let totalCSPOverhead = 0;
-
-      (positions || []).forEach((pp: any) => {
-        const horas = Number(pp.horas_alocadas) || 0;
-        const cph = Number(pp.positions?.cph) || 0;
-        const nome = pp.positions?.nome || '';
-        const csp = horas * cph;
-        if (isOverheadPosition(nome)) {
-          totalCSPOverhead += csp;
-        } else {
-          totalCSPDireto += csp;
-        }
-      });
-
-      // Faturamento Ancoragem = (CSP Direto × markup direto) + (CSP Overhead × markup overhead)
-      const faturamentoAncoragem = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
-      return faturamentoAncoragem;
-    } catch (error) {
-      console.error('Erro ao calcular faturamento sem desconto:', error);
-      return 0;
-    }
+    return await calculateFaturamentoAncoragem(productId);
   };
 
   // Função para atualizar o time envolvido e valor quando as posições mudarem
@@ -1509,13 +1462,10 @@ const Admin = () => {
                           )}
                           <div className="space-y-1 text-sm">
                             <div className="flex justify-between">
-                              <span className="font-bold text-foreground">Valor:</span>
-                              <span className="font-normal text-content">
-                                {calculatedValues[product.id] && calculatedValues[product.id] > 0 
-                                  ? formatCurrency(calculatedValues[product.id]) 
-                                  : "A definir"
-                                }
-                              </span>
+                               <span className="font-bold text-foreground">Valor:</span>
+                               <span className="font-normal text-content">
+                                 {product.valor === "A definir" ? "A definir" : formatCurrency(product.valor)}
+                               </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="font-bold text-foreground">Duração:</span>

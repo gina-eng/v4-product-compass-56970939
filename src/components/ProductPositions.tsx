@@ -12,6 +12,7 @@ import { Plus, Edit, Trash2, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/formatters";
+import { calculateFaturamentoFromData } from "@/lib/productCalculations";
 
 interface Position {
   id: string;

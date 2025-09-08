@@ -18,6 +18,7 @@ import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import UseCaseMap from "@/components/UseCaseMap";
 import ProductSummary from "@/components/ProductSummary";
 import { formatCurrency } from "@/lib/formatters";
+import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 
 interface Product {
   id: string;
@@ -87,6 +88,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
+  const [valorCalculado, setValorCalculado] = useState<string>("A definir");
 
   useEffect(() => {
     if (id) {
@@ -164,6 +166,10 @@ const ProductDetails = () => {
       };
       
       setProduct(mappedProduct);
+      
+      // Calcular valor base atualizado
+      const valorBase = await calculateFaturamentoAncoragem(data.id);
+      setValorCalculado(valorBase > 0 ? valorBase.toString() : "A definir");
     } catch (error) {
       console.error('Erro ao buscar produto:', error);
     } finally {
@@ -289,7 +295,7 @@ const ProductDetails = () => {
                       <div>
                         <span className="text-label">Valor Base:</span>
                         <p className="text-body">
-                          {product.valor === "A definir" ? product.valor : formatCurrency(product.valor)}
+                          {valorCalculado === "A definir" ? valorCalculado : formatCurrency(valorCalculado)}
                         </p>
                       </div>
                     </div>

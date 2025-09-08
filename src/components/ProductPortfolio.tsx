@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCurrency } from "@/lib/formatters";
+import { calculateFaturamentoFromData, isOverheadPosition } from "@/lib/productCalculations";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -70,80 +72,66 @@ const ProductPortfolio = () => {
               console.error('Error fetching positions:', positionsError);
             }
 
-            // Calcular valores DRE
+            // Calcular valores DRE usando função utilitária
             let margemOperacional: number | string = "A definir";
             let faturamentoSemDesconto = 0;
             
             if (positions && positions.length > 0) {
-              const markup = Number(product.markup) || 1;
-              const markupOverhead = Number(product.markup_overhead) || 1;
-              const categoria = product.categoria;
-              const nivelDedicacao = product.usa_dedicacao
-                ? (niveisDedicacao[product.id] ?? (categoria === 'executar' ? 0.1 : 1))
-                : 1; // 100% se não usa dedicação
-
-              // Classificação de overhead por categoria
-              const overheadPositions = categoria === 'executar'
-                ? ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager']
-                : ['Gerente de PE&G', 'Coordenador de PE&G'];
-
-              // Função para calcular CSP com dedicação APENAS se usa_dedicacao estiver habilitado
-              const calculateCSP = (cph: number, horasAlocadas: number) => {
-                const horasEfetivas = (categoria === 'executar' && product.usa_dedicacao) 
-                  ? horasAlocadas * nivelDedicacao 
-                  : horasAlocadas; // Sempre 100% se não usa dedicação
-                return horasEfetivas * cph;
+              const productData = {
+                markup: Number(product.markup) || 1,
+                markup_overhead: Number(product.markup_overhead) || 1,
+                categoria: product.categoria,
+                usa_dedicacao: product.usa_dedicacao || false
               };
+              
+              const nivelDedicacao = product.usa_dedicacao
+                ? (niveisDedicacao[product.id] ?? (product.categoria === 'executar' ? 0.1 : 1))
+                : 1;
 
-              // Totais CSP
-              let totalCSPDireto = 0;
-              let totalCSPOverhead = 0;
+              // Usar função utilitária para cálculo consistente
+              faturamentoSemDesconto = calculateFaturamentoFromData(
+                positions, 
+                productData, 
+                nivelDedicacao
+              );
 
-              positions.forEach((pp: any) => {
-                const horas = Number(pp.horas_alocadas) || 0;
-                const cph = Number(pp.positions?.cph) || 0;
-                const nome = pp.positions?.nome || '';
-                const csp = calculateCSP(cph, horas);
-                if (isOverheadPosition(nome, categoria)) {
-                  totalCSPOverhead += csp;
-                } else {
-                  totalCSPDireto += csp;
-                }
-              });
-
-              const totalCSP = totalCSPDireto + totalCSPOverhead;
-
-              if (totalCSP > 0) {
-                // Faturamento Ancoragem (Fórmula consistente para todas as categorias)
-                faturamentoSemDesconto = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
-
+              if (faturamentoSemDesconto > 0) {
                 console.log('[PORTFOLIO] Produto:', product.produto);
-                console.log('[PORTFOLIO] Categoria:', categoria);
-                console.log('[PORTFOLIO] Totais CSP -> Direto:', totalCSPDireto, 'Overhead:', totalCSPOverhead);
-                console.log('[PORTFOLIO] Markups -> direto:', markup, 'overhead:', markupOverhead);
                 console.log('[PORTFOLIO] Faturamento Ancoragem:', faturamentoSemDesconto);
                 
-                // Cálculo DRE correto - Estrutura hierárquica
+                // Cálculo dos descontos
                 const descontoPagamento = faturamentoSemDesconto * 0.11;  // sobre ancoragem
                 const faturamentoMedio = faturamentoSemDesconto - descontoPagamento;
-                
+
                 // Descontos sobre faturamento ancoragem
                 const descontoComprometimento = faturamentoSemDesconto * 0.06;   // sobre ancoragem  
                 const descontoCupom = faturamentoSemDesconto * 0.20;             // sobre ancoragem
                 const faturamentoMinimo = faturamentoMedio - descontoComprometimento - descontoCupom;
-                
+
                 const faturamentoComDesconto = faturamentoMinimo;
                 const royalties = faturamentoComDesconto * 0.17;
                 const taxaTransicao = faturamentoComDesconto * 0.03;
                 const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao;
-                const impostosReceita = receitaBruta * 0.0925;
-                const receitaLiquida = receitaBruta - impostosReceita;
-                const custosDiretos = totalCSPDireto + totalCSPOverhead;
-                const margemOperacionalValor = receitaLiquida - custosDiretos;
-                
-                margemOperacional = receitaLiquida > 0 ? (margemOperacionalValor / receitaLiquida) * 100 : 0;
-              }
-            }
+
+                // Calcular custo total para margem operacional
+                const totalCSP = positions.reduce((total, pp) => {
+                  const horas = Number(pp.horas_alocadas) || 0;
+                  const cph = Number(pp.positions?.cph) || 0;
+                  const categoria = product.categoria;
+                  const horasEfetivas = (categoria === 'executar' && product.usa_dedicacao) 
+                    ? horas * nivelDedicacao 
+                    : horas;
+                  return total + (horasEfetivas * cph);
+                }, 0);
+
+                const custoVariavel = totalCSP + (Number(product.outros) || 0) + royalties + taxaTransicao;
+                const margemBruta = receitaBruta - (totalCSP + (Number(product.outros) || 0));
+                const margemBrutaPercentual = ((margemBruta / receitaBruta) * 100).toFixed(2);
+
+                margemOperacional = margemBrutaPercentual + "%";
+              } else {
+                margemOperacional = "A definir";
+              }            }
 
             const productData = {
               id: product.id,
