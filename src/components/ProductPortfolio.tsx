@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import ProductCard from "./ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoFromData, isOverheadPosition } from "@/lib/productCalculations";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search } from "lucide-react";
 
 const ProductPortfolio = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("Disponível");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   // Nível de dedicação por produto (objeto com productId como chave)
@@ -252,7 +255,15 @@ const ProductPortfolio = () => {
 
   const filteredProducts = products
     .filter(product => statusFilter === "all" || product.status === statusFilter)
-    .filter(product => activeFilter === "all" || product.category === activeFilter);
+    .filter(product => activeFilter === "all" || product.category === activeFilter)
+    .filter(product => {
+      if (!searchTerm.trim()) return true;
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        product.name?.toLowerCase().includes(searchLower) ||
+        product.description?.toLowerCase().includes(searchLower)
+      );
+    });
 
   const handleViewDetails = (productId: string) => {
     navigate(`/produto/${productId}`);
@@ -263,6 +274,20 @@ const ProductPortfolio = () => {
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-8">Portfólio de Produtos e Serviços V4</h2>
+          
+          {/* Campo de Pesquisa */}
+          <div className="max-w-md mx-auto mb-8">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                type="text"
+                placeholder="Pesquisar produtos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
           
           {/* Filtros lado a lado */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
