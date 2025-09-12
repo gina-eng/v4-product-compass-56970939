@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,7 +83,8 @@ interface Position {
 }
 
 const ProductDetails = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
@@ -91,96 +92,199 @@ const ProductDetails = () => {
   const [valorCalculado, setValorCalculado] = useState<string>("A definir");
 
   useEffect(() => {
-    if (id) {
-      fetchProduct();
-      fetchPositions();
-    }
-  }, [id]);
+    fetchProduct();
+    fetchPositions();
+  }, [slug, location.state]);
 
   const fetchProduct = async () => {
-    if (!id) return;
+    // Primeiro tenta pegar o ID do state (quando vem da navegação)
+    const productId = location.state?.productId;
+    
+    if (productId) {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('id', productId)
+          .single();
+
+        if (error) throw error;
+        
+        // Mapear os dados para a nova interface
+        const mappedProduct: Product = {
+          id: data.id,
+          produto: data.produto,
+          categoria: data.categoria,
+          status: data.status,
+          valor: data.valor,
+          duracao: data.duracao,
+          dono: data.dono,
+          description: data.description,
+          descricao_card: data.descricao_card,
+          escopo: data.escopo,
+          duracao_media: data.duracao_media,
+          time_envolvido: data.time_envolvido,
+          formato_entrega: data.formato_entrega,
+          descricao_completa: data.descricao_completa,
+          para_quem_serve: data.para_quem_serve,
+          como_entrega_valor: data.como_entrega_valor,
+          entregaveis_relacionados: data.entregaveis_relacionados,
+          stack_digital: data.stack_digital,
+          bonus_kpi: data.bonus_kpi,
+          garantia_especifica: data.garantia_especifica,
+          kpi_principal: data.kpi_principal,
+          tempo_meta_kpi: data.tempo_meta_kpi,
+          o_que_entrego: data.o_que_entrego,
+          pitch: data.pitch,
+          bpmn: data.bpmn,
+          playbook: data.playbook,
+          icp: data.icp,
+          pricing: data.pricing,
+          certificacao: data.certificacao,
+          pitch_url: data.pitch_url,
+          bpmn_url: data.bpmn_url,
+          playbook_url: data.playbook_url,
+          icp_url: data.icp_url,
+          pricing_url: data.pricing_url,
+          certificacao_url: data.certificacao_url,
+          case_1_name: data.case_1_name,
+          case_1_unidade_responsavel: data.case_1_unidade_responsavel,
+          case_1_responsavel_projeto: data.case_1_responsavel_projeto,
+          case_1_documento_url: data.case_1_documento_url,
+          case_2_name: data.case_2_name,
+          case_2_unidade_responsavel: data.case_2_unidade_responsavel,
+          case_2_responsavel_projeto: data.case_2_responsavel_projeto,
+          case_2_documento_url: data.case_2_documento_url,
+          como_vendo: data.como_vendo,
+          spiced_data: data.spiced_data,
+          spiced_data_2: data.spiced_data_2,
+          como_entrego_dados: Array.isArray(data.como_entrego_dados) ? data.como_entrego_dados : [],
+          markup: data.markup,
+          use_case_map_1_name: data.use_case_map_1_name,
+          use_case_map_1_data: data.use_case_map_1_data,
+          use_case_map_2_name: data.use_case_map_2_name,
+          use_case_map_2_data: data.use_case_map_2_data
+        };
+        
+        // Atualizar o valor do produto no banco se necessário
+        const valorCalculado = await calculateFaturamentoAncoragem(data.id);
+        if (valorCalculado > 0 && data.valor !== valorCalculado.toFixed(2)) {
+          await supabase
+            .from('products')
+            .update({ valor: valorCalculado.toFixed(2) })
+            .eq('id', data.id);
+            
+          // Atualizar o produto mapeado com o novo valor
+          mappedProduct.valor = valorCalculado.toFixed(2);
+        }
+        
+        setProduct(mappedProduct);
+        setValorCalculado(valorCalculado > 0 ? valorCalculado.toString() : "A definir");
+        return;
+      } catch (error) {
+        console.error('Error fetching product by ID:', error);
+      }
+    }
+    
+    // Se não tem ID no state, tenta buscar pelo slug
+    if (!slug) return;
     
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('*')
-        .eq('id', id)
-        .single();
+        .select('*');
 
       if (error) throw error;
       
-      // Mapear os dados para a nova interface
-      const mappedProduct: Product = {
-        id: data.id,
-        produto: data.produto,
-        categoria: data.categoria,
-        status: data.status,
-        valor: data.valor,
-        duracao: data.duracao,
-        dono: data.dono,
-        description: data.description,
-        descricao_card: data.descricao_card,
-        escopo: data.escopo,
-        duracao_media: data.duracao_media,
-        time_envolvido: data.time_envolvido,
-        formato_entrega: data.formato_entrega,
-        descricao_completa: data.descricao_completa,
-        para_quem_serve: data.para_quem_serve,
-        como_entrega_valor: data.como_entrega_valor,
-        entregaveis_relacionados: data.entregaveis_relacionados,
-        stack_digital: data.stack_digital,
-        bonus_kpi: data.bonus_kpi,
-        garantia_especifica: data.garantia_especifica,
-        kpi_principal: data.kpi_principal,
-        tempo_meta_kpi: data.tempo_meta_kpi,
-        o_que_entrego: data.o_que_entrego,
-        pitch: data.pitch,
-        bpmn: data.bpmn,
-        playbook: data.playbook,
-        icp: data.icp,
-        pricing: data.pricing,
-        certificacao: data.certificacao,
-        pitch_url: data.pitch_url,
-        bpmn_url: data.bpmn_url,
-        playbook_url: data.playbook_url,
-        icp_url: data.icp_url,
-        pricing_url: data.pricing_url,
-        certificacao_url: data.certificacao_url,
-        case_1_name: data.case_1_name,
-        case_1_unidade_responsavel: data.case_1_unidade_responsavel,
-        case_1_responsavel_projeto: data.case_1_responsavel_projeto,
-        case_1_documento_url: data.case_1_documento_url,
-        case_2_name: data.case_2_name,
-        case_2_unidade_responsavel: data.case_2_unidade_responsavel,
-        case_2_responsavel_projeto: data.case_2_responsavel_projeto,
-        case_2_documento_url: data.case_2_documento_url,
-        como_vendo: data.como_vendo,
-        spiced_data: data.spiced_data,
-        spiced_data_2: data.spiced_data_2,
-        como_entrego_dados: Array.isArray(data.como_entrego_dados) ? data.como_entrego_dados : [],
-        markup: data.markup,
-        use_case_map_1_name: data.use_case_map_1_name,
-        use_case_map_1_data: data.use_case_map_1_data,
-        use_case_map_2_name: data.use_case_map_2_name,
-        use_case_map_2_data: data.use_case_map_2_data
-      };
+      // Buscar produto que corresponde ao slug
+      const foundProduct = data.find(p => {
+        const productSlug = p.produto
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim();
+        return productSlug === slug;
+      });
       
-      // Atualizar o valor do produto no banco se necessário
-      const valorCalculado = await calculateFaturamentoAncoragem(data.id);
-      if (valorCalculado > 0 && data.valor !== valorCalculado.toFixed(2)) {
-        await supabase
-          .from('products')
-          .update({ valor: valorCalculado.toFixed(2) })
-          .eq('id', data.id);
-          
-        // Atualizar o produto mapeado com o novo valor
-        mappedProduct.valor = valorCalculado.toFixed(2);
+      if (foundProduct) {
+        // Mapear os dados para a nova interface
+        const mappedProduct: Product = {
+          id: foundProduct.id,
+          produto: foundProduct.produto,
+          categoria: foundProduct.categoria,
+          status: foundProduct.status,
+          valor: foundProduct.valor,
+          duracao: foundProduct.duracao,
+          dono: foundProduct.dono,
+          description: foundProduct.description,
+          descricao_card: foundProduct.descricao_card,
+          escopo: foundProduct.escopo,
+          duracao_media: foundProduct.duracao_media,
+          time_envolvido: foundProduct.time_envolvido,
+          formato_entrega: foundProduct.formato_entrega,
+          descricao_completa: foundProduct.descricao_completa,
+          para_quem_serve: foundProduct.para_quem_serve,
+          como_entrega_valor: foundProduct.como_entrega_valor,
+          entregaveis_relacionados: foundProduct.entregaveis_relacionados,
+          stack_digital: foundProduct.stack_digital,
+          bonus_kpi: foundProduct.bonus_kpi,
+          garantia_especifica: foundProduct.garantia_especifica,
+          kpi_principal: foundProduct.kpi_principal,
+          tempo_meta_kpi: foundProduct.tempo_meta_kpi,
+          o_que_entrego: foundProduct.o_que_entrego,
+          pitch: foundProduct.pitch,
+          bpmn: foundProduct.bpmn,
+          playbook: foundProduct.playbook,
+          icp: foundProduct.icp,
+          pricing: foundProduct.pricing,
+          certificacao: foundProduct.certificacao,
+          pitch_url: foundProduct.pitch_url,
+          bpmn_url: foundProduct.bpmn_url,
+          playbook_url: foundProduct.playbook_url,
+          icp_url: foundProduct.icp_url,
+          pricing_url: foundProduct.pricing_url,
+          certificacao_url: foundProduct.certificacao_url,
+          case_1_name: foundProduct.case_1_name,
+          case_1_unidade_responsavel: foundProduct.case_1_unidade_responsavel,
+          case_1_responsavel_projeto: foundProduct.case_1_responsavel_projeto,
+          case_1_documento_url: foundProduct.case_1_documento_url,
+          case_2_name: foundProduct.case_2_name,
+          case_2_unidade_responsavel: foundProduct.case_2_unidade_responsavel,
+          case_2_responsavel_projeto: foundProduct.case_2_responsavel_projeto,
+          case_2_documento_url: foundProduct.case_2_documento_url,
+          como_vendo: foundProduct.como_vendo,
+          spiced_data: foundProduct.spiced_data,
+          spiced_data_2: foundProduct.spiced_data_2,
+          como_entrego_dados: Array.isArray(foundProduct.como_entrego_dados) ? foundProduct.como_entrego_dados : [],
+          markup: foundProduct.markup,
+          use_case_map_1_name: foundProduct.use_case_map_1_name,
+          use_case_map_1_data: foundProduct.use_case_map_1_data,
+          use_case_map_2_name: foundProduct.use_case_map_2_name,
+          use_case_map_2_data: foundProduct.use_case_map_2_data
+        };
+        
+        // Atualizar o valor do produto no banco se necessário
+        const valorCalculado = await calculateFaturamentoAncoragem(foundProduct.id);
+        if (valorCalculado > 0 && foundProduct.valor !== valorCalculado.toFixed(2)) {
+          await supabase
+            .from('products')
+            .update({ valor: valorCalculado.toFixed(2) })
+            .eq('id', foundProduct.id);
+            
+          // Atualizar o produto mapeado com o novo valor
+          mappedProduct.valor = valorCalculado.toFixed(2);
+        }
+        
+        setProduct(mappedProduct);
+        setValorCalculado(valorCalculado > 0 ? valorCalculado.toString() : "A definir");
+      } else {
+        throw new Error('Produto não encontrado');
       }
-      
-      setProduct(mappedProduct);
-      setValorCalculado(valorCalculado > 0 ? valorCalculado.toString() : "A definir");
     } catch (error) {
-      console.error('Erro ao buscar produto:', error);
+      console.error('Error fetching product:', error);
     } finally {
       setLoading(false);
     }

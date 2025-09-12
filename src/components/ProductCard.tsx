@@ -64,7 +64,17 @@ const ProductCard = ({
   };
 
   const handleViewDetails = () => {
-    navigate(`/produto/${id}`);
+    // Criar slug a partir do nome do produto
+    const slug = produto
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+      .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
+      .replace(/\s+/g, '-') // Substitui espaços por hífens
+      .replace(/-+/g, '-') // Remove múltiplos hífens consecutivos
+      .trim();
+    
+    navigate(`/produto/${slug}`, { state: { productId: id } });
   };
 
   return (

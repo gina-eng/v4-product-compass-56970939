@@ -40,7 +40,7 @@ const App = () => {
                   <Admin />
                 </ProtectedRoute>
               } />
-              <Route path="/produto/:id" element={
+              <Route path="/produto/:slug" element={
                 <ProtectedRoute>
                   <ProductDetails />
                 </ProtectedRoute>
