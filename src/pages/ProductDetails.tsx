@@ -83,13 +83,19 @@ interface Position {
 }
 
 const ProductDetails = () => {
+  console.log('ProductDetails component started');
   const { slug } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  
+  console.log('ProductDetails - slug:', slug, 'location:', location);
+  
   const [product, setProduct] = useState<Product | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
   const [valorCalculado, setValorCalculado] = useState<string>("A definir");
+  
+  console.log('ProductDetails - current state:', { product: !!product, loading, slug });
 
   useEffect(() => {
     fetchProduct();
@@ -186,9 +192,10 @@ const ProductDetails = () => {
         setProduct(mappedProduct);
         setValorCalculado(valorCalculado > 0 ? valorCalculado.toString() : "A definir");
         return;
-      } catch (error) {
-        console.error('Error fetching product by ID:', error);
-      }
+    } catch (error) {
+      console.error('Error fetching product by ID:', error);
+      setLoading(false);
+    }
     }
     
     // Se não tem ID no state, tenta buscar pelo slug
@@ -298,8 +305,7 @@ const ProductDetails = () => {
         throw new Error('Produto não encontrado');
       }
     } catch (error) {
-      console.error('Error fetching product:', error);
-    } finally {
+      console.error('Error fetching product by slug:', error);
       setLoading(false);
     }
   };
