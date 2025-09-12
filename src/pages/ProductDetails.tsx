@@ -97,10 +97,13 @@ const ProductDetails = () => {
   }, [slug, location.state]);
 
   const fetchProduct = async () => {
+    console.log('fetchProduct called with slug:', slug, 'location.state:', location.state);
+    
     // Primeiro tenta pegar o ID do state (quando vem da navegação)
     const productId = location.state?.productId;
     
     if (productId) {
+      console.log('Using productId from state:', productId);
       try {
         const { data, error } = await supabase
           .from('products')
@@ -109,6 +112,7 @@ const ProductDetails = () => {
           .single();
 
         if (error) throw error;
+        console.log('Product found by ID:', data);
         
         // Mapear os dados para a nova interface
         const mappedProduct: Product = {
@@ -187,14 +191,20 @@ const ProductDetails = () => {
     }
     
     // Se não tem ID no state, tenta buscar pelo slug
-    if (!slug) return;
+    if (!slug) {
+      console.log('No slug provided');
+      setLoading(false);
+      return;
+    }
     
+    console.log('Searching by slug:', slug);
     try {
       const { data, error } = await supabase
         .from('products')
         .select('*');
 
       if (error) throw error;
+      console.log('All products fetched for slug search:', data.length);
       
       // Buscar produto que corresponde ao slug
       const foundProduct = data.find(p => {
@@ -206,9 +216,11 @@ const ProductDetails = () => {
           .replace(/\s+/g, '-')
           .replace(/-+/g, '-')
           .trim();
+        console.log('Comparing slug:', productSlug, 'with:', slug, 'for product:', p.produto);
         return productSlug === slug;
       });
       
+      console.log('Found product:', foundProduct);
       if (foundProduct) {
         // Mapear os dados para a nova interface
         const mappedProduct: Product = {
