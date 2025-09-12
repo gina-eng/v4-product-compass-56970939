@@ -74,9 +74,6 @@ const ProductCard = ({
       .replace(/-+/g, '-') // Remove múltiplos hífens consecutivos
       .trim();
     
-    console.log('ProductCard - Produto:', produto);
-    console.log('ProductCard - Slug gerado:', slug);
-    console.log('ProductCard - ID:', id);
     navigate(`/produto/${slug}`, { state: { productId: id } });
   };
 

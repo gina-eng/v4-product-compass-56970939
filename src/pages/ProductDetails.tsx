@@ -105,6 +105,14 @@ const ProductDetails = () => {
   const fetchProduct = async () => {
     console.log('fetchProduct called with slug:', slug, 'location.state:', location.state);
     
+    // Verificar se usuário está autenticado
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      console.log('No session found, redirecting to auth');
+      navigate('/auth');
+      return;
+    }
+    
     // Primeiro tenta pegar o ID do state (quando vem da navegação)
     const productId = location.state?.productId;
     
@@ -115,9 +123,18 @@ const ProductDetails = () => {
           .from('products')
           .select('*')
           .eq('id', productId)
-          .single();
+          .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
+        
+        if (!data) {
+          console.log('No product found with ID:', productId);
+          setLoading(false);
+          return;
+        }
         console.log('Product found by ID:', data);
         console.log('Mapped product:', data);
         
