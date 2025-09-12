@@ -83,19 +83,20 @@ interface Position {
 }
 
 const ProductDetails = () => {
-  console.log('ProductDetails component started');
+  console.log('>>> ProductDetails START <<<');
   const { slug } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   
-  console.log('ProductDetails - slug:', slug, 'location:', location);
+  console.log('>>> ProductDetails - slug:', slug, 'location:', location);
+  console.log('>>> ProductDetails - location.state:', location.state);
   
   const [product, setProduct] = useState<Product | null>(null);
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
   const [valorCalculado, setValorCalculado] = useState<string>("A definir");
   
-  console.log('ProductDetails - current state:', { product: !!product, loading, slug });
+  console.log('>>> ProductDetails - useState initialized. Loading:', loading);
 
   useEffect(() => {
     fetchProduct();
@@ -104,14 +105,6 @@ const ProductDetails = () => {
 
   const fetchProduct = async () => {
     console.log('fetchProduct called with slug:', slug, 'location.state:', location.state);
-    
-    // Verificar se usuário está autenticado
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      console.log('No session found, redirecting to auth');
-      navigate('/auth');
-      return;
-    }
     
     // Primeiro tenta pegar o ID do state (quando vem da navegação)
     const productId = location.state?.productId;
