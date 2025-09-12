@@ -201,6 +201,7 @@ const ProductDetails = () => {
         
         setProduct(mappedProduct);
         setValorCalculado(valorCalculado > 0 ? valorCalculado.toString() : "A definir");
+        setLoading(false); // CRÍTICO: definir loading como false após sucesso
         return;
     } catch (error) {
       console.error('Error fetching product by ID:', error);
@@ -311,6 +312,8 @@ const ProductDetails = () => {
         setProduct(mappedProduct);
         console.log('Product state set:', mappedProduct);
         setValorCalculado(valorCalculado > 0 ? valorCalculado.toString() : "A definir");
+        setLoading(false); // Importante: sempre definir loading como false aqui
+        return; // Importante: sair da função após sucesso
       } else {
         throw new Error('Produto não encontrado');
       }
