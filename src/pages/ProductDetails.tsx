@@ -113,6 +113,7 @@ const ProductDetails = () => {
 
         if (error) throw error;
         console.log('Product found by ID:', data);
+        console.log('Mapped product:', data);
         
         // Mapear os dados para a nova interface
         const mappedProduct: Product = {
@@ -291,6 +292,7 @@ const ProductDetails = () => {
         }
         
         setProduct(mappedProduct);
+        console.log('Product state set:', mappedProduct);
         setValorCalculado(valorCalculado > 0 ? valorCalculado.toString() : "A definir");
       } else {
         throw new Error('Produto não encontrado');
@@ -336,7 +338,10 @@ const ProductDetails = () => {
     return statusConfig[status as keyof typeof statusConfig] || statusConfig["Disponível"];
   };
 
+  console.log('Render - loading:', loading, 'product:', product);
+
   if (loading) {
+    console.log('Rendering loading state');
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-[400px]">
@@ -347,6 +352,7 @@ const ProductDetails = () => {
   }
 
   if (!product) {
+    console.log('Rendering product not found state');
     return (
       <Layout>
         <div className="text-center animate-fade-in">
