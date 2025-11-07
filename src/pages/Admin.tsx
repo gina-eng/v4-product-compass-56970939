@@ -372,9 +372,11 @@ const Admin = () => {
   // Handlers para posições
   const handleEditPosition = (position: Position) => {
     setEditingPosition(position);
+    // Recalcular o CPH com 168 horas ao editar
+    const cphRecalculado = (position.investimento_total / 168).toFixed(2);
     setPositionForm({
       nome: position.nome,
-      cph: position.cph.toString(),
+      cph: cphRecalculado,
       investimento_total: position.investimento_total.toString()
     });
     setIsPositionDialogOpen(true);
@@ -403,9 +405,12 @@ const Admin = () => {
 
   const handleSavePosition = async () => {
     try {
+      // Garantir que o CPH está correto (168 horas)
+      const cphCorreto = parseFloat(positionForm.investimento_total) / 168;
+      
       const positionData = {
         nome: positionForm.nome,
-        cph: parseFloat(positionForm.cph),
+        cph: cphCorreto,
         investimento_total: parseFloat(positionForm.investimento_total)
       };
 
