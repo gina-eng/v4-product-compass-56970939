@@ -1633,7 +1633,15 @@ const Admin = () => {
                   type="number"
                   step="0.01"
                   value={positionForm.investimento_total}
-                  onChange={(e) => setPositionForm({...positionForm, investimento_total: e.target.value})}
+                  onChange={(e) => {
+                    const investimento = e.target.value;
+                    const cphCalculado = investimento ? (parseFloat(investimento) / 168).toFixed(2) : '';
+                    setPositionForm({
+                      ...positionForm, 
+                      investimento_total: investimento,
+                      cph: cphCalculado
+                    });
+                  }}
                 />
               </div>
             </div>
