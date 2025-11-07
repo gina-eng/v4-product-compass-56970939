@@ -1623,8 +1623,13 @@ const Admin = () => {
                   type="number"
                   step="0.01"
                   value={positionForm.cph}
-                  onChange={(e) => setPositionForm({...positionForm, cph: e.target.value})}
+                  readOnly
+                  disabled
+                  className="bg-muted"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Calculado automaticamente: Investimento Total ÷ 168 horas
+                </p>
               </div>
               <div>
                 <Label htmlFor="investimento_total">Investimento Total</Label>
