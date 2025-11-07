@@ -363,6 +363,21 @@ const Admin = () => {
         .order('nome');
 
       if (error) throw error;
+      
+      // Recalcular e atualizar CPH se necessário (migração para 160 horas)
+      if (data) {
+        for (const position of data) {
+          const cphCorreto = (position.investimento_total / 160).toFixed(2);
+          if (position.cph.toFixed(2) !== cphCorreto) {
+            await supabase
+              .from('positions')
+              .update({ cph: parseFloat(cphCorreto) })
+              .eq('id', position.id);
+            position.cph = parseFloat(cphCorreto);
+          }
+        }
+      }
+      
       setPositions(data || []);
     } catch (error) {
       console.error('Erro ao buscar posições:', error);
