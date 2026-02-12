@@ -431,10 +431,7 @@ export type Database = {
       }
     }
     Functions: {
-      is_internal_user: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_internal_user: { Args: never; Returns: boolean }
     }
     Enums: {
       categoria_produto: "saber" | "ter" | "executar" | "potencializar"
