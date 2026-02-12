@@ -1,0 +1,1 @@
+ALTER TYPE categoria_produto ADD VALUE 'destrava_receita';
