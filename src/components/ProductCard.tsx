@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 interface ProductCardProps {
   id: string;
   produto: string;
-  categoria: "saber" | "ter" | "executar" | "potencializar";
+  categoria: "destrava_receita" | "saber" | "ter" | "executar" | "potencializar";
   valor: string;
   status: "Disponível" | "Em produção" | "Em homologação";
   description?: string;
@@ -45,12 +45,25 @@ const ProductCard = ({
 
   const getCategoryColor = (category: string) => {
     const colors = {
+      destrava_receita: "hsl(var(--primary))",
       saber: "hsl(var(--saber))",
       ter: "hsl(var(--ter))", 
       executar: "hsl(var(--executar))",
       potencializar: "hsl(var(--potencializar))"
     };
     return colors[category as keyof typeof colors] || "hsl(var(--primary))";
+  };
+
+  const getCategoryLabel = (category: string) => {
+    const labels = {
+      destrava_receita: "DESTRAVA RECEITA",
+      saber: "SABER",
+      ter: "TER",
+      executar: "EXECUTAR",
+      potencializar: "POTENCIALIZAR",
+    };
+
+    return labels[category as keyof typeof labels] || category.replace(/_/g, " ").toUpperCase();
   };
 
   const getStatusBadge = (status: string) => {
@@ -95,7 +108,7 @@ const ProductCard = ({
           className="inline-block px-3 py-1 rounded-full text-xs font-medium text-white w-fit shadow-sm"
           style={{backgroundColor: getCategoryColor(categoria)}}
         >
-          {categoria.toUpperCase()}
+          {getCategoryLabel(categoria)}
         </div>
       </CardHeader>
       

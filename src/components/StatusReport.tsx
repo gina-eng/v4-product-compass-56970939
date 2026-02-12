@@ -50,6 +50,7 @@ const StatusReport = () => {
 
   const filters = [
     { key: "all", label: "Todos", color: "default" },
+    { key: "destrava_receita", label: "DESTRAVA RECEITA", color: "default" },
     { key: "saber", label: "SABER", color: "saber" },
     { key: "ter", label: "TER", color: "ter" },
     { key: "executar", label: "EXECUTAR", color: "executar" },
@@ -72,6 +73,7 @@ const StatusReport = () => {
 
   const getCategoryColor = (categoria: string) => {
     const colors = {
+      "destrava_receita": "primary",
       "saber": "saber",
       "ter": "ter", 
       "executar": "executar",
@@ -82,12 +84,13 @@ const StatusReport = () => {
 
   const getCategoryLabel = (categoria: string) => {
     const labels = {
+      "destrava_receita": "DESTRAVA RECEITA",
       "saber": "SABER",
       "ter": "TER", 
       "executar": "EXECUTAR",
       "potencializar": "POTENCIALIZAR"
     };
-    return labels[categoria as keyof typeof labels] || categoria.toUpperCase();
+    return labels[categoria as keyof typeof labels] || categoria.replace(/_/g, " ").toUpperCase();
   };
 
   const StatusIcon = ({ value }: { value: boolean }) => (

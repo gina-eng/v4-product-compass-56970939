@@ -39,7 +39,7 @@ const Header = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/materiais-apoio" className="flex items-center">
                     <FileText className="w-4 h-4 mr-2" />
-                    Materiais de Apoio
+                    Artefatos
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

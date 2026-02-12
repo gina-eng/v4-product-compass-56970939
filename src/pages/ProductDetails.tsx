@@ -339,12 +339,25 @@ const ProductDetails = () => {
 
   const getCategoryColor = (category: string) => {
     const colors = {
+      destrava_receita: "hsl(var(--primary))",
       saber: "hsl(var(--saber))",
       ter: "hsl(var(--ter))", 
       executar: "hsl(var(--executar))",
       potencializar: "hsl(var(--potencializar))"
     };
     return colors[category as keyof typeof colors] || "hsl(var(--primary))";
+  };
+
+  const getCategoryLabel = (category: string) => {
+    const labels = {
+      destrava_receita: "DESTRAVA RECEITA",
+      saber: "SABER",
+      ter: "TER",
+      executar: "EXECUTAR",
+      potencializar: "POTENCIALIZAR",
+    };
+
+    return labels[category as keyof typeof labels] || category.replace(/_/g, " ").toUpperCase();
   };
 
   const getStatusBadge = (status: string) => {
@@ -426,7 +439,7 @@ const ProductDetails = () => {
                             className="text-body-small font-medium px-3 py-1"
                             style={{backgroundColor: getCategoryColor(product.categoria), color: 'white'}}
                           >
-                            {product.categoria.toUpperCase()}
+                            {getCategoryLabel(product.categoria)}
                           </Badge>
                         </div>
                       </div>

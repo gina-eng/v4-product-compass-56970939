@@ -19,7 +19,7 @@ import SalesMaterials from "@/components/SalesMaterials";
 import OperationalMaterials from "@/components/OperationalMaterials";
 import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { Plus, Edit, Trash2, Upload } from "lucide-react";
+import { Plus, Edit, Trash2, Upload, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -114,12 +114,16 @@ interface SupportMaterial {
 const Admin = () => {
   const { toast } = useToast();
   const { settings, updateSetting, isTableAvailable } = useSiteSettings();
+
+  const formatCategoryLabel = (category: string) =>
+    category.replace(/_/g, " ").toUpperCase();
   
   // Estados para produtos
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   
   // Cache para valores calculados por produto
   const [calculatedValues, setCalculatedValues] = useState<{[key: string]: number}>({});
@@ -465,7 +469,12 @@ const Admin = () => {
     try {
       const productData = {
         produto: productForm.produto,
-        categoria: productForm.categoria as "saber" | "ter" | "executar" | "potencializar",
+        categoria: productForm.categoria as
+          | "destrava_receita"
+          | "saber"
+          | "ter"
+          | "executar"
+          | "potencializar",
         description: productForm.description,
         descricao_card: productForm.descricao_card || null,
         como_vendo: productForm.como_vendo,
@@ -697,6 +706,15 @@ const Admin = () => {
   // Filtrar produtos
   useEffect(() => {
     let filtered = products;
+
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    if (normalizedSearch) {
+      filtered = filtered.filter((product) => {
+        const searchableContent =
+          `${product.produto} ${product.description ?? ''} ${product.descricao_card ?? ''}`.toLowerCase();
+        return searchableContent.includes(normalizedSearch);
+      });
+    }
     
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(product => product.categoria === categoryFilter);
@@ -707,7 +725,7 @@ const Admin = () => {
     }
     
     setFilteredProducts(filtered);
-  }, [products, categoryFilter, statusFilter]);
+  }, [products, categoryFilter, statusFilter, searchTerm]);
 
   const resetProductForm = () => {
     setEditingProduct(null);
@@ -822,14 +840,14 @@ const Admin = () => {
     <Layout showHeader={true}>
       <div className="space-y-8 animate-fade-in">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Administração</h1>
+          <h1 className="text-3xl font-bold">Área Administrativa</h1>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
           <TabsList>
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="positions">Posições</TabsTrigger>
-            <TabsTrigger value="support">Materiais de Apoio</TabsTrigger>
+            <TabsTrigger value="support">Artefatos</TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
@@ -881,6 +899,7 @@ const Admin = () => {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
+                                  <SelectItem value="destrava_receita">DESTRAVA RECEITA</SelectItem>
                                   <SelectItem value="saber">SABER</SelectItem>
                                   <SelectItem value="ter">TER</SelectItem>
                                   <SelectItem value="executar">EXECUTAR</SelectItem>
@@ -1397,7 +1416,20 @@ const Admin = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-4 mb-6">
+                <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_170px_170px]">
+                  <div>
+                    <Label htmlFor="searchProducts">Buscar Produtos</Label>
+                    <div className="relative">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="searchProducts"
+                        value={searchTerm}
+                        onChange={(event) => setSearchTerm(event.target.value)}
+                        placeholder="Buscar por nome ou descrição..."
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
                   <div>
                     <Label htmlFor="categoryFilter">Filtrar por Categoria</Label>
                     <Select value={categoryFilter} onValueChange={setCategoryFilter}>
@@ -1406,6 +1438,7 @@ const Admin = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Todas</SelectItem>
+                        <SelectItem value="destrava_receita">DESTRAVA RECEITA</SelectItem>
                         <SelectItem value="saber">SABER</SelectItem>
                         <SelectItem value="ter">TER</SelectItem>
                         <SelectItem value="executar">EXECUTAR</SelectItem>
@@ -1437,12 +1470,13 @@ const Admin = () => {
                             <CardTitle className="text-lg leading-tight pr-2">{product.produto}</CardTitle>
                             <div className="flex flex-wrap gap-1">
                               <Badge variant={
+                                product.categoria === 'destrava_receita' ? 'outline' :
                                 product.categoria === 'saber' ? 'default' :
                                 product.categoria === 'ter' ? 'secondary' :
                                 product.categoria === 'executar' ? 'outline' :
                                 'default'
                               } className="text-xs">
-                                {product.categoria.toUpperCase()}
+                                {formatCategoryLabel(product.categoria)}
                               </Badge>
                               <Badge variant={
                                 product.status === 'Disponível' ? 'default' :
@@ -1560,7 +1594,7 @@ const Admin = () => {
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle>Materiais de Apoio</CardTitle>
+                  <CardTitle>Artefatos</CardTitle>
                   <Button>
                     <Plus className="h-4 w-4 mr-2" />
                     Novo Material

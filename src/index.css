@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,36 +9,35 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 99%;
-    --foreground: 0 0% 0%; /* Títulos e labels em preto */
+    --background: 220 20% 97%;
+    --foreground: 224 27% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%; /* Títulos em cards preto */
+    --card-foreground: 224 27% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%; /* Títulos em popover preto */
+    --popover-foreground: 224 27% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 0 81% 53%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 0 0% 0%; /* Títulos secundários preto */
+    --secondary: 220 22% 94%;
+    --secondary-foreground: 224 27% 12%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 0 0% 30%; /* Conteúdo/respostas em cinza escuro */
+    --muted: 220 16% 93%;
+    --muted-foreground: 220 9% 38%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 0 0% 0%; /* Títulos accent preto */
+    --accent: 220 23% 92%;
+    --accent-foreground: 224 27% 12%;
 
-    /* Nova variável para conteúdo/respostas dos campos */
-    --content-text: 0 0% 30%; /* Cinza escuro para respostas */
+    --content-text: 220 9% 34%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 220 9% 46%;
+    --border: 220 17% 88%;
+    --input: 220 17% 88%;
+    --ring: 0 81% 53%;
 
     --radius: 0.75rem;
 
@@ -69,55 +69,54 @@ All colors MUST be HSL.
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 220 9% 46%;
+    --sidebar-background: 220 19% 95%;
+    --sidebar-foreground: 224 18% 20%;
+    --sidebar-primary: 0 81% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 100%;
+    --sidebar-accent-foreground: 224 18% 20%;
+    --sidebar-border: 220 17% 88%;
+    --sidebar-ring: 0 81% 53%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
+    --background: 223 27% 10%;
+    --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
+    --card: 223 27% 12%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
+    --popover: 223 27% 12%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 0 81% 58%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
+    --secondary: 223 18% 18%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%; /* Conteúdo cinza claro no modo escuro */
+    --muted: 223 17% 17%;
+    --muted-foreground: 215 18% 71%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%; /* Títulos brancos no modo escuro */
+    --accent: 223 17% 17%;
+    --accent-foreground: 210 40% 98%;
 
-    /* Conteúdo no modo escuro */
-    --content-text: 215 20.2% 65.1%; /* Cinza claro para respostas no modo escuro */
+    --content-text: 215 18% 71%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 220 9% 46%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 220 9% 26%;
+    --border: 223 18% 22%;
+    --input: 223 18% 22%;
+    --ring: 0 81% 58%;
+    --sidebar-background: 223 23% 14%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 0 81% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 220 9% 46%;
+    --sidebar-accent: 223 16% 18%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 223 16% 20%;
+    --sidebar-ring: 0 81% 58%;
   }
 }
 
@@ -127,7 +126,13 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: "Manrope", "Segoe UI", sans-serif;
+    background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), rgba(248, 249, 253, 0.7));
+  }
+
+  #root {
+    min-height: 100vh;
   }
   
   .text-content {

@@ -346,6 +346,8 @@ export type Database = {
           created_at: string
           id: string
           nome_arquivo: string
+          output_cliente: string | null
+          trava: string | null
           updated_at: string
           url_direcionamento: string
         }
@@ -353,6 +355,8 @@ export type Database = {
           created_at?: string
           id?: string
           nome_arquivo: string
+          output_cliente?: string | null
+          trava?: string | null
           updated_at?: string
           url_direcionamento: string
         }
@@ -360,6 +364,8 @@ export type Database = {
           created_at?: string
           id?: string
           nome_arquivo?: string
+          output_cliente?: string | null
+          trava?: string | null
           updated_at?: string
           url_direcionamento?: string
         }
@@ -434,7 +440,7 @@ export type Database = {
       is_internal_user: { Args: never; Returns: boolean }
     }
     Enums: {
-      categoria_produto: "saber" | "ter" | "executar" | "potencializar"
+      categoria_produto: "destrava_receita" | "saber" | "ter" | "executar" | "potencializar"
       kpi_tipo: "CPL" | "CTR" | "CONVERSÃO" | "ENGAJAMENTO" | "TAXA DE ABERTURA"
       status_produto: "Disponível" | "Em produção" | "Em homologação"
       tempo_meta: "3 meses" | "6 meses" | "12 meses"
@@ -565,7 +571,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      categoria_produto: ["saber", "ter", "executar", "potencializar"],
+      categoria_produto: ["destrava_receita", "saber", "ter", "executar", "potencializar"],
       kpi_tipo: ["CPL", "CTR", "CONVERSÃO", "ENGAJAMENTO", "TAXA DE ABERTURA"],
       status_produto: ["Disponível", "Em produção", "Em homologação"],
       tempo_meta: ["3 meses", "6 meses", "12 meses"],

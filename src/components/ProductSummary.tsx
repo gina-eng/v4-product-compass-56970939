@@ -13,7 +13,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      const shouldShow = scrollTop > 500; // Aparece após 500px
+      const shouldShow = scrollTop > 0; // Aparece ao iniciar a rolagem
       setIsSticky(shouldShow);
     };
 
@@ -66,7 +66,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
     <div
       className={cn(
         "fixed left-0 right-0 z-40 bg-background border-b shadow-md transition-all duration-500 ease-out",
-        isSticky ? "top-24 translate-y-0 opacity-100" : "top-24 -translate-y-full opacity-0"
+        isSticky ? "top-0 translate-y-0 opacity-100" : "top-0 -translate-y-full opacity-0"
       )}
       style={{ margin: 0, padding: 0 }}
     >

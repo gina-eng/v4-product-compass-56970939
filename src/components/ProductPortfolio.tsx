@@ -1,45 +1,90 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowUpRight, LayoutGrid, List, Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import ProductCard from "./ProductCard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/formatters";
-import { calculateFaturamentoFromData, isOverheadPosition } from "@/lib/productCalculations";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { calculateFaturamentoFromData } from "@/lib/productCalculations";
+
+interface PortfolioItem {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  status: string;
+  valorBase: string;
+}
+
+const validCategoryFilters = [
+  "all",
+  "destrava_receita",
+  "saber",
+  "ter",
+  "executar",
+  "potencializar",
+] as const;
+type CategoryFilter = (typeof validCategoryFilters)[number];
+
+const normalizeCategoryFilter = (value: string | null): CategoryFilter => {
+  const normalized = value?.toLowerCase() ?? "all";
+  return validCategoryFilters.includes(normalized as CategoryFilter)
+    ? (normalized as CategoryFilter)
+    : "all";
+};
+
+const categoryLabelMap: Record<string, string> = {
+  destrava_receita: "DESTRAVA RECEITA",
+  saber: "SABER",
+  ter: "TER",
+  executar: "EXECUTAR",
+  potencializar: "POTENCIALIZAR",
+};
+
+const categoryToneMap: Record<string, string> = {
+  destrava_receita: "bg-primary/10 text-primary",
+  saber: "bg-saber/10 text-saber",
+  ter: "bg-ter/10 text-ter",
+  executar: "bg-executar/10 text-executar",
+  potencializar: "bg-potencializar/10 text-potencializar",
+};
+
+const statusToneMap: Record<string, string> = {
+  Disponível: "bg-green-100 text-green-800",
+  "Em produção": "bg-amber-100 text-amber-800",
+  "Em homologação": "bg-slate-100 text-slate-700",
+};
 
 const ProductPortfolio = () => {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("Disponível");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
-  // Nível de dedicação por produto (objeto com productId como chave)
-  const [niveisDedicacao, setNiveisDedicacao] = useState<{[key: string]: number}>({});
+  const activeFilter = normalizeCategoryFilter(searchParams.get("categoria"));
 
-  // Identifica se uma posição é considerada Overhead conforme a categoria
-  const isOverheadPosition = (nome: string, categoria: string) => {
-    const normalized = (nome || '').toLowerCase();
-    const isGestaoPeG = normalized === 'gerente de pe&g' || normalized === 'coordenador de pe&g';
-    const isAccount = normalized.includes('account manager') || normalized === 'am' || normalized.includes('account');
-    if (categoria === 'executar') {
-      return isGestaoPeG || isAccount;
-    }
-    return isGestaoPeG;
+  const handleCategoryFilterChange = (value: string) => {
+    const nextCategory = normalizeCategoryFilter(value);
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.set("categoria", nextCategory);
+    setSearchParams(nextParams, { replace: true });
   };
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const { data, error } = await supabase
-          .from('products')
-          .select('*');
-        
+          .from("products")
+          .select("*")
+          .order("updated_at", { ascending: false });
+
         if (error) {
-          console.error('Error fetching products:', error);
+          console.error("Error fetching products:", error);
           return;
         }
 
@@ -48,112 +93,56 @@ const ProductPortfolio = () => {
           return;
         }
 
-        // Inicializar níveis de dedicação apenas para produtos que usam dedicação
-        setNiveisDedicacao(prev => {
-          const newDedicacao = { ...prev };
-          data.forEach(product => {
-            if (product.usa_dedicacao && !newDedicacao[product.id]) {
-              // EXECUTAR inicia como "Compartilhado 1" (10%), demais permanecem 100%
-              newDedicacao[product.id] = product.categoria === 'executar' ? 0.1 : 1;
-            }
-          });
-          return newDedicacao;
-        });
-
-        // Calcular produtos com margem
-        const productsWithMargin = await Promise.all(
+        const productsWithMetrics = await Promise.all(
           data.map(async (product) => {
             const { data: positions, error: positionsError } = await supabase
-              .from('product_positions')
-              .select(`
+              .from("product_positions")
+              .select(
+                `
                 *,
                 positions (*)
-              `)
-              .eq('product_id', product.id);
+              `
+              )
+              .eq("product_id", product.id);
 
             if (positionsError) {
-              console.error('Error fetching positions:', positionsError);
+              console.error("Error fetching positions:", positionsError);
             }
 
-            // Calcular valores DRE usando função utilitária
-            let margemOperacional: number | string = "A definir";
             let faturamentoSemDesconto = 0;
-            
+
             if (positions && positions.length > 0) {
               const productData = {
                 markup: Number(product.markup) || 1,
                 markup_overhead: Number(product.markup_overhead) || 1,
                 categoria: product.categoria,
-                usa_dedicacao: product.usa_dedicacao || false
+                usa_dedicacao: product.usa_dedicacao || false,
               };
-              
-              const nivelDedicacao = product.usa_dedicacao
-                ? (niveisDedicacao[product.id] ?? (product.categoria === 'executar' ? 0.1 : 1))
-                : 1;
 
-              // Usar função utilitária para cálculo consistente
+              const nivelDedicacao =
+                product.usa_dedicacao && product.categoria === "executar" ? 0.1 : 1;
+
               faturamentoSemDesconto = calculateFaturamentoFromData(
-                positions, 
-                productData, 
+                positions,
+                productData,
                 nivelDedicacao
               );
+            }
 
-              if (faturamentoSemDesconto > 0) {
-                console.log('[PORTFOLIO] Produto:', product.produto);
-                console.log('[PORTFOLIO] Faturamento Ancoragem:', faturamentoSemDesconto);
-                
-                // Cálculo dos descontos
-                const descontoPagamento = faturamentoSemDesconto * 0.11;  // sobre ancoragem
-                const faturamentoMedio = faturamentoSemDesconto - descontoPagamento;
-
-                // Descontos sobre faturamento ancoragem
-                const descontoComprometimento = faturamentoSemDesconto * 0.06;   // sobre ancoragem  
-                const descontoCupom = faturamentoSemDesconto * 0.20;             // sobre ancoragem
-                const faturamentoMinimo = faturamentoMedio - descontoComprometimento - descontoCupom;
-
-                const faturamentoComDesconto = faturamentoMinimo;
-                const royalties = faturamentoComDesconto * 0.17;
-                const taxaTransicao = faturamentoComDesconto * 0.03;
-                const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao;
-
-                // Calcular custo total para margem operacional
-                const totalCSP = positions.reduce((total, pp) => {
-                  const horas = Number(pp.horas_alocadas) || 0;
-                  const cph = Number(pp.positions?.cph) || 0;
-                  const categoria = product.categoria;
-                  const horasEfetivas = (categoria === 'executar' && product.usa_dedicacao) 
-                    ? horas * nivelDedicacao 
-                    : horas;
-                  return total + (horasEfetivas * cph);
-                }, 0);
-
-                const custoVariavel = totalCSP + (Number(product.outros) || 0) + royalties + taxaTransicao;
-                const margemBruta = receitaBruta - (totalCSP + (Number(product.outros) || 0));
-                const margemBrutaPercentual = ((margemBruta / receitaBruta) * 100).toFixed(2);
-
-                margemOperacional = margemBrutaPercentual + "%";
-              } else {
-                margemOperacional = "A definir";
-              }            }
-
-            const productData = {
+            return {
               id: product.id,
               name: product.produto,
-              description: product.descricao_card && product.descricao_card.trim() ? product.descricao_card.trim() : "",
+              description: product.descricao_card?.trim() || product.description || "",
               category: product.categoria,
               status: product.status,
               valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
-              margemOperacional: margemOperacional,
-              usaDedicacao: product.usa_dedicacao || false
             };
-            
-            return productData;
           })
         );
-        
-        setProducts(productsWithMargin);
+
+        setProducts(productsWithMetrics);
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       } finally {
         setLoading(false);
       }
@@ -162,214 +151,244 @@ const ProductPortfolio = () => {
     fetchProducts();
   }, []);
 
-  // UseEffect separado para recalcular quando a dedicação muda
-  useEffect(() => {
-    if (products.length > 0) {
-      const recalculateProducts = async () => {
-        const updatedProducts = await Promise.all(
-          products.map(async (product) => {
-            if (!product.usaDedicacao || product.category !== 'executar') {
-              return product; // Não recalcula se não usa dedicação ou não é EXECUTAR
-            }
+  const filteredProducts = useMemo(
+    () =>
+      products
+        .filter((product) => statusFilter === "all" || product.status === statusFilter)
+        .filter((product) => activeFilter === "all" || product.category === activeFilter)
+        .filter((product) => {
+          if (!searchTerm.trim()) return true;
+          const normalizedSearch = searchTerm.toLowerCase();
+          return (
+            product.name?.toLowerCase().includes(normalizedSearch) ||
+            product.description?.toLowerCase().includes(normalizedSearch)
+          );
+        }),
+    [products, statusFilter, activeFilter, searchTerm]
+  );
 
-            const { data: positions } = await supabase
-              .from('product_positions')
-              .select(`
-                *,
-                positions (*)
-              `)
-              .eq('product_id', product.id);
-
-            if (!positions || positions.length === 0) {
-              return product;
-            }
-
-            const { data: productData } = await supabase
-              .from('products')
-              .select('markup, markup_overhead')
-              .eq('id', product.id)
-              .single();
-
-            const markup = Number(productData?.markup) || 1;
-            const markupOverhead = Number(productData?.markup_overhead) || 1;
-            const nivelDedicacao = product.usaDedicacao
-              ? (niveisDedicacao[product.id] ?? (product.category === 'executar' ? 0.1 : 1))
-              : 1; // 100% se não usa dedicação
-
-            // Recalcular apenas o valor base com a nova dedicação
-            const overheadPositions = ['Gerente de PE&G', 'Coordenador de PE&G', 'Account Manager'];
-            
-            let totalCSPDireto = 0;
-            let totalCSPOverhead = 0;
-
-            positions.forEach((pp: any) => {
-              const horas = Number(pp.horas_alocadas) || 0;
-              const cph = Number(pp.positions?.cph) || 0;
-              const nome = pp.positions?.nome || '';
-              const horasEfetivas = product.usaDedicacao ? (horas * nivelDedicacao) : horas; // 100% se não usa dedicação
-              const csp = horasEfetivas * cph;
-              
-              if (isOverheadPosition(nome, 'executar')) {
-                totalCSPOverhead += csp;
-              } else {
-                totalCSPDireto += csp;
-              }
-            });
-
-            const faturamentoSemDesconto = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
-
-            return {
-              ...product,
-              valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir"
-            };
-          })
-        );
-        
-        setProducts(updatedProducts);
-      };
-
-      recalculateProducts();
-    }
-  }, [niveisDedicacao]);
-
-  const handleDedicacaoChange = (productId: string, nivel: number) => {
-    setNiveisDedicacao(prev => ({
-      ...prev,
-      [productId]: nivel
-    }));
-  };
-
-  const filters = [
-    { key: "all", label: "Todos", color: "default" },
-    { key: "saber", label: "SABER", color: "saber" },
-    { key: "ter", label: "TER", color: "ter" },
-    { key: "executar", label: "EXECUTAR", color: "executar" },
-    { key: "potencializar", label: "POTENCIALIZAR", color: "potencializar" }
-  ];
-
-  const statusFilters = [
-    { key: "all", label: "Todos os Status", color: "default" },
-    { key: "Disponível", label: "Disponível", color: "default" },
-    { key: "Em produção", label: "Em Produção", color: "secondary" }
-  ];
-
-  const filteredProducts = products
-    .filter(product => statusFilter === "all" || product.status === statusFilter)
-    .filter(product => activeFilter === "all" || product.category === activeFilter)
-    .filter(product => {
-      if (!searchTerm.trim()) return true;
-      const searchLower = searchTerm.toLowerCase();
-      return (
-        product.name?.toLowerCase().includes(searchLower) ||
-        product.description?.toLowerCase().includes(searchLower)
-      );
-    });
-
-  const handleViewDetails = (product: any) => {
-    // Criar slug a partir do nome do produto
+  const handleViewDetails = (product: PortfolioItem) => {
     const slug = product.name
       .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-      .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
-      .replace(/\s+/g, '-') // Substitui espaços por hífens
-      .replace(/-+/g, '-') // Remove múltiplos hífens consecutivos
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
       .trim();
-    
+
     navigate(`/produto/${slug}`, { state: { productId: product.id } });
   };
 
   return (
-    <section className="py-16 px-4 bg-gray-50">
-      <div className="container mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-8">Portfólio de Produtos e Serviços V4</h2>
-          
-          {/* Campo de Pesquisa */}
-          <div className="max-w-md mx-auto mb-8">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Pesquisar produtos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          
-          {/* Filtros lado a lado */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Filtros por Categoria */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Filtrar por Categoria</h3>
-              <div className="flex flex-wrap justify-center gap-3">
-                {filters.map((filter) => (
-                  <Button
-                    key={filter.key}
-                    variant={activeFilter === filter.key ? filter.color as any : "outline"}
-                    size="sm"
-                    onClick={() => setActiveFilter(filter.key)}
-                    className="transition-all duration-200"
-                  >
-                    {filter.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
+    <section className="space-y-6 animate-fade-in">
+      <header>
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Painel de Portfólio</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Central de acompanhamento dos produtos e serviços cadastrados.
+          </p>
+        </div>
+      </header>
 
-            {/* Filtros por Status */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Filtrar por Status</h3>
-              <div className="flex flex-wrap justify-center gap-3">
-                {statusFilters.map((filter) => (
-                  <Button
-                    key={filter.key}
-                    variant={statusFilter === filter.key ? filter.color as any : "outline"}
-                    size="sm"
-                    onClick={() => setStatusFilter(filter.key)}
-                    className="transition-all duration-200"
-                  >
-                    {filter.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_220px_220px_auto]">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="text"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Buscar por produto ou descrição..."
+            className="h-11 rounded-xl border-border/80 bg-white pl-10 shadow-sm"
+          />
         </div>
 
-        {/* Grid de Produtos */}
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-foreground">Carregando produtos...</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                produto={product.name}
-                description={product.description}
-                categoria={product.category}
-                status={product.status}
-                valor={product.valorBase}
-                margemOperacional={product.margemOperacional}
-                usaDedicacao={product.usaDedicacao}
-                nivelDedicacao={niveisDedicacao[product.id] ?? (product.usaDedicacao && product.category === 'executar' ? 0.1 : 1)}
-                onDedicacaoChange={handleDedicacaoChange}
-              />
-            ))}
-          </div>
-        )}
+        <Select value={activeFilter} onValueChange={handleCategoryFilterChange}>
+          <SelectTrigger className="h-11 rounded-xl border-border/80 bg-white shadow-sm">
+            <SelectValue placeholder="Categoria" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas categorias</SelectItem>
+            <SelectItem value="destrava_receita">DESTRAVA RECEITA</SelectItem>
+            <SelectItem value="saber">SABER</SelectItem>
+            <SelectItem value="ter">TER</SelectItem>
+            <SelectItem value="executar">EXECUTAR</SelectItem>
+            <SelectItem value="potencializar">POTENCIALIZAR</SelectItem>
+          </SelectContent>
+        </Select>
 
-        {!loading && filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-foreground">Nenhum produto encontrado para esta categoria.</p>
-          </div>
-        )}
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="h-11 rounded-xl border-border/80 bg-white shadow-sm">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os status</SelectItem>
+            <SelectItem value="Disponível">Disponível</SelectItem>
+            <SelectItem value="Em produção">Em produção</SelectItem>
+            <SelectItem value="Em homologação">Em homologação</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="flex items-center gap-1 rounded-xl border border-border/80 bg-white p-1 shadow-sm">
+          <Button
+            variant={viewMode === "cards" ? "default" : "ghost"}
+            size="sm"
+            className="h-9 rounded-lg px-3"
+            onClick={() => setViewMode("cards")}
+          >
+            <LayoutGrid className="h-4 w-4" />
+            Cards
+          </Button>
+          <Button
+            variant={viewMode === "list" ? "default" : "ghost"}
+            size="sm"
+            className="h-9 rounded-lg px-3"
+            onClick={() => setViewMode("list")}
+          >
+            <List className="h-4 w-4" />
+            Lista
+          </Button>
+        </div>
       </div>
+
+      {viewMode === "cards" ? (
+        <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-[0_14px_30px_-24px_rgba(15,23,42,0.45)]">
+          {loading && (
+            <div className="py-10 text-center text-sm text-muted-foreground">Carregando produtos...</div>
+          )}
+
+          {!loading && filteredProducts.length === 0 && (
+            <div className="py-10 text-center text-sm text-muted-foreground">
+              Nenhum produto encontrado para os filtros selecionados.
+            </div>
+          )}
+
+          {!loading && filteredProducts.length > 0 && (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {filteredProducts.map((product) => (
+                <Card key={product.id} className="h-full border-border/80 shadow-sm transition-shadow hover:shadow-md">
+                  <CardHeader className="space-y-3 pb-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <CardTitle className="line-clamp-2 text-base leading-tight">{product.name}</CardTitle>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 rounded-lg border-border/80 bg-white px-2.5"
+                        onClick={() => handleViewDetails(product)}
+                      >
+                        Abrir
+                        <ArrowUpRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1">
+                      <Badge
+                        variant="secondary"
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${categoryToneMap[product.category] || "bg-muted text-foreground"}`}
+                      >
+                        {categoryLabelMap[product.category] || product.category.toUpperCase()}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusToneMap[product.status] || "bg-muted text-foreground"}`}
+                      >
+                        {product.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-4 pt-0">
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
+                      {product.description || "Sem descrição curta"}
+                    </p>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-muted-foreground">Valor base</span>
+                      <span className="font-semibold text-foreground">
+                        {product.valorBase === "A definir" ? "A definir" : formatCurrency(product.valorBase)}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-[0_14px_30px_-24px_rgba(15,23,42,0.45)]">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px]">
+              <thead className="bg-muted/55">
+                <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-4 py-3 font-semibold">Categoria</th>
+                  <th className="px-4 py-3 font-semibold">Produto</th>
+                  <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Valor Base</th>
+                  <th className="px-4 py-3 font-semibold">Ação</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/80">
+                {loading && (
+                  <tr>
+                    <td className="px-4 py-10 text-center text-sm text-muted-foreground" colSpan={5}>
+                      Carregando produtos...
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && filteredProducts.length === 0 && (
+                  <tr>
+                    <td className="px-4 py-10 text-center text-sm text-muted-foreground" colSpan={5}>
+                      Nenhum produto encontrado para os filtros selecionados.
+                    </td>
+                  </tr>
+                )}
+
+                {!loading &&
+                  filteredProducts.map((product) => (
+                    <tr key={product.id} className="bg-white transition-colors hover:bg-muted/25">
+                      <td className="px-4 py-3">
+                        <Badge
+                          variant="secondary"
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${categoryToneMap[product.category] || "bg-muted text-foreground"}`}
+                        >
+                          {categoryLabelMap[product.category] || product.category.toUpperCase()}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="max-w-[280px] truncate text-sm font-semibold text-foreground">
+                          {product.name}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge
+                          variant="secondary"
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusToneMap[product.status] || "bg-muted text-foreground"}`}
+                        >
+                          {product.status}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-foreground">
+                        {product.valorBase === "A definir" ? "A definir" : formatCurrency(product.valorBase)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-9 rounded-lg border-border/80 bg-white px-3"
+                          onClick={() => handleViewDetails(product)}
+                        >
+                          Abrir
+                          <ArrowUpRight className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

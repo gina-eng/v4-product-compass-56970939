@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Home, Building2, FileText, Settings, Package, BarChart3 } from "lucide-react";
+import { Home, Building2, FileText, Package, Cog } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -17,9 +16,8 @@ import {
 const navigationItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Produtos", url: "/", icon: Package, badge: "principal" },
-  { title: "Administração", url: "/admin", icon: Settings },
-  { title: "Materiais de Apoio", url: "/materiais-apoio", icon: FileText },
-  { title: "Relatórios", url: "/nova-estrutura", icon: BarChart3 },
+  { title: "Sistemas", url: "/sistemas", icon: Cog },
+  { title: "Artefatos", url: "/materiais-apoio", icon: FileText },
 ];
 
 export function AppSidebar() {

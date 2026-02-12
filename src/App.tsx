@@ -8,8 +8,8 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import ProductDetails from "./pages/ProductDetails";
 import SupportMaterials from "./pages/SupportMaterials";
-import ProductStructureTest from "./pages/ProductStructureTest";
-import TestPositions from "./pages/TestPositions";
+import ProductPortfolioPage from "./pages/ProductPortfolioPage";
+import Systems from "./pages/Systems";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,11 +26,11 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/portfolio-produtos" element={<ProductPortfolioPage />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/sistemas" element={<Systems />} />
             <Route path="/produto/:slug" element={<ProductDetails />} />
             <Route path="/materiais-apoio" element={<SupportMaterials />} />
-            <Route path="/nova-estrutura" element={<ProductStructureTest />} />
-            <Route path="/teste-posicoes" element={<TestPositions />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

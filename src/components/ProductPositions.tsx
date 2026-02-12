@@ -68,7 +68,6 @@ const ProductPositions = ({
   const [isPositionsOpen, setIsPositionsOpen] = useState(false);
   const [aplicarDescontoPagamento, setAplicarDescontoPagamento] = useState(true);
   const [aplicarDescontoCupom, setAplicarDescontoCupom] = useState(true);
-  const [aplicarDescontoComprometimento, setAplicarDescontoComprometimento] = useState(false); // Iniciar como false
   const [nivelDedicacao, setNivelDedicacao] = useState<number>(1); // 100% por padrão
   const [usaDedicacao, setUsaDedicacao] = useState<boolean>(false); // Controla se deve aplicar dedicação
 
@@ -108,12 +107,6 @@ const ProductPositions = ({
         setUsaDedicacao(usa); // Armazenar se usa dedicação
         if (data.categoria) {
           setCategoria(data.categoria);
-          // Configurar desconto de comprometimento baseado na categoria
-          if (data.categoria === 'saber' || data.categoria === 'ter') {
-            setAplicarDescontoComprometimento(false);
-          } else {
-            setAplicarDescontoComprometimento(true);
-          }
         }
         // Padrão: EXECUTAR com dedicação inicia em "Compartilhado 1" (10%)
         if (usa && data.categoria === 'executar') {
@@ -400,18 +393,17 @@ const ProductPositions = ({
   const faturamentoAncoragem = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
     
   // Estrutura hierárquica correta
-  const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.11 : 0;
+  const descontoPagamento = aplicarDescontoPagamento ? faturamentoAncoragem * 0.30 : 0;
   const faturamentoMedio = faturamentoAncoragem - descontoPagamento;
   
-  const descontoComprometimento = aplicarDescontoComprometimento ? faturamentoAncoragem * 0.06 : 0;
-  const descontoCupom = aplicarDescontoCupom ? faturamentoAncoragem * 0.20 : 0;
-  const faturamentoMinimo = faturamentoMedio - descontoComprometimento - descontoCupom;
+  const descontoCupom = aplicarDescontoCupom ? faturamentoAncoragem * 0.30 : 0;
+  const faturamentoMinimo = faturamentoMedio - descontoCupom;
   
   const faturamentoComDesconto = faturamentoMinimo;
   
   const royalties = faturamentoComDesconto * 0.17;
-  const taxaTransicao = faturamentoComDesconto * 0.03;
-  const receitaBruta = faturamentoComDesconto - royalties - taxaTransicao;
+  const taxaPagamento = faturamentoComDesconto * 0.03;
+  const receitaBruta = faturamentoComDesconto - royalties - taxaPagamento;
   const impostosReceita = receitaBruta * 0.0925;
   const receitaLiquida = receitaBruta - impostosReceita;
   const custosDiretos = totalCSPDireto + totalCSPOverhead + outros;
@@ -442,7 +434,7 @@ const ProductPositions = ({
   console.log(`Faturamento = ${totalCSPDireto * markup} + ${totalCSPOverhead * markupOverhead} = ${faturamentoAncoragem}`);
   console.log('================================');
   
-  console.log('ProductPositions rendering - Taxa de Transição updated');
+  console.log('ProductPositions rendering - Taxa de Pagamento updated');
 
   return (
     <Collapsible open={isPositionsOpen} onOpenChange={setIsPositionsOpen}>
@@ -620,7 +612,7 @@ const ProductPositions = ({
                         <TableRow className="bg-red-50 dark:bg-red-950/30 border-l-4 border-l-red-500">
                           <TableCell className="font-semibold flex items-center gap-2">
                             <span className="text-red-600 dark:text-red-400">⚓</span>
-                            (=) Faturamento Ancoragem
+                            (=) Faturamento - Ancoragem
                             <span className="text-xs bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 px-2 py-1 rounded-full font-medium">
                               (CSP direto × markup direto) + (CSP Overhead × markup overhead)
                             </span>
@@ -631,7 +623,7 @@ const ProductPositions = ({
                         </TableRow>
                         <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoPagamento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
-                            (-) Desconto de pagamento (-11%)
+                            (-) Desconto de Pagamento (-30%)
                             <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium ml-2">
                               sobre Faturamento Ancoragem
                             </span>
@@ -652,39 +644,14 @@ const ProductPositions = ({
                           </TableCell>
                         </TableRow>
                         <TableRow className="bg-muted/50">
-                          <TableCell className="font-medium">(=) Faturamento Médio</TableCell>
+                          <TableCell className="font-medium">(=) Faturamento - Médio</TableCell>
                           <TableCell className="text-center">R$</TableCell>
                           <TableCell className="text-right font-medium">{formatCurrency(faturamentoMedio).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className={`font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
-                            (-) Desconto de Comprometimento (-6%)
-                            {(categoria === 'saber' || categoria === 'ter') && (
-                              <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full font-medium ml-2">
-                                N/A para {categoria.toUpperCase()}
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell className={`text-center ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
-                          <TableCell className={`text-right font-medium ${aplicarDescontoComprometimento ? 'text-red-600' : 'text-muted-foreground'}`}>
-                            {formatCurrency(descontoComprometimento).replace('R$ ', '')}
-                          </TableCell>
-                          <TableCell className="w-16">
-                            <Button
-                              variant={aplicarDescontoComprometimento ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setAplicarDescontoComprometimento(!aplicarDescontoComprometimento)}
-                              disabled={categoria === 'saber' || categoria === 'ter'}
-                              className="h-6 w-6 p-0 text-xs"
-                            >
-                              {aplicarDescontoComprometimento ? "✓" : "✗"}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
                           <TableCell className={`font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground line-through'}`}>
-                            (-) Desconto de Cupom (-20%)
+                            (-) Desconto de Cupom (-30%)
                           </TableCell>
                           <TableCell className={`text-center ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>R$</TableCell>
                           <TableCell className={`text-right font-medium ${aplicarDescontoCupom ? 'text-red-600' : 'text-muted-foreground'}`}>
@@ -704,9 +671,9 @@ const ProductPositions = ({
                         <TableRow className="bg-green-50 dark:bg-green-950/30 border-l-4 border-l-green-500 border-t-2 border-t-green-200 dark:border-t-green-800">
                           <TableCell className="font-semibold flex items-center gap-2">
                             <span className="text-green-600 dark:text-green-400">💰</span>
-                            (=) Faturamento Mínimo
+                            (=) Faturamento - Mínimo
                             <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-medium">
-                              Médio - Comprometimento - Cupom
+                              Médio - Cupom
                             </span>
                           </TableCell>
                           <TableCell className="text-center text-green-600 dark:text-green-400 font-medium">R$</TableCell>
@@ -720,9 +687,9 @@ const ProductPositions = ({
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-red-600">(-) Taxa de Transação (-3%)</TableCell>
+                          <TableCell className="font-medium text-red-600">(-) Taxa de Pagamento (-3%)</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
-                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaTransicao).replace('R$ ', '')}</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(taxaPagamento).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="bg-muted/50">
@@ -732,7 +699,7 @@ const ProductPositions = ({
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-red-600">(-) Impostos sobre Receita (-9,25%)</TableCell>
+                          <TableCell className="font-medium text-red-600">(-) Impostos sobre Receita (9,25%)</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(impostosReceita).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
@@ -750,15 +717,15 @@ const ProductPositions = ({
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="pl-6">
-                          <TableCell className="font-medium text-red-600 pl-8">(-) CSP Direto</TableCell>
-                          <TableCell className="text-center text-red-600">R$</TableCell>
-                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(totalCSPDireto).replace('R$ ', '')}</TableCell>
-                          <TableCell className="w-16"></TableCell>
-                        </TableRow>
-                        <TableRow className="pl-6">
                           <TableCell className="font-medium text-red-600 pl-8">(-) CSP Overhead</TableCell>
                           <TableCell className="text-center text-red-600">R$</TableCell>
                           <TableCell className="text-right font-medium text-red-600">{formatCurrency(totalCSPOverhead).replace('R$ ', '')}</TableCell>
+                          <TableCell className="w-16"></TableCell>
+                        </TableRow>
+                        <TableRow className="pl-6">
+                          <TableCell className="font-medium text-red-600 pl-8">(-) CSP Direto</TableCell>
+                          <TableCell className="text-center text-red-600">R$</TableCell>
+                          <TableCell className="text-right font-medium text-red-600">{formatCurrency(totalCSPDireto).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
@@ -768,13 +735,13 @@ const ProductPositions = ({
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow className="bg-muted/50 border-t-2">
-                          <TableCell className="font-bold">(=) Margem operacional</TableCell>
+                          <TableCell className="font-bold">(=) Margem operacional R$</TableCell>
                           <TableCell className="text-center font-bold">R$</TableCell>
                           <TableCell className="text-right font-bold">{formatCurrency(margemOperacional).replace('R$ ', '')}</TableCell>
                           <TableCell className="w-16"></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell></TableCell>
+                          <TableCell className="font-medium">(-) Margem operacional %</TableCell>
                           <TableCell></TableCell>
                           <TableCell className="text-right font-bold text-sm">{margemPercentual.toFixed(2)}%</TableCell>
                           <TableCell className="w-16"></TableCell>
