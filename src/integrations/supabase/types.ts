@@ -434,7 +434,12 @@ export type Database = {
       is_internal_user: { Args: never; Returns: boolean }
     }
     Enums: {
-      categoria_produto: "saber" | "ter" | "executar" | "potencializar"
+      categoria_produto:
+        | "saber"
+        | "ter"
+        | "executar"
+        | "potencializar"
+        | "destrava_receita"
       kpi_tipo: "CPL" | "CTR" | "CONVERSÃO" | "ENGAJAMENTO" | "TAXA DE ABERTURA"
       status_produto: "Disponível" | "Em produção" | "Em homologação"
       tempo_meta: "3 meses" | "6 meses" | "12 meses"
@@ -565,7 +570,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      categoria_produto: ["saber", "ter", "executar", "potencializar"],
+      categoria_produto: [
+        "saber",
+        "ter",
+        "executar",
+        "potencializar",
+        "destrava_receita",
+      ],
       kpi_tipo: ["CPL", "CTR", "CONVERSÃO", "ENGAJAMENTO", "TAXA DE ABERTURA"],
       status_produto: ["Disponível", "Em produção", "Em homologação"],
       tempo_meta: ["3 meses", "6 meses", "12 meses"],
