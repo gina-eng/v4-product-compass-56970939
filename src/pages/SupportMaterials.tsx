@@ -11,22 +11,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import bowtieTravas from "@/assets/bowtie-travas.svg";
 
 type TravaKey =
+  | "trava_0"
+  | "trava_1"
   | "trava_2"
   | "trava_3"
   | "trava_4"
   | "trava_5"
   | "trava_6"
-  | "trava_7"
-  | "trava_8";
+  | "trava_7";
 
 const travaOrder: TravaKey[] = [
+  "trava_0",
+  "trava_1",
   "trava_2",
   "trava_3",
   "trava_4",
   "trava_5",
   "trava_6",
   "trava_7",
-  "trava_8",
 ];
 
 const travaInfo: Record<
@@ -39,55 +41,61 @@ const travaInfo: Record<
     badgeClass: string;
   }
 > = {
+  trava_0: {
+    label: "Trava 0",
+    title: "Cegueira",
+    description: "A empresa não enxerga o problema ou a oportunidade que está diante dela.",
+    output: "Diagnóstico de mercado e oportunidades para eliminar pontos cegos estratégicos.",
+    badgeClass: "bg-slate-100 text-slate-700",
+  },
+  trava_1: {
+    label: "Trava 1",
+    title: "Retenção",
+    description: "A venda acontece, mas não se repete.",
+    output: "Plano de retenção e expansão para aumentar recorrência, recompra e valor do ciclo de vida.",
+    badgeClass: "bg-emerald-100 text-emerald-700",
+  },
   trava_2: {
     label: "Trava 2",
-    title: "Exposição",
-    description:
-      "Assumindo que exista mercado real, o próximo gargalo é simples: ninguém vê a empresa.",
-    output: "Plano de visibilidade com canais e ações prioritárias para aumentar a exposição da empresa.",
-    badgeClass: "bg-red-100 text-red-700",
-  },
-  trava_3: {
-    label: "Trava 3",
-    title: "Atenção",
-    description: "Exposição tornou-se commodity.\nA trava não é aparecer — é ser ignorado.",
-    output: "Diretrizes de mensagens e criativos para captar atenção qualificada e reduzir indiferença.",
-    badgeClass: "bg-orange-100 text-orange-700",
-  },
-  trava_4: {
-    label: "Trava 4",
-    title: "Interesse",
-    description: "Mesmo com atenção, poucos dão o primeiro passo.",
-    output: "Estrutura de conversão inicial com ofertas e jornadas para transformar atenção em interesse real.",
-    badgeClass: "bg-amber-100 text-amber-700",
-  },
-  trava_5: {
-    label: "Trava 5",
-    title: "Qualificação",
-    description: "Aqui ocorre um dos maiores autoenganos do crescimento.",
-    output: "Critérios de qualificação e roteiros para separar demanda real de volume sem potencial.",
-    badgeClass: "bg-yellow-100 text-yellow-800",
-  },
-  trava_6: {
-    label: "Trava 6",
-    title: "Compromisso",
-    description: "O cliente serve, mas não aparece.",
-    output: "Plano de ativação comercial para elevar presença, frequência de contato e avanço de oportunidades.",
-    badgeClass: "bg-lime-100 text-lime-700",
-  },
-  trava_7: {
-    label: "Trava 7",
     title: "Decisão",
     description: "O cliente chega até o fim, mas não fecha.",
     output: "Estrutura de fechamento com objeções, critérios de decisão e próximos passos claros.",
     badgeClass: "bg-green-100 text-green-700",
   },
-  trava_8: {
-    label: "Trava 8",
-    title: "Retenção",
-    description: "A venda acontece, mas não se repete.",
-    output: "Plano de retenção e expansão para aumentar recorrência, recompra e valor do ciclo de vida.",
-    badgeClass: "bg-emerald-100 text-emerald-700",
+  trava_3: {
+    label: "Trava 3",
+    title: "Compromisso",
+    description: "O cliente serve, mas não aparece.",
+    output: "Plano de ativação comercial para elevar presença, frequência de contato e avanço de oportunidades.",
+    badgeClass: "bg-lime-100 text-lime-700",
+  },
+  trava_4: {
+    label: "Trava 4",
+    title: "Qualificação",
+    description: "Aqui ocorre um dos maiores autoenganos do crescimento.",
+    output: "Critérios de qualificação e roteiros para separar demanda real de volume sem potencial.",
+    badgeClass: "bg-yellow-100 text-yellow-800",
+  },
+  trava_5: {
+    label: "Trava 5",
+    title: "Interesse",
+    description: "Mesmo com atenção, poucos dão o primeiro passo.",
+    output: "Estrutura de conversão inicial com ofertas e jornadas para transformar atenção em interesse real.",
+    badgeClass: "bg-amber-100 text-amber-700",
+  },
+  trava_6: {
+    label: "Trava 6",
+    title: "Atenção",
+    description: "Exposição tornou-se commodity.\nA trava não é aparecer — é ser ignorado.",
+    output: "Diretrizes de mensagens e criativos para captar atenção qualificada e reduzir indiferença.",
+    badgeClass: "bg-orange-100 text-orange-700",
+  },
+  trava_7: {
+    label: "Trava 7",
+    title: "Exposição",
+    description: "Assumindo que exista mercado real, o próximo gargalo é simples: ninguém vê a empresa.",
+    output: "Plano de visibilidade com canais e ações prioritárias para aumentar a exposição da empresa.",
+    badgeClass: "bg-red-100 text-red-700",
   },
 };
 
