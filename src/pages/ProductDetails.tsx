@@ -38,11 +38,6 @@ interface Product {
   para_quem_serve?: string;
   como_entrega_valor?: string;
   entregaveis_relacionados?: string;
-  stack_digital?: string;
-  bonus_kpi?: string;
-  garantia_especifica?: string;
-  kpi_principal?: string;
-  tempo_meta_kpi?: string;
   o_que_entrego?: string;
   pitch?: boolean;
   bpmn?: boolean;
@@ -50,20 +45,6 @@ interface Product {
   icp?: boolean;
   pricing?: boolean;
   certificacao?: boolean;
-  pitch_url?: string;
-  bpmn_url?: string;
-  playbook_url?: string;
-  icp_url?: string;
-  pricing_url?: string;
-  certificacao_url?: string;
-  case_1_name?: string;
-  case_1_unidade_responsavel?: string;
-  case_1_responsavel_projeto?: string;
-  case_1_documento_url?: string;
-  case_2_name?: string;
-  case_2_unidade_responsavel?: string;
-  case_2_responsavel_projeto?: string;
-  case_2_documento_url?: string;
   como_vendo: string;
   spiced_data: any;
   spiced_data_2: any;
@@ -150,11 +131,6 @@ const ProductDetails = () => {
           para_quem_serve: data.para_quem_serve,
           como_entrega_valor: data.como_entrega_valor,
           entregaveis_relacionados: data.entregaveis_relacionados,
-          stack_digital: data.stack_digital,
-          bonus_kpi: data.bonus_kpi,
-          garantia_especifica: data.garantia_especifica,
-          kpi_principal: data.kpi_principal,
-          tempo_meta_kpi: data.tempo_meta_kpi,
           o_que_entrego: data.o_que_entrego,
           pitch: data.pitch,
           bpmn: data.bpmn,
@@ -162,20 +138,6 @@ const ProductDetails = () => {
           icp: data.icp,
           pricing: data.pricing,
           certificacao: data.certificacao,
-          pitch_url: data.pitch_url,
-          bpmn_url: data.bpmn_url,
-          playbook_url: data.playbook_url,
-          icp_url: data.icp_url,
-          pricing_url: data.pricing_url,
-          certificacao_url: data.certificacao_url,
-          case_1_name: data.case_1_name,
-          case_1_unidade_responsavel: data.case_1_unidade_responsavel,
-          case_1_responsavel_projeto: data.case_1_responsavel_projeto,
-          case_1_documento_url: data.case_1_documento_url,
-          case_2_name: data.case_2_name,
-          case_2_unidade_responsavel: data.case_2_unidade_responsavel,
-          case_2_responsavel_projeto: data.case_2_responsavel_projeto,
-          case_2_documento_url: data.case_2_documento_url,
           como_vendo: data.como_vendo,
           spiced_data: data.spiced_data,
           spiced_data_2: data.spiced_data_2,
@@ -260,11 +222,6 @@ const ProductDetails = () => {
           para_quem_serve: foundProduct.para_quem_serve,
           como_entrega_valor: foundProduct.como_entrega_valor,
           entregaveis_relacionados: foundProduct.entregaveis_relacionados,
-          stack_digital: foundProduct.stack_digital,
-          bonus_kpi: foundProduct.bonus_kpi,
-          garantia_especifica: foundProduct.garantia_especifica,
-          kpi_principal: foundProduct.kpi_principal,
-          tempo_meta_kpi: foundProduct.tempo_meta_kpi,
           o_que_entrego: foundProduct.o_que_entrego,
           pitch: foundProduct.pitch,
           bpmn: foundProduct.bpmn,
@@ -272,20 +229,6 @@ const ProductDetails = () => {
           icp: foundProduct.icp,
           pricing: foundProduct.pricing,
           certificacao: foundProduct.certificacao,
-          pitch_url: foundProduct.pitch_url,
-          bpmn_url: foundProduct.bpmn_url,
-          playbook_url: foundProduct.playbook_url,
-          icp_url: foundProduct.icp_url,
-          pricing_url: foundProduct.pricing_url,
-          certificacao_url: foundProduct.certificacao_url,
-          case_1_name: foundProduct.case_1_name,
-          case_1_unidade_responsavel: foundProduct.case_1_unidade_responsavel,
-          case_1_responsavel_projeto: foundProduct.case_1_responsavel_projeto,
-          case_1_documento_url: foundProduct.case_1_documento_url,
-          case_2_name: foundProduct.case_2_name,
-          case_2_unidade_responsavel: foundProduct.case_2_unidade_responsavel,
-          case_2_responsavel_projeto: foundProduct.case_2_responsavel_projeto,
-          case_2_documento_url: foundProduct.case_2_documento_url,
           como_vendo: foundProduct.como_vendo,
           spiced_data: foundProduct.spiced_data,
           spiced_data_2: foundProduct.spiced_data_2,
@@ -516,6 +459,43 @@ const ProductDetails = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Campos estratégicos da visão geral */}
+            {(product.para_quem_serve || product.como_entrega_valor) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {product.para_quem_serve && (
+                  <div className="container-section">
+                    <h4 className="text-title-sub mb-3">Para quem serve</h4>
+                    <div className="text-body spacing-tight text-justify">
+                      {product.para_quem_serve
+                        .split('\n')
+                        .filter((line) => line.trim())
+                        .map((line, index) => (
+                          <p key={index} className="mb-0">
+                            {line.trim()}
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {product.como_entrega_valor && (
+                  <div className="container-section">
+                    <h4 className="text-title-sub mb-3">Como entregar valor</h4>
+                    <div className="text-body spacing-tight text-justify">
+                      {product.como_entrega_valor
+                        .split('\n')
+                        .filter((line) => line.trim())
+                        .map((line, index) => (
+                          <p key={index} className="mb-0">
+                            {line.trim()}
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
         </section>
@@ -557,14 +537,6 @@ const ProductDetails = () => {
                   <span className="text-label block mb-2">👥 Time envolvido:</span>
                   <div className="text-body">
                     {product.time_envolvido}
-                  </div>
-                </div>
-              )}
-              {product.stack_digital && (
-                <div className="container-section border border-purple-200 dark:border-purple-800">
-                  <span className="text-label block mb-2">💻 Stack digital:</span>
-                  <div className="text-body">
-                    {product.stack_digital}
                   </div>
                 </div>
               )}
@@ -691,166 +663,6 @@ const ProductDetails = () => {
         <TrainingMaterialsOnly productId={product.id} readOnly={true} />
         </section>
 
-        {/* Materiais Antigos e Documentos (manter para compatibilidade) */}
-        {(product.pitch_url || product.bpmn_url || product.playbook_url || product.pricing_url || product.certificacao_url || 
-          product.case_1_name || product.case_2_name) && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Materiais complementares</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* URLs de Documentos */}
-              {(product.pitch_url || product.bpmn_url || product.playbook_url || product.pricing_url || product.certificacao_url) && (
-                <div>
-                  <h4 className="font-bold text-foreground mb-4">URLs de Documentos</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {product.pitch_url && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">Pitch URL:</span>
-                        <a 
-                          href={product.pitch_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline block"
-                        >
-                          {product.pitch_url || "Link teste"}
-                        </a>
-                      </div>
-                    )}
-                    {product.bpmn_url && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">BPMN URL:</span>
-                        <a 
-                          href={product.bpmn_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline block"
-                        >
-                          {product.bpmn_url || "Link teste"}
-                        </a>
-                      </div>
-                    )}
-                    {product.playbook_url && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">Playbook URL:</span>
-                        <a 
-                          href={product.playbook_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline block"
-                        >
-                          {product.playbook_url || "Link teste"}
-                        </a>
-                      </div>
-                    )}
-                    {product.pricing_url && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">Pricing URL:</span>
-                        <a 
-                          href={product.pricing_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline block"
-                        >
-                          {product.pricing_url || "Link teste"}
-                        </a>
-                      </div>
-                    )}
-                    {product.certificacao_url && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">Certificação URL:</span>
-                        <a 
-                          href={product.certificacao_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline block"
-                        >
-                          {product.certificacao_url || "Link teste"}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Case 1 */}
-              {product.case_1_name && (
-                <div>
-                  <h4 className="font-bold text-foreground mb-4">Case 1</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-sm font-bold text-foreground">Nome do Case 1:</span>
-                      <p className="text-sm text-content">{product.case_1_name}</p>
-                    </div>
-                    {product.case_1_unidade_responsavel && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">Unidade Responsável:</span>
-                        <p className="text-sm text-content">{product.case_1_unidade_responsavel}</p>
-                      </div>
-                    )}
-                    {product.case_1_responsavel_projeto && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">Responsável Projeto:</span>
-                        <p className="text-sm text-content">{product.case_1_responsavel_projeto}</p>
-                      </div>
-                    )}
-                    {product.case_1_documento_url && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">URL do Documento:</span>
-                        <a 
-                          href={product.case_1_documento_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline block"
-                        >
-                          {product.case_1_documento_url || "Link teste"}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Case 2 */}
-              {product.case_2_name && (
-                <div>
-                  <h4 className="font-bold text-foreground mb-4">Case 2</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-sm font-bold text-foreground">Nome do Case 2:</span>
-                      <p className="text-sm text-content">{product.case_2_name}</p>
-                    </div>
-                    {product.case_2_unidade_responsavel && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">Unidade Responsável:</span>
-                        <p className="text-sm text-content">{product.case_2_unidade_responsavel}</p>
-                      </div>
-                    )}
-                    {product.case_2_responsavel_projeto && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">Responsável Projeto:</span>
-                        <p className="text-sm text-content">{product.case_2_responsavel_projeto}</p>
-                      </div>
-                    )}
-                    {product.case_2_documento_url && (
-                      <div>
-                        <span className="text-sm font-bold text-foreground">URL do Documento:</span>
-                        <a 
-                          href={product.case_2_documento_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-primary hover:underline block"
-                        >
-                          {product.case_2_documento_url || "Link teste"}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
         </div>
       </div>
     </Layout>

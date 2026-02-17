@@ -19,7 +19,7 @@ import SalesMaterials from "@/components/SalesMaterials";
 import OperationalMaterials from "@/components/OperationalMaterials";
 import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { Plus, Edit, Trash2, Upload, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ExternalLink } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -69,31 +69,12 @@ interface Product {
   para_quem_serve?: string;
   como_entrega_valor?: string;
   entregaveis_relacionados?: string;
-  stack_digital?: string;
-  bonus_kpi?: string;
-  garantia_especifica?: string;
-  kpi_principal?: string;
-  tempo_meta_kpi?: string;
   pitch?: boolean;
   bpmn?: boolean;
   playbook?: boolean;
   icp?: boolean;
   pricing?: boolean;
   certificacao?: boolean;
-  pitch_url?: string;
-  bpmn_url?: string;
-  playbook_url?: string;
-  icp_url?: string;
-  pricing_url?: string;
-  certificacao_url?: string;
-  case_1_name?: string;
-  case_1_unidade_responsavel?: string;
-  case_1_responsavel_projeto?: string;
-  case_1_documento_url?: string;
-  case_2_name?: string;
-  case_2_unidade_responsavel?: string;
-  case_2_responsavel_projeto?: string;
-  case_2_documento_url?: string;
   spiced_data: SpicedData;
   spiced_data_2?: SpicedData;
   como_entrego_dados: ComoEntregoItem[];
@@ -107,9 +88,47 @@ interface Product {
 interface SupportMaterial {
   id: string;
   nome_arquivo: string;
+  output_cliente: string | null;
+  trava: string | null;
   url_direcionamento: string;
   created_at: string;
 }
+
+interface AdminSystem {
+  id: string;
+  nome_sistema: string;
+  valor_entregue: string;
+  link_redirecionamento: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+type TravaOptionValue =
+  | "trava_0"
+  | "trava_1"
+  | "trava_2"
+  | "trava_3"
+  | "trava_4"
+  | "trava_5"
+  | "trava_6"
+  | "trava_7";
+
+const TRAVA_OPTIONS: { value: TravaOptionValue; label: string }[] = [
+  { value: "trava_0", label: "Trava 0 — Cegueira" },
+  { value: "trava_1", label: "Trava 1 — Retenção" },
+  { value: "trava_2", label: "Trava 2 — Decisão" },
+  { value: "trava_3", label: "Trava 3 — Compromisso" },
+  { value: "trava_4", label: "Trava 4 — Qualificação" },
+  { value: "trava_5", label: "Trava 5 — Interesse" },
+  { value: "trava_6", label: "Trava 6 — Atenção" },
+  { value: "trava_7", label: "Trava 7 — Exposição" },
+];
+
+const getTravaLabel = (trava: string | null | undefined) => {
+  if (!trava) return "Sem trava definida";
+  if (trava === "trava_8") return "Trava 1 — Retenção";
+  return TRAVA_OPTIONS.find((option) => option.value === trava)?.label || "Sem trava definida";
+};
 
 const Admin = () => {
   const { toast } = useToast();
@@ -142,8 +161,15 @@ const Admin = () => {
   const [editingSupportMaterial, setEditingSupportMaterial] = useState<SupportMaterial | null>(null);
   const [supportForm, setSupportForm] = useState({
     nome_arquivo: '',
+    output_cliente: '',
+    trava: 'trava_0' as TravaOptionValue,
     url_direcionamento: ''
   });
+
+  // Estados para sistemas
+  const [systems, setSystems] = useState<AdminSystem[]>([]);
+  const [isSystemDialogOpen, setIsSystemDialogOpen] = useState(false);
+  const [editingSystem, setEditingSystem] = useState<AdminSystem | null>(null);
   
   // Form states
   const [productForm, setProductForm] = useState({
@@ -165,31 +191,12 @@ const Admin = () => {
     para_quem_serve: '',
     como_entrega_valor: '',
     entregaveis_relacionados: '',
-    stack_digital: '',
-    bonus_kpi: '',
-    garantia_especifica: '',
-    kpi_principal: '',
-    tempo_meta_kpi: '',
     pitch: false,
     bpmn: false,
     playbook: false,
     icp: false,
     pricing: false,
     certificacao: false,
-    pitch_url: '',
-    bpmn_url: '',
-    playbook_url: '',
-    icp_url: '',
-    pricing_url: '',
-    certificacao_url: '',
-    case_1_name: '',
-    case_1_unidade_responsavel: '',
-    case_1_responsavel_projeto: '',
-    case_1_documento_url: '',
-    case_2_name: '',
-    case_2_unidade_responsavel: '',
-    case_2_responsavel_projeto: '',
-    case_2_documento_url: '',
     markup: 1,
     usa_dedicacao: false,
     use_case_map_1_name: 'Use Case Map - Cliente sem Investimento',
@@ -200,6 +207,12 @@ const Admin = () => {
     nome: '',
     cph: '',
     investimento_total: ''
+  });
+
+  const [systemForm, setSystemForm] = useState({
+    nome: "",
+    valor_entregue: "",
+    link_redirecionamento: "",
   });
 
   const [spicedData, setSpicedData] = useState<SpicedData>({
@@ -232,6 +245,7 @@ const Admin = () => {
     fetchProducts();
     fetchPositions();
     fetchSupportMaterials();
+    fetchSystems();
   }, []);
 
   const fetchSupportMaterials = async () => {
@@ -242,9 +256,31 @@ const Admin = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setSupportMaterials(data || []);
+      const formattedData: SupportMaterial[] = (data || []).map((material: any) => ({
+        id: material.id,
+        nome_arquivo: material.nome_arquivo,
+        output_cliente: material.output_cliente ?? null,
+        trava: material.trava ?? null,
+        url_direcionamento: material.url_direcionamento,
+        created_at: material.created_at,
+      }));
+      setSupportMaterials(formattedData);
     } catch (error) {
       console.error('Erro ao buscar materiais de apoio:', error);
+    }
+  };
+
+  const fetchSystems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("systems")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setSystems((data || []) as AdminSystem[]);
+    } catch (error) {
+      console.error("Erro ao buscar sistemas:", error);
     }
   };
 
@@ -277,31 +313,12 @@ const Admin = () => {
         para_quem_serve: product.para_quem_serve,
         como_entrega_valor: product.como_entrega_valor,
         entregaveis_relacionados: product.entregaveis_relacionados,
-        stack_digital: product.stack_digital,
-        bonus_kpi: product.bonus_kpi,
-        garantia_especifica: product.garantia_especifica,
-        kpi_principal: product.kpi_principal,
-        tempo_meta_kpi: product.tempo_meta_kpi,
         pitch: product.pitch,
         bpmn: product.bpmn,
         playbook: product.playbook,
         icp: product.icp,
         pricing: product.pricing,
         certificacao: product.certificacao,
-        pitch_url: product.pitch_url,
-        bpmn_url: product.bpmn_url,
-        playbook_url: product.playbook_url,
-        icp_url: product.icp_url,
-        pricing_url: product.pricing_url,
-        certificacao_url: product.certificacao_url,
-        case_1_name: product.case_1_name,
-        case_1_unidade_responsavel: product.case_1_unidade_responsavel,
-        case_1_responsavel_projeto: product.case_1_responsavel_projeto,
-        case_1_documento_url: product.case_1_documento_url,
-        case_2_name: product.case_2_name,
-        case_2_unidade_responsavel: product.case_2_unidade_responsavel,
-        case_2_responsavel_projeto: product.case_2_responsavel_projeto,
-        case_2_documento_url: product.case_2_documento_url,
         spiced_data: (product.spiced_data as unknown as SpicedData) || {
           situation: { objetivo: "", perguntas: "", observar: "" },
           pain: { objetivo: "", perguntas: "", observar: "" },
@@ -465,6 +482,241 @@ const Admin = () => {
     }
   };
 
+  const resetSupportForm = () => {
+    setEditingSupportMaterial(null);
+    setSupportForm({
+      nome_arquivo: "",
+      output_cliente: "",
+      trava: "trava_0",
+      url_direcionamento: "",
+    });
+  };
+
+  const handleEditSupportMaterial = (material: SupportMaterial) => {
+    const normalizedTrava =
+      material.trava === "trava_8"
+        ? "trava_1"
+        : TRAVA_OPTIONS.some((option) => option.value === material.trava)
+          ? (material.trava as TravaOptionValue)
+          : "trava_0";
+
+    setEditingSupportMaterial(material);
+    setSupportForm({
+      nome_arquivo: material.nome_arquivo,
+      output_cliente: material.output_cliente || "",
+      trava: normalizedTrava,
+      url_direcionamento: material.url_direcionamento,
+    });
+    setIsSupportDialogOpen(true);
+  };
+
+  const handleDeleteSupportMaterial = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este artefato?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("support_materials")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      await fetchSupportMaterials();
+      toast({
+        title: "Artefato excluído com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao excluir artefato:", error);
+      toast({
+        title: "Erro ao excluir artefato",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveSupportMaterial = async () => {
+    const nomeArquivo = supportForm.nome_arquivo.trim();
+    const outputCliente = supportForm.output_cliente.trim();
+    const trava = supportForm.trava;
+    const linkInput = supportForm.url_direcionamento.trim();
+
+    if (!nomeArquivo || !outputCliente || !trava || !linkInput) {
+      toast({
+        title: "Preencha todos os campos",
+        description: "Nome, output, trava e link são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const normalizedLink = /^https?:\/\//i.test(linkInput)
+      ? linkInput
+      : `https://${linkInput}`;
+
+    try {
+      new URL(normalizedLink);
+    } catch {
+      toast({
+        title: "Link inválido",
+        description: "Informe uma URL válida para redirecionamento.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const supportPayload = {
+        nome_arquivo: nomeArquivo,
+        output_cliente: outputCliente,
+        trava,
+        url_direcionamento: normalizedLink,
+      };
+
+      let error;
+      if (editingSupportMaterial) {
+        const { error: updateError } = await supabase
+          .from("support_materials")
+          .update(supportPayload as any)
+          .eq("id", editingSupportMaterial.id);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("support_materials")
+          .insert([supportPayload as any]);
+        error = insertError;
+      }
+
+      if (error) throw error;
+
+      await fetchSupportMaterials();
+      setIsSupportDialogOpen(false);
+      resetSupportForm();
+
+      toast({
+        title: editingSupportMaterial
+          ? "Artefato atualizado com sucesso!"
+          : "Artefato criado com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao salvar artefato:", error);
+      toast({
+        title: "Erro ao salvar artefato",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const resetSystemForm = () => {
+    setEditingSystem(null);
+    setSystemForm({
+      nome: "",
+      valor_entregue: "",
+      link_redirecionamento: "",
+    });
+  };
+
+  const handleEditSystem = (system: AdminSystem) => {
+    setEditingSystem(system);
+    setSystemForm({
+      nome: system.nome_sistema,
+      valor_entregue: system.valor_entregue,
+      link_redirecionamento: system.link_redirecionamento,
+    });
+    setIsSystemDialogOpen(true);
+  };
+
+  const handleDeleteSystem = async (systemId: string) => {
+    if (!confirm("Tem certeza que deseja excluir este sistema?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("systems")
+        .delete()
+        .eq("id", systemId);
+
+      if (error) throw error;
+
+      await fetchSystems();
+      toast({
+        title: "Sistema excluído com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao excluir sistema:", error);
+      toast({
+        title: "Erro ao excluir sistema",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveSystem = async () => {
+    const nome = systemForm.nome.trim();
+    const valorEntregue = systemForm.valor_entregue.trim();
+    const linkInput = systemForm.link_redirecionamento.trim();
+
+    if (!nome || !valorEntregue || !linkInput) {
+      toast({
+        title: "Preencha todos os campos",
+        description: "Nome, valor entregue e link são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const normalizedLink = /^https?:\/\//i.test(linkInput)
+      ? linkInput
+      : `https://${linkInput}`;
+
+    try {
+      new URL(normalizedLink);
+    } catch {
+      toast({
+        title: "Link inválido",
+        description: "Informe uma URL válida para redirecionamento.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const systemPayload = {
+      nome_sistema: nome,
+      valor_entregue: valorEntregue,
+      link_redirecionamento: normalizedLink,
+    };
+
+    try {
+      let error;
+      if (editingSystem) {
+        const { error: updateError } = await supabase
+          .from("systems")
+          .update(systemPayload)
+          .eq("id", editingSystem.id);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("systems")
+          .insert([systemPayload]);
+        error = insertError;
+      }
+
+      if (error) throw error;
+
+      await fetchSystems();
+      setIsSystemDialogOpen(false);
+      resetSystemForm();
+
+      toast({
+        title: editingSystem ? "Sistema atualizado com sucesso!" : "Sistema criado com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao salvar sistema:", error);
+      toast({
+        title: "Erro ao salvar sistema",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSaveProduct = async () => {
     try {
       const productData = {
@@ -491,31 +743,12 @@ const Admin = () => {
         para_quem_serve: productForm.para_quem_serve || null,
         como_entrega_valor: productForm.como_entrega_valor || null,
         entregaveis_relacionados: productForm.entregaveis_relacionados || null,
-        stack_digital: productForm.stack_digital || null,
-        bonus_kpi: productForm.bonus_kpi || null,
-        garantia_especifica: productForm.garantia_especifica || null,
-        kpi_principal: productForm.kpi_principal || null,
-        tempo_meta_kpi: productForm.tempo_meta_kpi || null,
         pitch: productForm.pitch,
         bpmn: productForm.bpmn,
         playbook: productForm.playbook,
         icp: productForm.icp,
         pricing: productForm.pricing,
         certificacao: productForm.certificacao,
-        pitch_url: productForm.pitch_url || null,
-        bpmn_url: productForm.bpmn_url || null,
-        playbook_url: productForm.playbook_url || null,
-      icp_url: productForm.icp_url || null,
-        pricing_url: productForm.pricing_url || null,
-        certificacao_url: productForm.certificacao_url || null,
-        case_1_name: productForm.case_1_name || null,
-        case_1_unidade_responsavel: productForm.case_1_unidade_responsavel || null,
-        case_1_responsavel_projeto: productForm.case_1_responsavel_projeto || null,
-        case_1_documento_url: productForm.case_1_documento_url || null,
-        case_2_name: productForm.case_2_name || null,
-        case_2_unidade_responsavel: productForm.case_2_unidade_responsavel || null,
-        case_2_responsavel_projeto: productForm.case_2_responsavel_projeto || null,
-        case_2_documento_url: productForm.case_2_documento_url || null,
         spiced_data: spicedData,
         spiced_data_2: spicedData2,
         como_entrego_dados: comoEntregoDados,
@@ -582,31 +815,12 @@ const Admin = () => {
       para_quem_serve: (product as any).para_quem_serve || '',
       como_entrega_valor: (product as any).como_entrega_valor || '',
       entregaveis_relacionados: (product as any).entregaveis_relacionados || '',
-      stack_digital: (product as any).stack_digital || '',
-      bonus_kpi: (product as any).bonus_kpi || '',
-      garantia_especifica: (product as any).garantia_especifica || '',
-      kpi_principal: (product as any).kpi_principal || '',
-      tempo_meta_kpi: (product as any).tempo_meta_kpi || '',
       pitch: (product as any).pitch || false,
       bpmn: (product as any).bpmn || false,
       playbook: (product as any).playbook || false,
       icp: (product as any).icp || false,
       pricing: (product as any).pricing || false,
       certificacao: (product as any).certificacao || false,
-      pitch_url: (product as any).pitch_url || '',
-      bpmn_url: (product as any).bpmn_url || '',
-      playbook_url: (product as any).playbook_url || '',
-      icp_url: (product as any).icp_url || '',
-      pricing_url: (product as any).pricing_url || '',
-      certificacao_url: (product as any).certificacao_url || '',
-      case_1_name: (product as any).case_1_name || '',
-      case_1_unidade_responsavel: (product as any).case_1_unidade_responsavel || '',
-      case_1_responsavel_projeto: (product as any).case_1_responsavel_projeto || '',
-      case_1_documento_url: (product as any).case_1_documento_url || '',
-      case_2_name: (product as any).case_2_name || '',
-      case_2_unidade_responsavel: (product as any).case_2_unidade_responsavel || '',
-      case_2_responsavel_projeto: (product as any).case_2_responsavel_projeto || '',
-      case_2_documento_url: (product as any).case_2_documento_url || '',
       markup: product.markup || 1,
       usa_dedicacao: (product as any).usa_dedicacao || false,
       use_case_map_1_name: product.use_case_map_1_name || 'Use Case Map - Cliente sem Investimento',
@@ -748,31 +962,12 @@ const Admin = () => {
       para_quem_serve: '',
       como_entrega_valor: '',
       entregaveis_relacionados: '',
-      stack_digital: '',
-      bonus_kpi: '',
-      garantia_especifica: '',
-      kpi_principal: '',
-      tempo_meta_kpi: '',
       pitch: false,
       bpmn: false,
       playbook: false,
       icp: false,
       pricing: false,
       certificacao: false,
-      pitch_url: '',
-      bpmn_url: '',
-      playbook_url: '',
-      icp_url: '',
-      pricing_url: '',
-      certificacao_url: '',
-      case_1_name: '',
-      case_1_unidade_responsavel: '',
-      case_1_responsavel_projeto: '',
-      case_1_documento_url: '',
-      case_2_name: '',
-      case_2_unidade_responsavel: '',
-      case_2_responsavel_projeto: '',
-      case_2_documento_url: '',
       markup: 1,
       usa_dedicacao: false,
       use_case_map_1_name: 'Use Case Map - Cliente sem Investimento',
@@ -848,6 +1043,7 @@ const Admin = () => {
             <TabsTrigger value="products">Produtos</TabsTrigger>
             <TabsTrigger value="positions">Posições</TabsTrigger>
             <TabsTrigger value="support">Artefatos</TabsTrigger>
+            <TabsTrigger value="systems">Sistemas</TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
@@ -1062,53 +1258,6 @@ const Admin = () => {
                               onChange={(e) => setProductForm({...productForm, entregaveis_relacionados: e.target.value})}
                             />
                           </div>
-                          
-                          <div>
-                            <Label htmlFor="stack_digital">Stack digital</Label>
-                            <Textarea
-                              id="stack_digital"
-                              value={productForm.stack_digital}
-                              onChange={(e) => setProductForm({...productForm, stack_digital: e.target.value})}
-                            />
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="bonus_kpi">Bônus KPI</Label>
-                              <Input
-                                id="bonus_kpi"
-                                value={productForm.bonus_kpi}
-                                onChange={(e) => setProductForm({...productForm, bonus_kpi: e.target.value})}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="garantia_especifica">Garantia específica</Label>
-                              <Input
-                                id="garantia_especifica"
-                                value={productForm.garantia_especifica}
-                                onChange={(e) => setProductForm({...productForm, garantia_especifica: e.target.value})}
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="kpi_principal">KPI Principal</Label>
-                              <Input
-                                id="kpi_principal"
-                                value={productForm.kpi_principal}
-                                onChange={(e) => setProductForm({...productForm, kpi_principal: e.target.value})}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="tempo_meta_kpi">Tempo meta KPI</Label>
-                              <Input
-                                id="tempo_meta_kpi"
-                                value={productForm.tempo_meta_kpi}
-                                onChange={(e) => setProductForm({...productForm, tempo_meta_kpi: e.target.value})}
-                              />
-                            </div>
-                          </div>
                         </TabsContent>
 
                         <TabsContent value="vendas" className="space-y-4">
@@ -1123,17 +1272,7 @@ const Admin = () => {
                           </div>
                           
                           <div>
-                            <Label htmlFor="description">Como eu entrego?</Label>
-                            <Textarea
-                              id="description"
-                              value={productForm.description}
-                              onChange={(e) => setProductForm({...productForm, description: e.target.value})}
-                              rows={3}
-                            />
-                          </div>
-                          
-                          <div>
-                            <Label htmlFor="o_que_entrego">O que entrego</Label>
+                            <Label htmlFor="o_que_entrego">Como entregar</Label>
                             <Textarea
                               id="o_que_entrego"
                               value={productForm.o_que_entrego}
@@ -1240,149 +1379,6 @@ const Admin = () => {
                             </div>
                           )}
                           
-                          <div className="space-y-4">
-                            <h4 className="font-semibold">URLs de Documentos (Legado)</h4>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <Label htmlFor="pitch_url">Pitch URL</Label>
-                                <Input
-                                  id="pitch_url"
-                                  value={productForm.pitch_url}
-                                  onChange={(e) => setProductForm({...productForm, pitch_url: e.target.value})}
-                                  placeholder="Link teste"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="bpmn_url">BPMN URL</Label>
-                                <Input
-                                  id="bpmn_url"
-                                  value={productForm.bpmn_url}
-                                  onChange={(e) => setProductForm({...productForm, bpmn_url: e.target.value})}
-                                  placeholder="Link teste"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="playbook_url">Playbook URL</Label>
-                                <Input
-                                  id="playbook_url"
-                                  value={productForm.playbook_url}
-                                  onChange={(e) => setProductForm({...productForm, playbook_url: e.target.value})}
-                                  placeholder="Link teste"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="pricing_url">Pricing URL</Label>
-                                <Input
-                                  id="pricing_url"
-                                  value={productForm.pricing_url}
-                                  onChange={(e) => setProductForm({...productForm, pricing_url: e.target.value})}
-                                  placeholder="Link teste"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="certificacao_url">Certificação URL</Label>
-                                <Input
-                                  id="certificacao_url"
-                                  value={productForm.certificacao_url}
-                                  onChange={(e) => setProductForm({...productForm, certificacao_url: e.target.value})}
-                                  placeholder="Link teste"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="icp_url">ICP URL</Label>
-                                <Input
-                                  id="icp_url"
-                                  value={productForm.icp_url}
-                                  onChange={(e) => setProductForm({...productForm, icp_url: e.target.value})}
-                                  placeholder="URL do documento ICP"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="space-y-4 mt-6">
-                            <h4 className="font-semibold">Case 1</h4>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <Label htmlFor="case_1_name">Nome do Case 1</Label>
-                                <Input
-                                  id="case_1_name"
-                                  value={productForm.case_1_name}
-                                  onChange={(e) => setProductForm({...productForm, case_1_name: e.target.value})}
-                                  placeholder="Case XPTO"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="case_1_unidade_responsavel">Unidade Responsável</Label>
-                                <Input
-                                  id="case_1_unidade_responsavel"
-                                  value={productForm.case_1_unidade_responsavel}
-                                  onChange={(e) => setProductForm({...productForm, case_1_unidade_responsavel: e.target.value})}
-                                  placeholder="Colli & Co"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="case_1_responsavel_projeto">Responsável Projeto</Label>
-                                <Input
-                                  id="case_1_responsavel_projeto"
-                                  value={productForm.case_1_responsavel_projeto}
-                                  onChange={(e) => setProductForm({...productForm, case_1_responsavel_projeto: e.target.value})}
-                                  placeholder="Rafael Corazza"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="case_1_documento_url">URL do Documento</Label>
-                                <Input
-                                  id="case_1_documento_url"
-                                  value={productForm.case_1_documento_url}
-                                  onChange={(e) => setProductForm({...productForm, case_1_documento_url: e.target.value})}
-                                  placeholder="Link teste"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="space-y-4 mt-6">
-                            <h4 className="font-semibold">Case 2</h4>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <Label htmlFor="case_2_name">Nome do Case 2</Label>
-                                <Input
-                                  id="case_2_name"
-                                  value={productForm.case_2_name}
-                                  onChange={(e) => setProductForm({...productForm, case_2_name: e.target.value})}
-                                  placeholder="Case XPTO 2"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="case_2_unidade_responsavel">Unidade Responsável</Label>
-                                <Input
-                                  id="case_2_unidade_responsavel"
-                                  value={productForm.case_2_unidade_responsavel}
-                                  onChange={(e) => setProductForm({...productForm, case_2_unidade_responsavel: e.target.value})}
-                                  placeholder="Colli & Co"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="case_2_responsavel_projeto">Responsável Projeto</Label>
-                                <Input
-                                  id="case_2_responsavel_projeto"
-                                  value={productForm.case_2_responsavel_projeto}
-                                  onChange={(e) => setProductForm({...productForm, case_2_responsavel_projeto: e.target.value})}
-                                  placeholder="Rafael Corazza"
-                                />
-                              </div>
-                              <div>
-                                <Label htmlFor="case_2_documento_url">URL do Documento</Label>
-                                <Input
-                                  id="case_2_documento_url"
-                                  value={productForm.case_2_documento_url}
-                                  onChange={(e) => setProductForm({...productForm, case_2_documento_url: e.target.value})}
-                                  placeholder="Link teste"
-                                />
-                              </div>
-                            </div>
-                          </div>
                         </TabsContent>
 
                         <TabsContent value="posicoes" className="space-y-4">
@@ -1595,33 +1591,128 @@ const Admin = () => {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Artefatos</CardTitle>
-                  <Button>
+                  <Button
+                    onClick={() => {
+                      resetSupportForm();
+                      setIsSupportDialogOpen(true);
+                    }}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Novo Material
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4">
-                  {supportMaterials.map((material) => (
-                    <Card key={material.id} className="p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h3 className="font-bold text-foreground">{material.nome_arquivo}</h3>
-                          <p className="text-sm text-content">{material.url_direcionamento}</p>
+                {supportMaterials.length === 0 ? (
+                  <div className="rounded-lg border border-border/70 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                    Nenhum artefato cadastrado no momento.
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {supportMaterials.map((material) => (
+                      <Card key={material.id} className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 space-y-2">
+                            <h3 className="font-bold text-foreground">{material.nome_arquivo}</h3>
+                            <p className="text-sm text-content">{material.output_cliente || "Sem output configurado"}</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.04em] text-muted-foreground">
+                              {getTravaLabel(material.trava)}
+                            </p>
+                            <a
+                              href={material.url_direcionamento}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary hover:underline break-all"
+                            >
+                              {material.url_direcionamento}
+                              <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                            </a>
+                          </div>
+                          <div className="flex gap-2 shrink-0">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditSupportMaterial(material)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteSupportMaterial(material.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="systems">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Sistemas</CardTitle>
+                  <Button
+                    onClick={() => {
+                      resetSystemForm();
+                      setIsSystemDialogOpen(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Sistema
+                  </Button>
                 </div>
+              </CardHeader>
+              <CardContent>
+                {systems.length === 0 ? (
+                  <div className="rounded-lg border border-border/70 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                    Nenhum sistema cadastrado. Adicione o primeiro para conectar redirecionamentos.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    {systems.map((system) => (
+                      <Card key={system.id} className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="space-y-2 min-w-0">
+                            <h3 className="font-semibold text-foreground">{system.nome_sistema}</h3>
+                            <p className="text-sm text-content">{system.valor_entregue}</p>
+                            <a
+                              href={system.link_redirecionamento}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary hover:underline break-all"
+                            >
+                              {system.link_redirecionamento}
+                              <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                            </a>
+                          </div>
+                          <div className="flex gap-2 shrink-0">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditSystem(system)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteSystem(system.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -1632,7 +1723,8 @@ const Admin = () => {
                 <CardTitle>Configurações Gerais</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {isTableAvailable && settings && Object.entries(settings).map(([key, value]) => (
+                {isTableAvailable && settings && Object.entries(settings)
+                  .map(([key, value]) => (
                   <div key={key}>
                     <Label htmlFor={key}>{key}</Label>
                     <Textarea
@@ -1710,6 +1802,159 @@ const Admin = () => {
               </Button>
               <Button onClick={handleSavePosition}>
                 {editingPosition ? 'Atualizar' : 'Criar'} Posição
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={isSupportDialogOpen}
+          onOpenChange={(open) => {
+            setIsSupportDialogOpen(open);
+            if (!open) resetSupportForm();
+          }}
+        >
+          <DialogContent className="sm:max-w-[560px]">
+            <DialogHeader>
+              <DialogTitle>
+                {editingSupportMaterial ? "Editar Artefato" : "Novo Artefato"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="support_nome">Nome do Artefato</Label>
+                <Input
+                  id="support_nome"
+                  value={supportForm.nome_arquivo}
+                  onChange={(event) =>
+                    setSupportForm((prev) => ({
+                      ...prev,
+                      nome_arquivo: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="support_output">Output para o Cliente</Label>
+                <Textarea
+                  id="support_output"
+                  value={supportForm.output_cliente}
+                  rows={4}
+                  onChange={(event) =>
+                    setSupportForm((prev) => ({
+                      ...prev,
+                      output_cliente: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="support_trava">Qual a trava relacionada</Label>
+                <Select
+                  value={supportForm.trava}
+                  onValueChange={(value: TravaOptionValue) =>
+                    setSupportForm((prev) => ({ ...prev, trava: value }))
+                  }
+                >
+                  <SelectTrigger id="support_trava">
+                    <SelectValue placeholder="Selecione a trava" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRAVA_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="support_link">Link de redirecionamento</Label>
+                <Input
+                  id="support_link"
+                  type="url"
+                  value={supportForm.url_direcionamento}
+                  onChange={(event) =>
+                    setSupportForm((prev) => ({
+                      ...prev,
+                      url_direcionamento: event.target.value,
+                    }))
+                  }
+                  placeholder="https://exemplo.com"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button variant="outline" onClick={() => setIsSupportDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSaveSupportMaterial}>
+                {editingSupportMaterial ? "Atualizar Artefato" : "Criar Artefato"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={isSystemDialogOpen}
+          onOpenChange={(open) => {
+            setIsSystemDialogOpen(open);
+            if (!open) resetSystemForm();
+          }}
+        >
+          <DialogContent className="sm:max-w-[560px]">
+            <DialogHeader>
+              <DialogTitle>
+                {editingSystem ? "Editar Sistema" : "Novo Sistema"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="system_nome">Nome do sistema</Label>
+                <Input
+                  id="system_nome"
+                  value={systemForm.nome}
+                  onChange={(event) =>
+                    setSystemForm((prev) => ({ ...prev, nome: event.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="system_valor">O que ele entrega de valor</Label>
+                <Textarea
+                  id="system_valor"
+                  value={systemForm.valor_entregue}
+                  rows={4}
+                  onChange={(event) =>
+                    setSystemForm((prev) => ({
+                      ...prev,
+                      valor_entregue: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="system_link">Link para redirecionamento</Label>
+                <Input
+                  id="system_link"
+                  type="url"
+                  value={systemForm.link_redirecionamento}
+                  onChange={(event) =>
+                    setSystemForm((prev) => ({
+                      ...prev,
+                      link_redirecionamento: event.target.value,
+                    }))
+                  }
+                  placeholder="https://exemplo.com"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button variant="outline" onClick={() => setIsSystemDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSaveSystem}>
+                {editingSystem ? "Atualizar Sistema" : "Criar Sistema"}
               </Button>
             </div>
           </DialogContent>

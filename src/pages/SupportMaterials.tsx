@@ -149,9 +149,13 @@ const SupportMaterials = () => {
   };
 
   const resolveMaterialTrava = (material: SupportMaterial): TravaKey | null => {
-    const rawTrava = (material.trava || "").toLowerCase() as TravaKey;
-    if (travaOrder.includes(rawTrava)) {
-      return rawTrava;
+    const rawTrava = (material.trava || "").toLowerCase();
+    if (rawTrava === "trava_8") {
+      // Compatibilidade com registros antigos (retenção mapeada para trava_1)
+      return "trava_1";
+    }
+    if (travaOrder.includes(rawTrava as TravaKey)) {
+      return rawTrava as TravaKey;
     }
     return inferTravaFromName(material.nome_arquivo);
   };

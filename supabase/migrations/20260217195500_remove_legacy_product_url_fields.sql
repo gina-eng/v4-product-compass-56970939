@@ -1,0 +1,7 @@
+ALTER TABLE public.products
+DROP COLUMN IF EXISTS pitch_url,
+DROP COLUMN IF EXISTS bpmn_url,
+DROP COLUMN IF EXISTS playbook_url,
+DROP COLUMN IF EXISTS icp_url,
+DROP COLUMN IF EXISTS pricing_url,
+DROP COLUMN IF EXISTS certificacao_url;

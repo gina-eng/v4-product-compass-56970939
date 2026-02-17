@@ -109,20 +109,9 @@ export type Database = {
       }
       products: {
         Row: {
-          bonus_kpi: string | null
           bpmn: boolean
-          bpmn_url: string | null
-          case_1_documento_url: string | null
-          case_1_name: string | null
-          case_1_responsavel_projeto: string | null
-          case_1_unidade_responsavel: string | null
-          case_2_documento_url: string | null
-          case_2_name: string | null
-          case_2_responsavel_projeto: string | null
-          case_2_unidade_responsavel: string | null
           categoria: Database["public"]["Enums"]["categoria_produto"]
           certificacao: boolean
-          certificacao_url: string | null
           como_entrega_valor: string | null
           como_entrego_dados: Json | null
           como_vendo: string
@@ -136,28 +125,20 @@ export type Database = {
           entregaveis_relacionados: string | null
           escopo: string | null
           formato_entrega: string | null
-          garantia_especifica: string | null
           icp: boolean
-          icp_url: string | null
           id: string
-          kpi_principal: Database["public"]["Enums"]["kpi_tipo"] | null
           markup: number | null
           markup_overhead: number | null
           o_que_entrego: string
           outros: number | null
           para_quem_serve: string | null
           pitch: boolean
-          pitch_url: string | null
           playbook: boolean
-          playbook_url: string | null
           pricing: boolean
-          pricing_url: string | null
           produto: string
           spiced_data: Json
           spiced_data_2: Json | null
-          stack_digital: string | null
           status: Database["public"]["Enums"]["status_produto"]
-          tempo_meta_kpi: Database["public"]["Enums"]["tempo_meta"] | null
           time_envolvido: string | null
           updated_at: string
           usa_dedicacao: boolean
@@ -168,20 +149,9 @@ export type Database = {
           valor: string
         }
         Insert: {
-          bonus_kpi?: string | null
           bpmn?: boolean
-          bpmn_url?: string | null
-          case_1_documento_url?: string | null
-          case_1_name?: string | null
-          case_1_responsavel_projeto?: string | null
-          case_1_unidade_responsavel?: string | null
-          case_2_documento_url?: string | null
-          case_2_name?: string | null
-          case_2_responsavel_projeto?: string | null
-          case_2_unidade_responsavel?: string | null
           categoria: Database["public"]["Enums"]["categoria_produto"]
           certificacao?: boolean
-          certificacao_url?: string | null
           como_entrega_valor?: string | null
           como_entrego_dados?: Json | null
           como_vendo: string
@@ -195,28 +165,20 @@ export type Database = {
           entregaveis_relacionados?: string | null
           escopo?: string | null
           formato_entrega?: string | null
-          garantia_especifica?: string | null
           icp?: boolean
-          icp_url?: string | null
           id?: string
-          kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
           markup?: number | null
           markup_overhead?: number | null
           o_que_entrego: string
           outros?: number | null
           para_quem_serve?: string | null
           pitch?: boolean
-          pitch_url?: string | null
           playbook?: boolean
-          playbook_url?: string | null
           pricing?: boolean
-          pricing_url?: string | null
           produto: string
           spiced_data?: Json
           spiced_data_2?: Json | null
-          stack_digital?: string | null
           status?: Database["public"]["Enums"]["status_produto"]
-          tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
           time_envolvido?: string | null
           updated_at?: string
           usa_dedicacao?: boolean
@@ -227,20 +189,9 @@ export type Database = {
           valor: string
         }
         Update: {
-          bonus_kpi?: string | null
           bpmn?: boolean
-          bpmn_url?: string | null
-          case_1_documento_url?: string | null
-          case_1_name?: string | null
-          case_1_responsavel_projeto?: string | null
-          case_1_unidade_responsavel?: string | null
-          case_2_documento_url?: string | null
-          case_2_name?: string | null
-          case_2_responsavel_projeto?: string | null
-          case_2_unidade_responsavel?: string | null
           categoria?: Database["public"]["Enums"]["categoria_produto"]
           certificacao?: boolean
-          certificacao_url?: string | null
           como_entrega_valor?: string | null
           como_entrego_dados?: Json | null
           como_vendo?: string
@@ -254,28 +205,20 @@ export type Database = {
           entregaveis_relacionados?: string | null
           escopo?: string | null
           formato_entrega?: string | null
-          garantia_especifica?: string | null
           icp?: boolean
-          icp_url?: string | null
           id?: string
-          kpi_principal?: Database["public"]["Enums"]["kpi_tipo"] | null
           markup?: number | null
           markup_overhead?: number | null
           o_que_entrego?: string
           outros?: number | null
           para_quem_serve?: string | null
           pitch?: boolean
-          pitch_url?: string | null
           playbook?: boolean
-          playbook_url?: string | null
           pricing?: boolean
-          pricing_url?: string | null
           produto?: string
           spiced_data?: Json
           spiced_data_2?: Json | null
-          stack_digital?: string | null
           status?: Database["public"]["Enums"]["status_produto"]
-          tempo_meta_kpi?: Database["public"]["Enums"]["tempo_meta"] | null
           time_envolvido?: string | null
           updated_at?: string
           usa_dedicacao?: boolean
@@ -341,11 +284,40 @@ export type Database = {
         }
         Relationships: []
       }
+      systems: {
+        Row: {
+          created_at: string
+          id: string
+          link_redirecionamento: string
+          nome_sistema: string
+          updated_at: string
+          valor_entregue: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link_redirecionamento: string
+          nome_sistema: string
+          updated_at?: string
+          valor_entregue: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link_redirecionamento?: string
+          nome_sistema?: string
+          updated_at?: string
+          valor_entregue?: string
+        }
+        Relationships: []
+      }
       support_materials: {
         Row: {
           created_at: string
           id: string
           nome_arquivo: string
+          output_cliente: string | null
+          trava: string | null
           updated_at: string
           url_direcionamento: string
         }
@@ -353,6 +325,8 @@ export type Database = {
           created_at?: string
           id?: string
           nome_arquivo: string
+          output_cliente?: string | null
+          trava?: string | null
           updated_at?: string
           url_direcionamento: string
         }
@@ -360,6 +334,8 @@ export type Database = {
           created_at?: string
           id?: string
           nome_arquivo?: string
+          output_cliente?: string | null
+          trava?: string | null
           updated_at?: string
           url_direcionamento?: string
         }

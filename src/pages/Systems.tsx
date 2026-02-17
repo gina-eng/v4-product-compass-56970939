@@ -1,54 +1,94 @@
+import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Cog, Database, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Cog, ExternalLink } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { LoadingSpinner } from "@/components/LoadingStates";
 
-const systemsAreas = [
-  {
-    title: "Integrações",
-    description: "Gerencie conexões e fluxos entre as ferramentas do ecossistema.",
-    icon: Database,
-  },
-  {
-    title: "Configurações Técnicas",
-    description: "Centralize parâmetros operacionais e padrões da plataforma.",
-    icon: Cog,
-  },
-  {
-    title: "Governança",
-    description: "Acompanhe acessos, regras e políticas de uso dos sistemas.",
-    icon: ShieldCheck,
-  },
-];
+interface SystemConnection {
+  id: string;
+  nome_sistema: string;
+  valor_entregue: string;
+  link_redirecionamento: string;
+}
 
 const Systems = () => {
+  const [systems, setSystems] = useState<SystemConnection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSystems();
+  }, []);
+
+  const fetchSystems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("systems")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setSystems((data || []) as SystemConnection[]);
+    } catch (error) {
+      console.error("Erro ao carregar sistemas:", error);
+      setSystems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <section className="space-y-8 animate-fade-in">
         <header>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Sistemas</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Nova página dedicada para módulos e gestão técnica dos sistemas.
+            Acesse os sistemas conectados e navegue para cada ambiente.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {systemsAreas.map((area) => (
-            <Card
-              key={area.title}
-              className="border-border/80 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <CardHeader>
-                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <area.icon className="h-5 w-5" />
-                </div>
-                <CardTitle className="text-xl">{area.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm leading-relaxed text-muted-foreground">{area.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex min-h-[220px] items-center justify-center">
+            <LoadingSpinner size="lg" />
+          </div>
+        ) : systems.length === 0 ? (
+          <Card className="border-border/80 bg-card shadow-sm">
+            <CardContent className="py-10 text-center text-sm text-muted-foreground">
+              Nenhum sistema conectado ainda. Cadastre em <strong>/admin</strong> na aba{" "}
+              <strong>Sistemas</strong>.
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {systems.map((system) => (
+              <Card
+                key={system.id}
+                className="border-border/80 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <CardHeader>
+                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Cog className="h-5 w-5" />
+                  </div>
+                  <CardTitle className="text-xl">{system.nome_sistema}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {system.valor_entregue}
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => window.open(system.link_redirecionamento, "_blank")}
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Acessar Sistema
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </section>
     </Layout>
   );
