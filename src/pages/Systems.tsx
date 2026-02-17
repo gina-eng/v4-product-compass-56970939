@@ -52,14 +52,7 @@ const Systems = () => {
           <div className="flex min-h-[220px] items-center justify-center">
             <LoadingSpinner size="lg" />
           </div>
-        ) : systems.length === 0 ? (
-          <Card className="border-border/80 bg-card shadow-sm">
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
-              Nenhum sistema conectado ainda. Cadastre em <strong>/admin</strong> na aba{" "}
-              <strong>Sistemas</strong>.
-            </CardContent>
-          </Card>
-        ) : (
+        ) : systems.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {systems.map((system) => (
               <Card
@@ -88,7 +81,7 @@ const Systems = () => {
               </Card>
             ))}
           </div>
-        )}
+        ) : null}
       </section>
     </Layout>
   );
