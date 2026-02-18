@@ -57,7 +57,7 @@ const Systems = () => {
             {systems.map((system) => (
               <Card
                 key={system.id}
-                className="border-border/80 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                className="flex h-full flex-col border-border/80 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
               >
                 <CardHeader>
                   <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -65,13 +65,13 @@ const Systems = () => {
                   </div>
                   <CardTitle className="text-xl">{system.nome_sistema}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="flex flex-1 flex-col gap-4">
                   <p className="text-sm leading-relaxed text-muted-foreground">
                     {system.valor_entregue}
                   </p>
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="mt-auto w-full"
                     onClick={() => window.open(system.link_redirecionamento, "_blank")}
                   >
                     <ExternalLink className="mr-2 h-4 w-4" />

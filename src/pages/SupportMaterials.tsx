@@ -279,7 +279,7 @@ const SupportMaterials = () => {
               const outputText = resolveMaterialOutput(material, materialTrava);
 
               return (
-                <Card key={material.id} className="card-hover animate-scale-in">
+                <Card key={material.id} className="card-hover animate-scale-in flex h-full flex-col">
                   <CardHeader className="space-y-3">
                     <CardTitle className="flex items-start justify-between gap-3">
                       <span className="flex items-center gap-2">
@@ -303,7 +303,7 @@ const SupportMaterials = () => {
                     </p>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
+                  <CardContent className="flex flex-1 flex-col gap-4">
                     <div className="rounded-lg border border-border/70 bg-muted/30 p-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                         Output para o cliente
@@ -312,7 +312,7 @@ const SupportMaterials = () => {
                     </div>
 
                     <Button
-                      className="w-full hover-scale"
+                      className="mt-auto w-full hover-scale"
                       onClick={() => window.open(material.url_direcionamento, "_blank")}
                       variant="outline"
                     >
