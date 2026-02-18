@@ -307,7 +307,7 @@ const Admin = () => {
         duracao: product.duracao,
         dono: product.dono,
         valor: product.valor,
-        status: product.status,
+        status: product.status === "Em homologação" ? "Em produção" : product.status,
         o_que_entrego: product.o_que_entrego,
         escopo: product.escopo,
         duracao_media: product.duracao_media,
@@ -811,7 +811,7 @@ const Admin = () => {
         duracao: productForm.duracao,
         dono: productForm.dono,
         valor: productForm.valor,
-        status: productForm.status as "Disponível" | "Em produção" | "Em homologação",
+        status: productForm.status as "Disponível" | "Em produção",
         o_que_entrego: productForm.o_que_entrego || '',
         escopo: productForm.escopo || null,
         duracao_media: productForm.duracao_media || null,
@@ -889,7 +889,7 @@ const Admin = () => {
       duracao: product.duracao,
       dono: product.dono,
       valor: product.valor,
-      status: product.status,
+      status: product.status === "Em homologação" ? "Em produção" : product.status,
       o_que_entrego: (product as any).o_que_entrego || '',
       escopo: product.escopo || '',
       duracao_media: product.duracao_media || '',
@@ -1398,7 +1398,6 @@ const Admin = () => {
                                 <SelectContent>
                                   <SelectItem value="Disponível">Disponível</SelectItem>
                                   <SelectItem value="Em produção">Em produção</SelectItem>
-                                  <SelectItem value="Em homologação">Em homologação</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -1700,7 +1699,6 @@ const Admin = () => {
                         <SelectItem value="all">Todos</SelectItem>
                         <SelectItem value="Disponível">Disponível</SelectItem>
                         <SelectItem value="Em produção">Em produção</SelectItem>
-                        <SelectItem value="Em homologação">Em homologação</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

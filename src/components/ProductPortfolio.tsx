@@ -57,7 +57,6 @@ const categoryToneMap: Record<string, string> = {
 const statusToneMap: Record<string, string> = {
   Disponível: "bg-green-100 text-green-800",
   "Em produção": "bg-amber-100 text-amber-800",
-  "Em homologação": "bg-slate-100 text-slate-700",
 };
 
 const ProductPortfolio = () => {
@@ -65,6 +64,7 @@ const ProductPortfolio = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [certificationFilter, setCertificationFilter] = useState<"all" | "required">("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [products, setProducts] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,7 +136,7 @@ const ProductPortfolio = () => {
               name: product.produto,
               description: product.descricao_card?.trim() || product.description || "",
               category: product.categoria,
-              status: product.status,
+              status: product.status === "Em homologação" ? "Em produção" : product.status,
               valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
               certificacao: Boolean(product.certificacao),
             };
@@ -158,6 +158,7 @@ const ProductPortfolio = () => {
     () =>
       products
         .filter((product) => statusFilter === "all" || product.status === statusFilter)
+        .filter((product) => certificationFilter === "all" || product.certificacao)
         .filter((product) => activeFilter === "all" || product.category === activeFilter)
         .filter((product) => {
           if (!searchTerm.trim()) return true;
@@ -167,7 +168,7 @@ const ProductPortfolio = () => {
             product.description?.toLowerCase().includes(normalizedSearch)
           );
         }),
-    [products, statusFilter, activeFilter, searchTerm]
+    [products, statusFilter, certificationFilter, activeFilter, searchTerm]
   );
 
   const handleViewDetails = (product: PortfolioItem) => {
@@ -194,7 +195,7 @@ const ProductPortfolio = () => {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_220px_220px_auto]">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_220px_220px_220px_auto]">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -228,7 +229,16 @@ const ProductPortfolio = () => {
             <SelectItem value="all">Todos os status</SelectItem>
             <SelectItem value="Disponível">Disponível</SelectItem>
             <SelectItem value="Em produção">Em produção</SelectItem>
-            <SelectItem value="Em homologação">Em homologação</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={certificationFilter} onValueChange={(value) => setCertificationFilter(value as "all" | "required")}>
+          <SelectTrigger className="h-11 rounded-xl border-border/80 bg-white shadow-sm">
+            <SelectValue placeholder="Certificação" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="required">Somente com certificação</SelectItem>
           </SelectContent>
         </Select>
 
