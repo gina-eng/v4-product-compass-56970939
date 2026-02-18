@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoFromData } from "@/lib/productCalculations";
+import certificationMedal from "@/assets/certificate-medal-svgrepo-com.svg";
 
 interface PortfolioItem {
   id: string;
@@ -17,6 +18,7 @@ interface PortfolioItem {
   category: string;
   status: string;
   valorBase: string;
+  certificacao: boolean;
 }
 
 const validCategoryFilters = [
@@ -136,6 +138,7 @@ const ProductPortfolio = () => {
               category: product.categoria,
               status: product.status,
               valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
+              certificacao: Boolean(product.certificacao),
             };
           })
         );
@@ -269,7 +272,16 @@ const ProductPortfolio = () => {
                 <Card key={product.id} className="h-full border-border/80 shadow-sm transition-shadow hover:shadow-md">
                   <CardHeader className="space-y-3 pb-3">
                     <div className="flex items-start justify-between gap-3">
-                      <CardTitle className="line-clamp-2 text-base leading-tight">{product.name}</CardTitle>
+                      <div className="flex min-w-0 items-start gap-2">
+                        {product.certificacao && (
+                          <img
+                            src={certificationMedal}
+                            alt="Produto com certificação obrigatória"
+                            className="mt-0.5 h-7 w-7 shrink-0"
+                          />
+                        )}
+                        <CardTitle className="line-clamp-2 text-base leading-tight">{product.name}</CardTitle>
+                      </div>
                       <Button
                         variant="outline"
                         size="sm"
