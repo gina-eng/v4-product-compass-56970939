@@ -19,7 +19,7 @@ import SalesMaterials from "@/components/SalesMaterials";
 import OperationalMaterials from "@/components/OperationalMaterials";
 import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { Plus, Edit, Trash2, Search, ExternalLink } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ExternalLink, Copy } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -534,6 +534,42 @@ const Admin = () => {
     }
   };
 
+  const handleDuplicateSupportMaterial = async (id: string) => {
+    try {
+      const { data: original, error: fetchError } = await supabase
+        .from("support_materials")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (fetchError || !original) throw fetchError;
+
+      const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...payload } = original;
+
+      const { error: insertError } = await supabase
+        .from("support_materials")
+        .insert([
+          {
+            ...payload,
+            nome_arquivo: `Copy - ${original.nome_arquivo}`,
+          },
+        ]);
+
+      if (insertError) throw insertError;
+
+      await fetchSupportMaterials();
+      toast({
+        title: "Artefato duplicado com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao duplicar artefato:", error);
+      toast({
+        title: "Erro ao duplicar artefato",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSaveSupportMaterial = async () => {
     const nomeArquivo = supportForm.nome_arquivo.trim();
     const outputCliente = supportForm.output_cliente.trim();
@@ -644,6 +680,42 @@ const Admin = () => {
       console.error("Erro ao excluir sistema:", error);
       toast({
         title: "Erro ao excluir sistema",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDuplicateSystem = async (systemId: string) => {
+    try {
+      const { data: original, error: fetchError } = await supabase
+        .from("systems")
+        .select("*")
+        .eq("id", systemId)
+        .single();
+
+      if (fetchError || !original) throw fetchError;
+
+      const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...payload } = original;
+
+      const { error: insertError } = await supabase
+        .from("systems")
+        .insert([
+          {
+            ...payload,
+            nome_sistema: `Copy - ${original.nome_sistema}`,
+          },
+        ]);
+
+      if (insertError) throw insertError;
+
+      await fetchSystems();
+      toast({
+        title: "Sistema duplicado com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao duplicar sistema:", error);
+      toast({
+        title: "Erro ao duplicar sistema",
         variant: "destructive",
       });
     }
@@ -1019,6 +1091,108 @@ const Admin = () => {
         title: "Erro",
         description: "Erro ao excluir produto",
         variant: "destructive"
+      });
+    }
+  };
+
+  const handleDuplicateProduct = async (id: string) => {
+    try {
+      const { data: original, error: fetchError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (fetchError || !original) throw fetchError;
+
+      const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...payload } = original;
+
+      const { data: duplicatedProduct, error: insertError } = await supabase
+        .from("products")
+        .insert([
+          {
+            ...payload,
+            produto: `Copy - ${original.produto}`,
+          } as any,
+        ])
+        .select("id")
+        .single();
+
+      if (insertError) throw insertError;
+
+      if (!duplicatedProduct?.id) {
+        throw new Error("Não foi possível obter o ID do produto duplicado.");
+      }
+
+      const { data: relatedPositions, error: relatedPositionsError } = await supabase
+        .from("product_positions")
+        .select("*")
+        .eq("product_id", id);
+
+      if (relatedPositionsError) {
+        await supabase.from("products").delete().eq("id", duplicatedProduct.id);
+        throw relatedPositionsError;
+      }
+
+      const { data: relatedMaterials, error: relatedMaterialsError } = await supabase
+        .from("training_materials")
+        .select("*")
+        .eq("product_id", id);
+
+      if (relatedMaterialsError) {
+        await supabase.from("products").delete().eq("id", duplicatedProduct.id);
+        throw relatedMaterialsError;
+      }
+
+      if ((relatedPositions || []).length > 0) {
+        const duplicatedPositions = (relatedPositions || []).map((row) => {
+          const { id: _rowId, created_at: _rowCreatedAt, updated_at: _rowUpdatedAt, ...positionPayload } = row;
+          return {
+            ...positionPayload,
+            product_id: duplicatedProduct.id,
+          };
+        });
+
+        const { error: duplicatePositionsError } = await supabase
+          .from("product_positions")
+          .insert(duplicatedPositions as any);
+
+        if (duplicatePositionsError) {
+          await supabase.from("products").delete().eq("id", duplicatedProduct.id);
+          throw duplicatePositionsError;
+        }
+      }
+
+      if ((relatedMaterials || []).length > 0) {
+        const duplicatedMaterials = (relatedMaterials || []).map((row) => {
+          const { id: _rowId, created_at: _rowCreatedAt, updated_at: _rowUpdatedAt, ...materialPayload } = row;
+          return {
+            ...materialPayload,
+            product_id: duplicatedProduct.id,
+          };
+        });
+
+        const { error: duplicateMaterialsError } = await supabase
+          .from("training_materials")
+          .insert(duplicatedMaterials as any);
+
+        if (duplicateMaterialsError) {
+          await supabase.from("products").delete().eq("id", duplicatedProduct.id);
+          throw duplicateMaterialsError;
+        }
+      }
+
+      await fetchProducts();
+      toast({
+        title: "Sucesso",
+        description: `Produto duplicado com ${(relatedPositions || []).length} posições e ${(relatedMaterials || []).length} materiais relacionados.`,
+      });
+    } catch (error) {
+      console.error("Erro ao duplicar produto:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao duplicar produto",
+        variant: "destructive",
       });
     }
   };
@@ -1489,14 +1663,25 @@ const Admin = () => {
                               size="sm"
                               onClick={() => handleEditProduct(product)}
                               className="h-8 w-8 p-0"
+                              title="Editar produto"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => handleDuplicateProduct(product.id)}
+                              className="h-8 w-8 p-0"
+                              title="Duplicar produto"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleDeleteProduct(product.id)}
                               className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                              title="Excluir produto"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -1633,13 +1818,23 @@ const Admin = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => handleEditSupportMaterial(material)}
+                              title="Editar artefato"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
+                              onClick={() => handleDuplicateSupportMaterial(material.id)}
+                              title="Duplicar artefato"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
                               onClick={() => handleDeleteSupportMaterial(material.id)}
+                              title="Excluir artefato"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -1697,13 +1892,23 @@ const Admin = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => handleEditSystem(system)}
+                              title="Editar sistema"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
+                              onClick={() => handleDuplicateSystem(system.id)}
+                              title="Duplicar sistema"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
                               onClick={() => handleDeleteSystem(system.id)}
+                              title="Excluir sistema"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
