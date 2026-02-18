@@ -6,11 +6,12 @@ import { NavLink } from "react-router-dom";
 
 interface ProductSummaryProps {
   productName: string;
+  hasCertificationSection?: boolean;
 }
 
 const STICKY_LOGO_URL = "https://portfolio.v4company.com/assets/product-compass-logo-DOWNNDSp.svg";
 
-const ProductSummary = ({ productName }: ProductSummaryProps) => {
+const ProductSummary = ({ productName, hasCertificationSection = false }: ProductSummaryProps) => {
   const [isSticky, setIsSticky] = useState(false);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
     }
   };
 
-  const sections = [
+  const baseSections = [
     { id: 'estrutura-produto', label: 'Estrutura do Produto' },
     { id: 'visao-geral', label: 'Visão Geral' },
     { id: 'aspectos-tecnicos', label: 'Aspectos Técnicos' },
@@ -43,6 +44,14 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
     { id: 'posicoes-alocadas', label: 'Posições Alocadas' },
     { id: 'materiais-treinamentos', label: 'Materiais de Treinamentos' },
   ];
+
+  const sections = hasCertificationSection
+    ? [
+        baseSections[0],
+        { id: 'destaque-certificacao', label: 'Produto com Certificação Obrigatória' },
+        ...baseSections.slice(1),
+      ]
+    : baseSections;
 
   // Sidebar Summary (always visible in sidebar)
   const SidebarSummary = () => (
@@ -92,7 +101,10 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
               </h3>
             </div>
 
-            <div className="grid grid-cols-7 gap-2">
+            <div
+              className="grid gap-2"
+              style={{ gridTemplateColumns: `repeat(${sections.length}, minmax(0, 1fr))` }}
+            >
               {sections.map((section, index) => (
                 <Button
                   key={section.id}

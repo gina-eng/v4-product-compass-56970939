@@ -75,6 +75,8 @@ interface Product {
   icp?: boolean;
   pricing?: boolean;
   certificacao?: boolean;
+  certificacao_destaque_texto?: string;
+  certificacao_destaque_link?: string;
   spiced_data: SpicedData;
   spiced_data_2?: SpicedData;
   como_entrego_dados: ComoEntregoItem[];
@@ -197,6 +199,8 @@ const Admin = () => {
     icp: false,
     pricing: false,
     certificacao: false,
+    certificacao_destaque_texto: '',
+    certificacao_destaque_link: '',
     markup: 1,
     usa_dedicacao: false,
     use_case_map_1_name: 'Use Case Map - Cliente sem Investimento',
@@ -319,6 +323,8 @@ const Admin = () => {
         icp: product.icp,
         pricing: product.pricing,
         certificacao: product.certificacao,
+        certificacao_destaque_texto: product.certificacao_destaque_texto,
+        certificacao_destaque_link: product.certificacao_destaque_link,
         spiced_data: (product.spiced_data as unknown as SpicedData) || {
           situation: { objetivo: "", perguntas: "", observar: "" },
           pain: { objetivo: "", perguntas: "", observar: "" },
@@ -821,6 +827,12 @@ const Admin = () => {
         icp: productForm.icp,
         pricing: productForm.pricing,
         certificacao: productForm.certificacao,
+        certificacao_destaque_texto: productForm.certificacao
+          ? productForm.certificacao_destaque_texto || null
+          : null,
+        certificacao_destaque_link: productForm.certificacao
+          ? productForm.certificacao_destaque_link || null
+          : null,
         spiced_data: spicedData,
         spiced_data_2: spicedData2,
         como_entrego_dados: comoEntregoDados,
@@ -893,6 +905,8 @@ const Admin = () => {
       icp: (product as any).icp || false,
       pricing: (product as any).pricing || false,
       certificacao: (product as any).certificacao || false,
+      certificacao_destaque_texto: (product as any).certificacao_destaque_texto || '',
+      certificacao_destaque_link: (product as any).certificacao_destaque_link || '',
       markup: product.markup || 1,
       usa_dedicacao: (product as any).usa_dedicacao || false,
       use_case_map_1_name: product.use_case_map_1_name || 'Use Case Map - Cliente sem Investimento',
@@ -1040,6 +1054,8 @@ const Admin = () => {
       icp: false,
       pricing: false,
       certificacao: false,
+      certificacao_destaque_texto: '',
+      certificacao_destaque_link: '',
       markup: 1,
       usa_dedicacao: false,
       use_case_map_1_name: 'Use Case Map - Cliente sem Investimento',
@@ -1300,6 +1316,64 @@ const Admin = () => {
                                   </p>
                                 </div>
                               </div>
+                            </div>
+
+                            {/* Campo Destaque de Certificação */}
+                            <div className="col-span-2 space-y-3 rounded-lg border border-border/70 p-4">
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id="certificacao"
+                                  checked={productForm.certificacao}
+                                  onCheckedChange={(checked) =>
+                                    setProductForm({...productForm, certificacao: checked as boolean})
+                                  }
+                                />
+                                <div className="grid gap-1.5 leading-none">
+                                  <Label
+                                    htmlFor="certificacao"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    Exibir destaque de certificação na página do produto
+                                  </Label>
+                                  <p className="text-xs text-muted-foreground">
+                                    Ative apenas para produtos que precisam mostrar chamada especial de certificação.
+                                  </p>
+                                </div>
+                              </div>
+
+                              {productForm.certificacao && (
+                                <div className="space-y-4">
+                                  <div>
+                                    <Label htmlFor="certificacao_destaque_texto">Texto de destaque</Label>
+                                    <Textarea
+                                      id="certificacao_destaque_texto"
+                                      value={productForm.certificacao_destaque_texto}
+                                      onChange={(e) =>
+                                        setProductForm({
+                                          ...productForm,
+                                          certificacao_destaque_texto: e.target.value,
+                                        })
+                                      }
+                                      placeholder="Ex: Este produto inclui certificação oficial com aplicação prática."
+                                      rows={3}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="certificacao_destaque_link">Link de redirecionamento</Label>
+                                    <Input
+                                      id="certificacao_destaque_link"
+                                      value={productForm.certificacao_destaque_link}
+                                      onChange={(e) =>
+                                        setProductForm({
+                                          ...productForm,
+                                          certificacao_destaque_link: e.target.value,
+                                        })
+                                      }
+                                      placeholder="https://..."
+                                    />
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             
                             <div>

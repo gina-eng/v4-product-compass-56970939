@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown, ExternalLink } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { LoadingSpinner } from "@/components/LoadingStates";
 import SpicedTable from "@/components/SpicedTable";
@@ -19,6 +19,7 @@ import UseCaseMap from "@/components/UseCaseMap";
 import ProductSummary from "@/components/ProductSummary";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
+import certificationMedal from "@/assets/certificate-medal-svgrepo-com.svg";
 
 interface Product {
   id: string;
@@ -45,6 +46,8 @@ interface Product {
   icp?: boolean;
   pricing?: boolean;
   certificacao?: boolean;
+  certificacao_destaque_texto?: string;
+  certificacao_destaque_link?: string;
   como_vendo: string;
   spiced_data: any;
   spiced_data_2: any;
@@ -138,6 +141,8 @@ const ProductDetails = () => {
           icp: data.icp,
           pricing: data.pricing,
           certificacao: data.certificacao,
+          certificacao_destaque_texto: data.certificacao_destaque_texto,
+          certificacao_destaque_link: data.certificacao_destaque_link,
           como_vendo: data.como_vendo,
           spiced_data: data.spiced_data,
           spiced_data_2: data.spiced_data_2,
@@ -229,6 +234,8 @@ const ProductDetails = () => {
           icp: foundProduct.icp,
           pricing: foundProduct.pricing,
           certificacao: foundProduct.certificacao,
+          certificacao_destaque_texto: foundProduct.certificacao_destaque_texto,
+          certificacao_destaque_link: foundProduct.certificacao_destaque_link,
           como_vendo: foundProduct.como_vendo,
           spiced_data: foundProduct.spiced_data,
           spiced_data_2: foundProduct.spiced_data_2,
@@ -313,6 +320,12 @@ const ProductDetails = () => {
     return statusConfig[status as keyof typeof statusConfig] || statusConfig["Disponível"];
   };
 
+  const resolveExternalUrl = (url?: string | null) => {
+    const trimmed = url?.trim();
+    if (!trimmed) return null;
+    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  };
+
   console.log('Render - loading:', loading, 'product:', product);
 
   if (loading) {
@@ -341,6 +354,13 @@ const ProductDetails = () => {
     );
   }
 
+  const hasCertificationHighlight =
+    Boolean(product.certificacao) &&
+    Boolean(
+      product.certificacao_destaque_texto?.trim() || product.certificacao_destaque_link?.trim()
+    );
+  const certificationHighlightLink = resolveExternalUrl(product.certificacao_destaque_link);
+
   return (
     <Layout>
       <div className="spacing-section animate-fade-in">
@@ -361,7 +381,10 @@ const ProductDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
           {/* Coluna da esquerda - Sumário */}
           <div className="lg:col-span-1">
-            <ProductSummary productName={product.produto} />
+            <ProductSummary
+              productName={product.produto}
+              hasCertificationSection={hasCertificationHighlight}
+            />
           </div>
 
           {/* Coluna da direita - Estrutura do Produto */}
@@ -425,6 +448,48 @@ const ProductDetails = () => {
 
         {/* Restante do conteúdo em largura total */}
         <div className="spacing-section">
+        {/* Destaque de Certificação */}
+        {hasCertificationHighlight && (
+          <section id="destaque-certificacao">
+            <Card className="border-primary/30 bg-primary/5">
+              <CardHeader>
+                <CardTitle className="text-title-section">Produto com Certificação Obrigatória</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid items-start gap-6 md:grid-cols-[240px_minmax(0,1fr)]">
+                  <div className="mx-auto w-full max-w-[220px] md:mx-0 md:max-w-[240px]">
+                    <img
+                      src={certificationMedal}
+                      alt="Medalha de certificação"
+                      className="h-auto w-full"
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    {product.certificacao_destaque_texto && (
+                      <p className="text-body leading-relaxed whitespace-pre-wrap">
+                        {product.certificacao_destaque_texto}
+                      </p>
+                    )}
+                    {certificationHighlightLink && (
+                      <Button asChild variant="outline" className="w-fit hover-scale">
+                        <a
+                          href={certificationHighlightLink}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Acessar Certificação
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
+
         {/* Visão Geral do Produto */}
         <section id="visao-geral">
         <Card>

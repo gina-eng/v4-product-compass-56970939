@@ -112,6 +112,8 @@ export type Database = {
           bpmn: boolean
           categoria: Database["public"]["Enums"]["categoria_produto"]
           certificacao: boolean
+          certificacao_destaque_link: string | null
+          certificacao_destaque_texto: string | null
           como_entrega_valor: string | null
           como_entrego_dados: Json | null
           como_vendo: string
@@ -152,6 +154,8 @@ export type Database = {
           bpmn?: boolean
           categoria: Database["public"]["Enums"]["categoria_produto"]
           certificacao?: boolean
+          certificacao_destaque_link?: string | null
+          certificacao_destaque_texto?: string | null
           como_entrega_valor?: string | null
           como_entrego_dados?: Json | null
           como_vendo: string
@@ -192,6 +196,8 @@ export type Database = {
           bpmn?: boolean
           categoria?: Database["public"]["Enums"]["categoria_produto"]
           certificacao?: boolean
+          certificacao_destaque_link?: string | null
+          certificacao_destaque_texto?: string | null
           como_entrega_valor?: string | null
           como_entrego_dados?: Json | null
           como_vendo?: string
