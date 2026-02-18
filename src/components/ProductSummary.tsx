@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { NavLink } from "react-router-dom";
 
 interface ProductSummaryProps {
   productName: string;
 }
+
+const STICKY_LOGO_URL = "https://portfolio.v4company.com/assets/product-compass-logo-DOWNNDSp.svg";
 
 const ProductSummary = ({ productName }: ProductSummaryProps) => {
   const [isSticky, setIsSticky] = useState(false);
@@ -70,28 +73,42 @@ const ProductSummary = ({ productName }: ProductSummaryProps) => {
       )}
       style={{ margin: 0, padding: 0 }}
     >
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
-            📋 {productName} - Navegação
-          </h3>
+      <div className="flex">
+        <div className="hidden w-[272px] shrink-0 border-r border-border/70 bg-background/95 lg:flex">
+          <div className="w-full px-4 py-4">
+            <div className="mb-6 rounded-xl px-2 py-2">
+              <NavLink to="/" aria-label="Ir para Visão Geral" className="inline-flex">
+                <img src={STICKY_LOGO_URL} alt="Product Compass" className="h-9 w-auto" />
+              </NavLink>
+            </div>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-7 gap-2">
-          {sections.map((section, index) => (
-            <Button
-              key={section.id}
-              variant="outline"
-              size="sm"
-              onClick={() => scrollToSection(section.id)}
-              className="justify-start text-sm h-10 hover:bg-primary/10 hover:border-primary/30 transition-all group"
-            >
-              <span className="font-mono mr-2 text-primary bg-primary/10 rounded-full w-6 h-6 flex items-center justify-center text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-all">
-                {index + 1}
-              </span>
-              <span className="truncate">{section.label}</span>
-            </Button>
-          ))}
+
+        <div className="min-w-0 flex-1 px-4 py-4 sm:px-6 lg:px-10">
+          <div className="mx-auto w-full max-w-[1240px]">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                📋 {productName} - Navegação
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-7 gap-2">
+              {sections.map((section, index) => (
+                <Button
+                  key={section.id}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => scrollToSection(section.id)}
+                  className="justify-start text-sm h-10 hover:bg-primary/10 hover:border-primary/30 transition-all group"
+                >
+                  <span className="font-mono mr-2 text-primary bg-primary/10 rounded-full w-6 h-6 flex items-center justify-center text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                    {index + 1}
+                  </span>
+                  <span className="truncate">{section.label}</span>
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
