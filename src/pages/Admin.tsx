@@ -65,6 +65,7 @@ interface Product {
   duracao_media?: string;
   time_envolvido?: string;
   formato_entrega?: string;
+  forum_sobre_produto?: string;
   descricao_completa?: string;
   para_quem_serve?: string;
   como_entrega_valor?: string;
@@ -189,6 +190,7 @@ const Admin = () => {
     duracao_media: '',
     time_envolvido: '',
     formato_entrega: '',
+    forum_sobre_produto: '',
     descricao_completa: '',
     para_quem_serve: '',
     como_entrega_valor: '',
@@ -313,6 +315,7 @@ const Admin = () => {
         duracao_media: product.duracao_media,
         time_envolvido: product.time_envolvido,
         formato_entrega: product.formato_entrega,
+        forum_sobre_produto: product.forum_sobre_produto,
         descricao_completa: product.descricao_completa,
         para_quem_serve: product.para_quem_serve,
         como_entrega_valor: product.como_entrega_valor,
@@ -797,6 +800,27 @@ const Admin = () => {
 
   const handleSaveProduct = async () => {
     try {
+      const forumLinkInput = productForm.forum_sobre_produto.trim();
+      let normalizedForumLink: string | null = null;
+
+      if (forumLinkInput) {
+        const forumCandidate = /^https?:\/\//i.test(forumLinkInput)
+          ? forumLinkInput
+          : `https://${forumLinkInput}`;
+
+        try {
+          const parsedForumUrl = new URL(forumCandidate);
+          normalizedForumLink = parsedForumUrl.toString();
+        } catch {
+          toast({
+            title: "Link inválido",
+            description: "Informe uma URL válida para o Fórum no Google Chat.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
       const productData = {
         produto: productForm.produto,
         categoria: productForm.categoria as
@@ -817,6 +841,7 @@ const Admin = () => {
         duracao_media: productForm.duracao_media || null,
         time_envolvido: productForm.time_envolvido || null,
         formato_entrega: productForm.formato_entrega || null,
+        forum_sobre_produto: normalizedForumLink,
         descricao_completa: productForm.descricao_completa || null,
         para_quem_serve: productForm.para_quem_serve || null,
         como_entrega_valor: productForm.como_entrega_valor || null,
@@ -870,9 +895,32 @@ const Admin = () => {
       fetchProducts();
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
+
+      const errorMessage =
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof (error as { message?: unknown }).message === "string"
+          ? ((error as { message: string }).message || "").trim()
+          : "";
+
+      const errorCode =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        typeof (error as { code?: unknown }).code === "string"
+          ? (error as { code: string }).code
+          : "";
+
+      const forumColumnMissing =
+        (errorCode === "PGRST204" || errorCode === "42703") &&
+        errorMessage.toLowerCase().includes("forum_sobre_produto");
+
       toast({
         title: "Erro",
-        description: "Erro ao salvar produto",
+        description: forumColumnMissing
+          ? "O campo 'Forum sobre Produto' ainda nao existe no banco. Aplique a migration mais recente e tente novamente."
+          : (errorMessage || "Erro ao salvar produto"),
         variant: "destructive"
       });
     }
@@ -895,6 +943,7 @@ const Admin = () => {
       duracao_media: product.duracao_media || '',
       time_envolvido: product.time_envolvido || '',
       formato_entrega: product.formato_entrega || '',
+      forum_sobre_produto: product.forum_sobre_produto || '',
       descricao_completa: product.descricao_completa || '',
       para_quem_serve: (product as any).para_quem_serve || '',
       como_entrega_valor: (product as any).como_entrega_valor || '',
@@ -1044,6 +1093,7 @@ const Admin = () => {
       duracao_media: '',
       time_envolvido: '',
       formato_entrega: '',
+      forum_sobre_produto: '',
       descricao_completa: '',
       para_quem_serve: '',
       como_entrega_valor: '',
@@ -1415,6 +1465,15 @@ const Admin = () => {
                                 id="dono"
                                 value={productForm.dono}
                                 onChange={(e) => setProductForm({...productForm, dono: e.target.value})}
+                              />
+                            </div>
+                            <div className="col-span-2">
+                              <Label htmlFor="forum_sobre_produto">Forum sobre Produto (Google Chat)</Label>
+                              <Input
+                                id="forum_sobre_produto"
+                                value={productForm.forum_sobre_produto}
+                                onChange={(e) => setProductForm({...productForm, forum_sobre_produto: e.target.value})}
+                                placeholder="Cole aqui o link da sala do Google Chat"
                               />
                             </div>
                           </div>

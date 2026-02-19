@@ -20,6 +20,7 @@ import ProductSummary from "@/components/ProductSummary";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 import certificationMedal from "@/assets/certificate-medal-svgrepo-com.svg";
+import googleChatLogo from "@/assets/google-chat-logo.svg";
 
 interface Product {
   id: string;
@@ -35,6 +36,7 @@ interface Product {
   duracao_media?: string;
   time_envolvido?: string;
   formato_entrega?: string;
+  forum_sobre_produto?: string;
   descricao_completa?: string;
   para_quem_serve?: string;
   como_entrega_valor?: string;
@@ -130,6 +132,7 @@ const ProductDetails = () => {
           duracao_media: data.duracao_media,
           time_envolvido: data.time_envolvido,
           formato_entrega: data.formato_entrega,
+          forum_sobre_produto: data.forum_sobre_produto,
           descricao_completa: data.descricao_completa,
           para_quem_serve: data.para_quem_serve,
           como_entrega_valor: data.como_entrega_valor,
@@ -223,6 +226,7 @@ const ProductDetails = () => {
           duracao_media: foundProduct.duracao_media,
           time_envolvido: foundProduct.time_envolvido,
           formato_entrega: foundProduct.formato_entrega,
+          forum_sobre_produto: foundProduct.forum_sobre_produto,
           descricao_completa: foundProduct.descricao_completa,
           para_quem_serve: foundProduct.para_quem_serve,
           como_entrega_valor: foundProduct.como_entrega_valor,
@@ -360,6 +364,16 @@ const ProductDetails = () => {
       product.certificacao_destaque_texto?.trim() || product.certificacao_destaque_link?.trim()
     );
   const certificationHighlightLink = resolveExternalUrl(product.certificacao_destaque_link);
+  const forumSobreProdutoLink = (() => {
+    const normalizedUrl = resolveExternalUrl(product.forum_sobre_produto);
+    if (!normalizedUrl) return null;
+    try {
+      new URL(normalizedUrl);
+      return normalizedUrl;
+    } catch {
+      return null;
+    }
+  })();
 
   return (
     <Layout>
@@ -439,6 +453,26 @@ const ProductDetails = () => {
                         <p className="text-body">{product.dono}</p>
                       </div>
                     </div>
+
+                    {forumSobreProdutoLink && (
+                      <div>
+                        <Button asChild variant="outline" className="w-fit hover-scale">
+                          <a
+                            href={forumSobreProdutoLink}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <img
+                              src={googleChatLogo}
+                              alt="Google Chat"
+                              className="h-4 w-4 mr-2"
+                            />
+                            <span>Acessar Forum no Google Chat sobre o Produto</span>
+                            <ExternalLink className="h-4 w-4 ml-2" />
+                          </a>
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -127,6 +127,7 @@ export type Database = {
           entregaveis_relacionados: string | null
           escopo: string | null
           formato_entrega: string | null
+          forum_sobre_produto: string | null
           icp: boolean
           id: string
           markup: number | null
@@ -169,6 +170,7 @@ export type Database = {
           entregaveis_relacionados?: string | null
           escopo?: string | null
           formato_entrega?: string | null
+          forum_sobre_produto?: string | null
           icp?: boolean
           id?: string
           markup?: number | null
@@ -211,6 +213,7 @@ export type Database = {
           entregaveis_relacionados?: string | null
           escopo?: string | null
           formato_entrega?: string | null
+          forum_sobre_produto?: string | null
           icp?: boolean
           id?: string
           markup?: number | null
