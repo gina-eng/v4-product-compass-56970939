@@ -87,23 +87,15 @@ const PlatformGartnerQuadrantPage = () => {
 
         if (error) {
           console.error("Erro ao buscar plataformas para o quadrante:", error);
-          setPlatforms(mapRowsToItems(mockPlatforms));
-          setIsPreviewMode(true);
+          setPlatforms([]);
           return;
         }
 
         const rows = (data || []) as PlatformRow[];
-        if (rows.length === 0) {
-          setPlatforms(mapRowsToItems(mockPlatforms));
-          setIsPreviewMode(true);
-        } else {
-          setPlatforms(mapRowsToItems(rows));
-          setIsPreviewMode(false);
-        }
+        setPlatforms(mapRowsToItems(rows));
       } catch (error) {
         console.error("Erro inesperado ao buscar plataformas para o quadrante:", error);
-        setPlatforms(mapRowsToItems(mockPlatforms));
-        setIsPreviewMode(true);
+        setPlatforms([]);
       } finally {
         setLoading(false);
       }
