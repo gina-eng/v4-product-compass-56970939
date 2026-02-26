@@ -65,6 +65,99 @@ export type Database = {
         }
         Relationships: []
       }
+      platforms: {
+        Row: {
+          base_pricing: string | null
+          benefits_and_advantages: string | null
+          category: string
+          client_benefits: string | null
+          client_logo_url: string | null
+          commission_and_invoicing: string | null
+          created_at: string
+          forum_url: string | null
+          general_description: string | null
+          gtm_maturity: string | null
+          how_to_hire: string | null
+          icp_recommended: string | null
+          id: string
+          name: string
+          operational_capacity_scores: Json
+          partnership_regulations: string | null
+          practical_applications: string | null
+          short_description: string | null
+          slug: string
+          status: string
+          strategic_potential_scores: Json
+          technical_commercial_support: string | null
+          request_form_url: string | null
+          thumbs_down_count: number
+          thumbs_up_count: number
+          unit_benefits: string | null
+          updated_at: string
+          useful_links: Json
+        }
+        Insert: {
+          base_pricing?: string | null
+          benefits_and_advantages?: string | null
+          category?: string
+          client_benefits?: string | null
+          client_logo_url?: string | null
+          commission_and_invoicing?: string | null
+          created_at?: string
+          forum_url?: string | null
+          general_description?: string | null
+          gtm_maturity?: string | null
+          how_to_hire?: string | null
+          icp_recommended?: string | null
+          id?: string
+          name: string
+          operational_capacity_scores?: Json
+          partnership_regulations?: string | null
+          practical_applications?: string | null
+          short_description?: string | null
+          slug: string
+          status?: string
+          strategic_potential_scores?: Json
+          technical_commercial_support?: string | null
+          request_form_url?: string | null
+          thumbs_down_count?: number
+          thumbs_up_count?: number
+          unit_benefits?: string | null
+          updated_at?: string
+          useful_links?: Json
+        }
+        Update: {
+          base_pricing?: string | null
+          benefits_and_advantages?: string | null
+          category?: string
+          client_benefits?: string | null
+          client_logo_url?: string | null
+          commission_and_invoicing?: string | null
+          created_at?: string
+          forum_url?: string | null
+          general_description?: string | null
+          gtm_maturity?: string | null
+          how_to_hire?: string | null
+          icp_recommended?: string | null
+          id?: string
+          name?: string
+          operational_capacity_scores?: Json
+          partnership_regulations?: string | null
+          practical_applications?: string | null
+          short_description?: string | null
+          slug?: string
+          status?: string
+          strategic_potential_scores?: Json
+          technical_commercial_support?: string | null
+          request_form_url?: string | null
+          thumbs_down_count?: number
+          thumbs_up_count?: number
+          unit_benefits?: string | null
+          updated_at?: string
+          useful_links?: Json
+        }
+        Relationships: []
+      }
       product_positions: {
         Row: {
           created_at: string

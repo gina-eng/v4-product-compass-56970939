@@ -5,6 +5,7 @@ import {
   Cog,
   Home,
   Menu,
+  Network,
   Package,
   X,
 } from "lucide-react";
@@ -50,7 +51,8 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
           { title: "POTERNCIALIZAR", url: "/portfolio-produtos?categoria=potencializar", category: "potencializar" },
         ],
       },
-      { title: "Sistemas", url: "/sistemas", icon: Cog },
+      { title: "Stack Digital", url: "/stack-digital", icon: Network },
+      { title: "Sistemas Operacionais", url: "/sistemas", icon: Cog },
       { title: "Artefatos", url: "/materiais-apoio", icon: BookMarked },
     ],
   },
@@ -58,9 +60,12 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
 
 const resolveActiveArea = (pathname: string) => {
   if (pathname.startsWith("/produto/")) return "Detalhes do Produto";
+  if (pathname.startsWith("/stack-digital/plataforma/")) return "Detalhes da Plataforma";
+  if (pathname.startsWith("/stack-digital/quadrante-gartner")) return "Quadrante Gartner";
   if (pathname.startsWith("/portfolio-produtos")) return "Portfólio de Produtos";
+  if (pathname.startsWith("/stack-digital")) return "Stack Digital";
   if (pathname.startsWith("/admin")) return "Área Administrativa";
-  if (pathname.startsWith("/sistemas")) return "Sistemas";
+  if (pathname.startsWith("/sistemas")) return "Sistemas Operacionais";
   if (pathname.startsWith("/materiais-apoio")) return "Artefatos";
   return "Visão Geral";
 };

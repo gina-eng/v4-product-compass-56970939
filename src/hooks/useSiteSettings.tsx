@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+type SiteSettingRow = {
+  setting_key: string;
+  setting_value: string;
+};
+
 export const useSiteSettings = () => {
   const [settings, setSettings] = useState<Record<string, string>>({
     step_title: "Introdução ao modelo - STEP",
@@ -14,7 +19,8 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
     executar_subtitle: "Tenho tudo, mas preciso fazer funcionar",
     executar_description: "Implementar e operacionalizar soluções",
     potencializar_subtitle: "Domino tudo, quero resultados extraordinários",
-    potencializar_description: "Otimizar e escalar para máxima performance"
+    potencializar_description: "Otimizar e escalar para máxima performance",
+    stack_digital_request_form_url: "https://forms.gle/solicitacao-contratacao-stack-digital"
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isTableAvailable, setIsTableAvailable] = useState(false);
@@ -37,7 +43,7 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
       
       if (settingsData && settingsData.length > 0) {
         const settingsObj: Record<string, string> = {};
-        settingsData.forEach((item: any) => {
+        (settingsData as SiteSettingRow[]).forEach((item) => {
           settingsObj[item.setting_key] = item.setting_value;
         });
         
@@ -129,7 +135,8 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
       executar_subtitle: 'Subtítulo da categoria Executar',
       executar_description: 'Descrição da categoria Executar',
       potencializar_subtitle: 'Subtítulo da categoria Potencializar',
-      potencializar_description: 'Descrição da categoria Potencializar'
+      potencializar_description: 'Descrição da categoria Potencializar',
+      stack_digital_request_form_url: 'Link geral do botão Solicitar Contratação da Stack Digital'
     };
     return descriptions[key] || '';
   };
@@ -138,7 +145,7 @@ O framework STEP identifica onde o cliente está e qual solução ele realmente 
     fetchSettings();
 
     // Tentar configurar listener para mudanças em tempo real
-    let channel: any = null;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
     
     if (isTableAvailable) {
       channel = supabase

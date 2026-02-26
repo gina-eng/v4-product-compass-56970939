@@ -24,6 +24,7 @@ import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 import { Checkbox } from "@/components/ui/checkbox";
 import UseCaseMap from "@/components/UseCaseMap";
+import PlatformManagementTab from "@/components/admin/PlatformManagementTab";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -1281,9 +1282,10 @@ const Admin = () => {
         <Tabs defaultValue="products" className="space-y-6">
           <TabsList>
             <TabsTrigger value="products">Produtos</TabsTrigger>
+            <TabsTrigger value="platforms">Stack Digital</TabsTrigger>
             <TabsTrigger value="positions">Posições</TabsTrigger>
             <TabsTrigger value="support">Artefatos</TabsTrigger>
-            <TabsTrigger value="systems">Sistemas</TabsTrigger>
+            <TabsTrigger value="systems">Sistemas Operacionais</TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
@@ -1851,6 +1853,10 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="platforms">
+            <PlatformManagementTab />
+          </TabsContent>
+
           <TabsContent value="positions">
             <Card>
               <CardHeader>
@@ -1983,7 +1989,7 @@ const Admin = () => {
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle>Sistemas</CardTitle>
+                  <CardTitle>Sistemas Operacionais</CardTitle>
                   <Button
                     onClick={() => {
                       resetSystemForm();

@@ -11,8 +11,11 @@ interface BreadcrumbItem {
 const routeMap: Record<string, string> = {
   "/": "Home",
   "/portfolio-produtos": "Portfólio de Produtos",
+  "/stack-digital": "Stack Digital",
+  "/stack-digital/plataforma": "Detalhes da Plataforma",
+  "/stack-digital/quadrante-gartner": "Quadrante Gartner",
   "/admin": "Área Administrativa",
-  "/sistemas": "Sistemas",
+  "/sistemas": "Sistemas Operacionais",
   "/materiais-apoio": "Artefatos",
   "/produto": "Produto",
 };

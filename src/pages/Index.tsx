@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookMarked, Package, Settings2 } from "lucide-react";
+import { ArrowRight, BookMarked, Network, Package, Settings2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -14,21 +14,28 @@ const Index = () => {
       description: "Visualize produtos em cards e lista, com busca e filtros por categoria e status.",
       href: "/portfolio-produtos",
       icon: Package,
-      cta: "Acessar portfólio",
+      cta: "Acessar",
     },
     {
-      title: "Sistemas",
+      title: "Sistemas Operacionais",
       description: "Gerencie estrutura de produtos, posições, materiais e configurações da operação.",
       href: "/sistemas",
       icon: Settings2,
-      cta: "Acessar sistemas",
+      cta: "Acessar",
+    },
+    {
+      title: "Stack Digital",
+      description: "Centralize plataformas da stack parceira com score operacional, links úteis e avaliação.",
+      href: "/stack-digital",
+      icon: Network,
+      cta: "Acessar",
     },
     {
       title: "Artefatos",
       description: "Consulte artefatos e materiais de apoio para execução padronizada no dia a dia.",
       href: "/materiais-apoio",
       icon: BookMarked,
-      cta: "Acessar artefatos",
+      cta: "Acessar",
     },
   ];
 
@@ -73,7 +80,7 @@ const Index = () => {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
           {homeCards.map((item) => (
             <Card
               key={item.title}

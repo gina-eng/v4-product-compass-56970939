@@ -1,5 +1,26 @@
 -- Restaurar configurações básicas de RLS e políticas essenciais
 
+-- Garantir existência da tabela org_members para evitar falhas em ambientes novos
+CREATE TABLE IF NOT EXISTS public.org_members (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin', 'staff')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (user_id, role)
+);
+
+ALTER TABLE public.org_members ENABLE ROW LEVEL SECURITY;
+
+CREATE INDEX IF NOT EXISTS idx_org_members_user_id ON public.org_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_org_members_role ON public.org_members(role);
+
+DROP TRIGGER IF EXISTS update_org_members_updated_at ON public.org_members;
+CREATE TRIGGER update_org_members_updated_at
+BEFORE UPDATE ON public.org_members
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
 -- Verificar se as políticas básicas existem para as tabelas principais
 DO $$
 BEGIN

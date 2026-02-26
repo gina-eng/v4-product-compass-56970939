@@ -16,7 +16,7 @@ import {
 const navigationItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Produtos", url: "/", icon: Package, badge: "principal" },
-  { title: "Sistemas", url: "/sistemas", icon: Cog },
+  { title: "Sistemas Operacionais", url: "/sistemas", icon: Cog },
   { title: "Artefatos", url: "/materiais-apoio", icon: FileText },
 ];
 

@@ -42,9 +42,9 @@ const Systems = () => {
     <Layout>
       <section className="space-y-8 animate-fade-in">
         <header>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Sistemas</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Sistemas Operacionais</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Acesse os sistemas conectados e navegue para cada ambiente.
+            Acesse os sistemas operacionais conectados e navegue para cada ambiente.
           </p>
         </header>
 
