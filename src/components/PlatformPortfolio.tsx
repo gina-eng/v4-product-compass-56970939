@@ -195,11 +195,6 @@ const PlatformPortfolio = () => {
           <p className="mt-1 text-sm text-muted-foreground">
             Central de plataformas parceiras dentro da stack digital.
           </p>
-          {isPreviewMode && (
-            <p className="mt-2 text-xs font-medium text-amber-700">
-              Modo visual: exibindo dados de exemplo locais (sem dependência do Supabase).
-            </p>
-          )}
         </div>
 
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[290px]">
