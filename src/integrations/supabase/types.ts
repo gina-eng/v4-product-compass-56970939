@@ -38,33 +38,6 @@ export type Database = {
         }
         Relationships: []
       }
-      positions: {
-        Row: {
-          cph: number
-          created_at: string
-          id: string
-          investimento_total: number
-          nome: string
-          updated_at: string
-        }
-        Insert: {
-          cph: number
-          created_at?: string
-          id?: string
-          investimento_total: number
-          nome: string
-          updated_at?: string
-        }
-        Update: {
-          cph?: number
-          created_at?: string
-          id?: string
-          investimento_total?: number
-          nome?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       platforms: {
         Row: {
           base_pricing: string | null
@@ -84,12 +57,12 @@ export type Database = {
           operational_capacity_scores: Json
           partnership_regulations: string | null
           practical_applications: string | null
+          request_form_url: string | null
           short_description: string | null
           slug: string
           status: string
           strategic_potential_scores: Json
           technical_commercial_support: string | null
-          request_form_url: string | null
           thumbs_down_count: number
           thumbs_up_count: number
           unit_benefits: string | null
@@ -114,12 +87,12 @@ export type Database = {
           operational_capacity_scores?: Json
           partnership_regulations?: string | null
           practical_applications?: string | null
+          request_form_url?: string | null
           short_description?: string | null
           slug: string
           status?: string
           strategic_potential_scores?: Json
           technical_commercial_support?: string | null
-          request_form_url?: string | null
           thumbs_down_count?: number
           thumbs_up_count?: number
           unit_benefits?: string | null
@@ -144,17 +117,44 @@ export type Database = {
           operational_capacity_scores?: Json
           partnership_regulations?: string | null
           practical_applications?: string | null
+          request_form_url?: string | null
           short_description?: string | null
           slug?: string
           status?: string
           strategic_potential_scores?: Json
           technical_commercial_support?: string | null
-          request_form_url?: string | null
           thumbs_down_count?: number
           thumbs_up_count?: number
           unit_benefits?: string | null
           updated_at?: string
           useful_links?: Json
+        }
+        Relationships: []
+      }
+      positions: {
+        Row: {
+          cph: number
+          created_at: string
+          id: string
+          investimento_total: number
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          cph: number
+          created_at?: string
+          id?: string
+          investimento_total: number
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          cph?: number
+          created_at?: string
+          id?: string
+          investimento_total?: number
+          nome?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -386,33 +386,6 @@ export type Database = {
         }
         Relationships: []
       }
-      systems: {
-        Row: {
-          created_at: string
-          id: string
-          link_redirecionamento: string
-          nome_sistema: string
-          updated_at: string
-          valor_entregue: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          link_redirecionamento: string
-          nome_sistema: string
-          updated_at?: string
-          valor_entregue: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          link_redirecionamento?: string
-          nome_sistema?: string
-          updated_at?: string
-          valor_entregue?: string
-        }
-        Relationships: []
-      }
       support_materials: {
         Row: {
           created_at: string
@@ -440,6 +413,33 @@ export type Database = {
           trava?: string | null
           updated_at?: string
           url_direcionamento?: string
+        }
+        Relationships: []
+      }
+      systems: {
+        Row: {
+          created_at: string
+          id: string
+          link_redirecionamento: string
+          nome_sistema: string
+          updated_at: string
+          valor_entregue: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link_redirecionamento: string
+          nome_sistema: string
+          updated_at?: string
+          valor_entregue: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link_redirecionamento?: string
+          nome_sistema?: string
+          updated_at?: string
+          valor_entregue?: string
         }
         Relationships: []
       }
