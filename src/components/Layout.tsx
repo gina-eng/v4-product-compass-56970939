@@ -7,6 +7,7 @@ import {
   Menu,
   Network,
   Package,
+  Table2,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,12 +35,8 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
   {
     label: "Principal",
     items: [
-      {
-        title: "Visão Geral",
-        url: "/",
-        icon: Home,
-        children: [{ title: "Definição de TIER e WTP", url: "/visao-geral/definicao-tier-wtp" }],
-      },
+      { title: "Visão Geral", url: "/", icon: Home },
+      { title: "Definição de TIER e WTP", url: "/definicao-tier-wtp", icon: Table2 },
       {
         title: "Portfólio de Produtos",
         url: "/portfolio-produtos",
@@ -64,7 +61,7 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
 ];
 
 const resolveActiveArea = (pathname: string) => {
-  if (pathname.startsWith("/visao-geral/definicao-tier-wtp")) return "Definição de TIER e WTP";
+  if (pathname.startsWith("/definicao-tier-wtp")) return "Definição de TIER e WTP";
   if (pathname.startsWith("/produto/")) return "Detalhes do Produto";
   if (pathname.startsWith("/stack-digital/plataforma/")) return "Detalhes da Plataforma";
   if (pathname.startsWith("/stack-digital/quadrante-gartner")) return "Quadrante Gartner";

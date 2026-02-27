@@ -35,7 +35,11 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/visao-geral/definicao-tier-wtp" element={<TierWtpDefinition />} />
+            <Route path="/definicao-tier-wtp" element={<TierWtpDefinition />} />
+            <Route
+              path="/visao-geral/definicao-tier-wtp"
+              element={<Navigate replace to="/definicao-tier-wtp" />}
+            />
             <Route path="/portfolio-produtos" element={<ProductPortfolioPage />} />
             <Route path="/stack-digital" element={<PlatformPortfolioPage />} />
             <Route path="/stack-digital/quadrante-gartner" element={<PlatformGartnerQuadrantPage />} />
