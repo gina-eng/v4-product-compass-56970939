@@ -10,6 +10,8 @@ interface BreadcrumbItem {
 
 const routeMap: Record<string, string> = {
   "/": "Home",
+  "/visao-geral": "Visão Geral",
+  "/visao-geral/definicao-tier-wtp": "Definição de TIER e WTP",
   "/portfolio-produtos": "Portfólio de Produtos",
   "/stack-digital": "Stack Digital",
   "/stack-digital/plataforma": "Detalhes da Plataforma",

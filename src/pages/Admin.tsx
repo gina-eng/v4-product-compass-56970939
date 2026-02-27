@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Layout } from "@/components/Layout";
@@ -107,6 +108,39 @@ interface AdminSystem {
   updated_at?: string;
 }
 
+interface TierWtpRange {
+  id: string;
+  tier_key: string;
+  tier_label: string;
+  annual_revenue_min_brl: number | null;
+  annual_revenue_max_brl: number | null;
+  annual_revenue_label: string;
+  wtp_martech_min_pct: number;
+  wtp_martech_max_pct: number;
+  wtp_martech_label: string;
+  media_pct: number;
+  tech_pct: number;
+  service_pct: number;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface TierWtpFormState {
+  tier_key: string;
+  tier_label: string;
+  annual_revenue_min_brl: string;
+  annual_revenue_max_brl: string;
+  annual_revenue_label: string;
+  wtp_martech_min_pct: string;
+  wtp_martech_max_pct: string;
+  wtp_martech_label: string;
+  media_pct: string;
+  tech_pct: string;
+  service_pct: string;
+  sort_order: string;
+}
+
 type TravaOptionValue =
   | "trava_0"
   | "trava_1"
@@ -132,6 +166,21 @@ const getTravaLabel = (trava: string | null | undefined) => {
   if (!trava) return "Sem trava definida";
   if (trava === "trava_8") return "Trava 1 — Retenção";
   return TRAVA_OPTIONS.find((option) => option.value === trava)?.label || "Sem trava definida";
+};
+
+const initialTierWtpForm: TierWtpFormState = {
+  tier_key: "",
+  tier_label: "",
+  annual_revenue_min_brl: "",
+  annual_revenue_max_brl: "",
+  annual_revenue_label: "",
+  wtp_martech_min_pct: "",
+  wtp_martech_max_pct: "",
+  wtp_martech_label: "",
+  media_pct: "",
+  tech_pct: "",
+  service_pct: "",
+  sort_order: "",
 };
 
 const Admin = () => {
@@ -174,6 +223,12 @@ const Admin = () => {
   const [systems, setSystems] = useState<AdminSystem[]>([]);
   const [isSystemDialogOpen, setIsSystemDialogOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<AdminSystem | null>(null);
+
+  // Estados para definição de TIER e WTP
+  const [tierWtpRanges, setTierWtpRanges] = useState<TierWtpRange[]>([]);
+  const [isTierWtpDialogOpen, setIsTierWtpDialogOpen] = useState(false);
+  const [editingTierWtpRange, setEditingTierWtpRange] = useState<TierWtpRange | null>(null);
+  const [tierWtpForm, setTierWtpForm] = useState<TierWtpFormState>(initialTierWtpForm);
   
   // Form states
   const [productForm, setProductForm] = useState({
@@ -253,6 +308,7 @@ const Admin = () => {
     fetchPositions();
     fetchSupportMaterials();
     fetchSystems();
+    fetchTierWtpRanges();
   }, []);
 
   const fetchSupportMaterials = async () => {
@@ -288,6 +344,20 @@ const Admin = () => {
       setSystems((data || []) as AdminSystem[]);
     } catch (error) {
       console.error("Erro ao buscar sistemas:", error);
+    }
+  };
+
+  const fetchTierWtpRanges = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("tier_wtp_definitions")
+        .select("*")
+        .order("sort_order", { ascending: true });
+
+      if (error) throw error;
+      setTierWtpRanges((data || []) as TierWtpRange[]);
+    } catch (error) {
+      console.error("Erro ao buscar faixas de TIER/WTP:", error);
     }
   };
 
@@ -799,6 +869,203 @@ const Admin = () => {
     }
   };
 
+  const resetTierWtpForm = () => {
+    setEditingTierWtpRange(null);
+    setTierWtpForm(initialTierWtpForm);
+  };
+
+  const handleEditTierWtpRange = (range: TierWtpRange) => {
+    setEditingTierWtpRange(range);
+    setTierWtpForm({
+      tier_key: range.tier_key,
+      tier_label: range.tier_label,
+      annual_revenue_min_brl:
+        range.annual_revenue_min_brl === null ? "" : range.annual_revenue_min_brl.toString(),
+      annual_revenue_max_brl:
+        range.annual_revenue_max_brl === null ? "" : range.annual_revenue_max_brl.toString(),
+      annual_revenue_label: range.annual_revenue_label,
+      wtp_martech_min_pct: range.wtp_martech_min_pct.toString(),
+      wtp_martech_max_pct: range.wtp_martech_max_pct.toString(),
+      wtp_martech_label: range.wtp_martech_label,
+      media_pct: range.media_pct.toString(),
+      tech_pct: range.tech_pct.toString(),
+      service_pct: range.service_pct.toString(),
+      sort_order: range.sort_order.toString(),
+    });
+    setIsTierWtpDialogOpen(true);
+  };
+
+  const handleDeleteTierWtpRange = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir esta faixa de TIER/WTP?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("tier_wtp_definitions")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      await fetchTierWtpRanges();
+      toast({
+        title: "Faixa excluída com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao excluir faixa de TIER/WTP:", error);
+      toast({
+        title: "Erro ao excluir faixa",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveTierWtpRange = async () => {
+    const tierKeyNormalized = tierWtpForm.tier_key
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+
+    const tierLabel = tierWtpForm.tier_label.trim();
+    const annualRevenueLabel = tierWtpForm.annual_revenue_label.trim();
+    const wtpMartechLabel = tierWtpForm.wtp_martech_label.trim();
+    const annualRevenueMin = tierWtpForm.annual_revenue_min_brl.trim();
+    const annualRevenueMax = tierWtpForm.annual_revenue_max_brl.trim();
+    const wtpMin = tierWtpForm.wtp_martech_min_pct.trim();
+    const wtpMax = tierWtpForm.wtp_martech_max_pct.trim();
+    const mediaPct = tierWtpForm.media_pct.trim();
+    const techPct = tierWtpForm.tech_pct.trim();
+    const servicePct = tierWtpForm.service_pct.trim();
+    const sortOrder = tierWtpForm.sort_order.trim();
+
+    if (
+      !tierKeyNormalized ||
+      !tierLabel ||
+      !annualRevenueLabel ||
+      !wtpMartechLabel ||
+      !wtpMin ||
+      !wtpMax ||
+      !mediaPct ||
+      !techPct ||
+      !servicePct ||
+      !sortOrder
+    ) {
+      toast({
+        title: "Preencha os campos obrigatórios",
+        description: "Tier, labels, percentuais e ordem são obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const annualRevenueMinValue = annualRevenueMin ? parseFloat(annualRevenueMin) : null;
+    const annualRevenueMaxValue = annualRevenueMax ? parseFloat(annualRevenueMax) : null;
+    const wtpMinValue = parseFloat(wtpMin);
+    const wtpMaxValue = parseFloat(wtpMax);
+    const mediaPctValue = parseFloat(mediaPct);
+    const techPctValue = parseFloat(techPct);
+    const servicePctValue = parseFloat(servicePct);
+    const sortOrderValue = parseInt(sortOrder, 10);
+
+    if (
+      [wtpMinValue, wtpMaxValue, mediaPctValue, techPctValue, servicePctValue, sortOrderValue].some(
+        (value) => Number.isNaN(value),
+      ) ||
+      (annualRevenueMinValue !== null && Number.isNaN(annualRevenueMinValue)) ||
+      (annualRevenueMaxValue !== null && Number.isNaN(annualRevenueMaxValue))
+    ) {
+      toast({
+        title: "Valores inválidos",
+        description: "Verifique os campos numéricos antes de salvar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (wtpMinValue > wtpMaxValue) {
+      toast({
+        title: "Faixa de WTP inválida",
+        description: "O valor mínimo de WTP não pode ser maior que o máximo.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (
+      annualRevenueMinValue !== null &&
+      annualRevenueMaxValue !== null &&
+      annualRevenueMinValue >= annualRevenueMaxValue
+    ) {
+      toast({
+        title: "Faixa de receita inválida",
+        description: "A receita mínima deve ser menor que a receita máxima.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const splitTotal = mediaPctValue + techPctValue + servicePctValue;
+    if (Math.abs(splitTotal - 100) > 0.01) {
+      toast({
+        title: "Distribuição inválida",
+        description: "A soma de Mídia, Tech e Serviço deve ser 100%.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const payload = {
+      tier_key: tierKeyNormalized,
+      tier_label: tierLabel,
+      annual_revenue_min_brl: annualRevenueMinValue,
+      annual_revenue_max_brl: annualRevenueMaxValue,
+      annual_revenue_label: annualRevenueLabel,
+      wtp_martech_min_pct: wtpMinValue,
+      wtp_martech_max_pct: wtpMaxValue,
+      wtp_martech_label: wtpMartechLabel,
+      media_pct: mediaPctValue,
+      tech_pct: techPctValue,
+      service_pct: servicePctValue,
+      sort_order: sortOrderValue,
+    };
+
+    try {
+      let error;
+      if (editingTierWtpRange) {
+        const { error: updateError } = await supabase
+          .from("tier_wtp_definitions")
+          .update(payload)
+          .eq("id", editingTierWtpRange.id);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("tier_wtp_definitions")
+          .insert([payload]);
+        error = insertError;
+      }
+
+      if (error) throw error;
+
+      await fetchTierWtpRanges();
+      setIsTierWtpDialogOpen(false);
+      resetTierWtpForm();
+
+      toast({
+        title: editingTierWtpRange
+          ? "Faixa de TIER/WTP atualizada com sucesso!"
+          : "Faixa de TIER/WTP criada com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao salvar faixa de TIER/WTP:", error);
+      toast({
+        title: "Erro ao salvar faixa",
+        description:
+          "Verifique se não existe tier_key ou sort_order duplicado e tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSaveProduct = async () => {
     try {
       const forumLinkInput = productForm.forum_sobre_produto.trim();
@@ -1286,6 +1553,7 @@ const Admin = () => {
             <TabsTrigger value="positions">Posições</TabsTrigger>
             <TabsTrigger value="support">Artefatos</TabsTrigger>
             <TabsTrigger value="systems">Sistemas Operacionais</TabsTrigger>
+            <TabsTrigger value="tier-wtp">TIER e WTP</TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
@@ -2059,6 +2327,75 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="tier-wtp">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center gap-3">
+                  <div>
+                    <CardTitle>Definição de TIER e WTP</CardTitle>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Cadastre e edite as faixas de receita, WTP e distribuição de investimento.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      resetTierWtpForm();
+                      setIsTierWtpDialogOpen(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nova Faixa
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {tierWtpRanges.length === 0 ? (
+                  <div className="rounded-lg border border-border/70 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                    Nenhuma faixa cadastrada no momento.
+                  </div>
+                ) : (
+                  <div className="overflow-hidden rounded-xl border border-border/70">
+                    <Table className="min-w-[920px]">
+                      <TableHeader>
+                        <TableRow className="bg-muted/40 hover:bg-muted/40">
+                          <TableHead>Tier</TableHead>
+                          <TableHead>Annual Revenue</TableHead>
+                          <TableHead>WTP Martech</TableHead>
+                          <TableHead>Mídia</TableHead>
+                          <TableHead>Tech</TableHead>
+                          <TableHead>Serviço</TableHead>
+                          <TableHead className="text-right">Editar</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {tierWtpRanges.map((range) => (
+                          <TableRow key={range.id}>
+                            <TableCell className="font-semibold text-foreground">{range.tier_label}</TableCell>
+                            <TableCell className="text-content">{range.annual_revenue_label}</TableCell>
+                            <TableCell className="text-content">{range.wtp_martech_label}</TableCell>
+                            <TableCell className="text-content">{range.media_pct}%</TableCell>
+                            <TableCell className="text-content">{range.tech_pct}%</TableCell>
+                            <TableCell className="text-content">{range.service_pct}%</TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleEditTierWtpRange(range)}
+                                title="Editar faixa"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="settings">
             <Card>
               <CardHeader>
@@ -2297,6 +2634,200 @@ const Admin = () => {
               </Button>
               <Button onClick={handleSaveSystem}>
                 {editingSystem ? "Atualizar Sistema" : "Criar Sistema"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={isTierWtpDialogOpen}
+          onOpenChange={(open) => {
+            setIsTierWtpDialogOpen(open);
+            if (!open) resetTierWtpForm();
+          }}
+        >
+          <DialogContent className="sm:max-w-[760px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {editingTierWtpRange ? "Editar Faixa de TIER/WTP" : "Nova Faixa de TIER/WTP"}
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <Label htmlFor="tier_key">Tier Key</Label>
+                <Input
+                  id="tier_key"
+                  value={tierWtpForm.tier_key}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({ ...prev, tier_key: event.target.value }))
+                  }
+                  placeholder="ex: medium_plus"
+                />
+              </div>
+              <div>
+                <Label htmlFor="tier_label">Nome do Tier</Label>
+                <Input
+                  id="tier_label"
+                  value={tierWtpForm.tier_label}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({ ...prev, tier_label: event.target.value }))
+                  }
+                  placeholder='ex: Medium (+)'
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="annual_revenue_min_brl">Receita mínima (R$)</Label>
+                <Input
+                  id="annual_revenue_min_brl"
+                  type="number"
+                  step="0.01"
+                  value={tierWtpForm.annual_revenue_min_brl}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({
+                      ...prev,
+                      annual_revenue_min_brl: event.target.value,
+                    }))
+                  }
+                  placeholder="Ex: 2400000"
+                />
+              </div>
+              <div>
+                <Label htmlFor="annual_revenue_max_brl">Receita máxima (R$)</Label>
+                <Input
+                  id="annual_revenue_max_brl"
+                  type="number"
+                  step="0.01"
+                  value={tierWtpForm.annual_revenue_max_brl}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({
+                      ...prev,
+                      annual_revenue_max_brl: event.target.value,
+                    }))
+                  }
+                  placeholder="Ex: 10000000"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <Label htmlFor="annual_revenue_label">Rótulo da faixa de receita</Label>
+                <Input
+                  id="annual_revenue_label"
+                  value={tierWtpForm.annual_revenue_label}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({
+                      ...prev,
+                      annual_revenue_label: event.target.value,
+                    }))
+                  }
+                  placeholder="Ex: > R$ 2.4M < R$ 10M"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="wtp_martech_min_pct">WTP mínimo (%)</Label>
+                <Input
+                  id="wtp_martech_min_pct"
+                  type="number"
+                  step="0.01"
+                  value={tierWtpForm.wtp_martech_min_pct}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({
+                      ...prev,
+                      wtp_martech_min_pct: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="wtp_martech_max_pct">WTP máximo (%)</Label>
+                <Input
+                  id="wtp_martech_max_pct"
+                  type="number"
+                  step="0.01"
+                  value={tierWtpForm.wtp_martech_max_pct}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({
+                      ...prev,
+                      wtp_martech_max_pct: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <Label htmlFor="wtp_martech_label">Rótulo de WTP Martech</Label>
+                <Input
+                  id="wtp_martech_label"
+                  value={tierWtpForm.wtp_martech_label}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({
+                      ...prev,
+                      wtp_martech_label: event.target.value,
+                    }))
+                  }
+                  placeholder="Ex: 10 - 12%"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="media_pct">Mídia (%)</Label>
+                <Input
+                  id="media_pct"
+                  type="number"
+                  step="0.01"
+                  value={tierWtpForm.media_pct}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({ ...prev, media_pct: event.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="tech_pct">Tech (%)</Label>
+                <Input
+                  id="tech_pct"
+                  type="number"
+                  step="0.01"
+                  value={tierWtpForm.tech_pct}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({ ...prev, tech_pct: event.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="service_pct">Serviço (%)</Label>
+                <Input
+                  id="service_pct"
+                  type="number"
+                  step="0.01"
+                  value={tierWtpForm.service_pct}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({ ...prev, service_pct: event.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="sort_order">Ordem de exibição</Label>
+                <Input
+                  id="sort_order"
+                  type="number"
+                  step="1"
+                  value={tierWtpForm.sort_order}
+                  onChange={(event) =>
+                    setTierWtpForm((prev) => ({ ...prev, sort_order: event.target.value }))
+                  }
+                  placeholder="Ex: 1"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button variant="outline" onClick={() => setIsTierWtpDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSaveTierWtpRange}>
+                {editingTierWtpRange ? "Atualizar Faixa" : "Criar Faixa"}
               </Button>
             </div>
           </DialogContent>

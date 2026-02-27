@@ -13,6 +13,7 @@ import Systems from "./pages/Systems";
 import PlatformPortfolioPage from "./pages/PlatformPortfolioPage";
 import PlatformDetails from "./pages/PlatformDetails";
 import PlatformGartnerQuadrantPage from "./pages/PlatformGartnerQuadrantPage";
+import TierWtpDefinition from "./pages/TierWtpDefinition";
 
 const LegacyPlatformDetailsRedirect = () => {
   const { slug } = useParams();
@@ -34,6 +35,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/visao-geral/definicao-tier-wtp" element={<TierWtpDefinition />} />
             <Route path="/portfolio-produtos" element={<ProductPortfolioPage />} />
             <Route path="/stack-digital" element={<PlatformPortfolioPage />} />
             <Route path="/stack-digital/quadrante-gartner" element={<PlatformGartnerQuadrantPage />} />

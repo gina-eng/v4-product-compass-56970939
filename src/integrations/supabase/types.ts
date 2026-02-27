@@ -443,6 +443,60 @@ export type Database = {
         }
         Relationships: []
       }
+      tier_wtp_definitions: {
+        Row: {
+          annual_revenue_label: string
+          annual_revenue_max_brl: number | null
+          annual_revenue_min_brl: number | null
+          created_at: string
+          id: string
+          media_pct: number
+          service_pct: number
+          sort_order: number
+          tech_pct: number
+          tier_key: string
+          tier_label: string
+          updated_at: string
+          wtp_martech_label: string
+          wtp_martech_max_pct: number
+          wtp_martech_min_pct: number
+        }
+        Insert: {
+          annual_revenue_label: string
+          annual_revenue_max_brl?: number | null
+          annual_revenue_min_brl?: number | null
+          created_at?: string
+          id?: string
+          media_pct: number
+          service_pct: number
+          sort_order: number
+          tech_pct: number
+          tier_key: string
+          tier_label: string
+          updated_at?: string
+          wtp_martech_label: string
+          wtp_martech_max_pct: number
+          wtp_martech_min_pct: number
+        }
+        Update: {
+          annual_revenue_label?: string
+          annual_revenue_max_brl?: number | null
+          annual_revenue_min_brl?: number | null
+          created_at?: string
+          id?: string
+          media_pct?: number
+          service_pct?: number
+          sort_order?: number
+          tech_pct?: number
+          tier_key?: string
+          tier_label?: string
+          updated_at?: string
+          wtp_martech_label?: string
+          wtp_martech_max_pct?: number
+          wtp_martech_min_pct?: number
+        }
+        Relationships: []
+      }
       training_materials: {
         Row: {
           created_at: string

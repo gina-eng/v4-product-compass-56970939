@@ -26,7 +26,7 @@ interface NavigationItem {
   children?: {
     title: string;
     url: string;
-    category: "all" | "destrava_receita" | "saber" | "ter" | "executar" | "potencializar";
+    category?: "all" | "destrava_receita" | "saber" | "ter" | "executar" | "potencializar";
   }[];
 }
 
@@ -34,7 +34,12 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
   {
     label: "Principal",
     items: [
-      { title: "Visão Geral", url: "/", icon: Home },
+      {
+        title: "Visão Geral",
+        url: "/",
+        icon: Home,
+        children: [{ title: "Definição de TIER e WTP", url: "/visao-geral/definicao-tier-wtp" }],
+      },
       {
         title: "Portfólio de Produtos",
         url: "/portfolio-produtos",
@@ -59,6 +64,7 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
 ];
 
 const resolveActiveArea = (pathname: string) => {
+  if (pathname.startsWith("/visao-geral/definicao-tier-wtp")) return "Definição de TIER e WTP";
   if (pathname.startsWith("/produto/")) return "Detalhes do Produto";
   if (pathname.startsWith("/stack-digital/plataforma/")) return "Detalhes da Plataforma";
   if (pathname.startsWith("/stack-digital/quadrante-gartner")) return "Quadrante Gartner";
@@ -102,8 +108,19 @@ const AppNavigation = ({
           </p>
           <nav className="space-y-1">
             {group.items.map((item) => {
+              const hasActiveChild = Boolean(
+                item.children?.some((child) => {
+                  if (child.category) {
+                    return (
+                      pathname.startsWith("/portfolio-produtos") &&
+                      currentPortfolioFilter === child.category
+                    );
+                  }
+                  return pathname === child.url || pathname.startsWith(`${child.url}/`);
+                }),
+              );
               const isActive =
-                item.url === "/" ? pathname === "/" : pathname.startsWith(item.url);
+                item.url === "/" ? pathname === "/" || hasActiveChild : pathname.startsWith(item.url) || hasActiveChild;
 
               return (
                 <div key={item.title}>
@@ -125,9 +142,10 @@ const AppNavigation = ({
                   {isActive && item.children && (
                     <div className="mt-1 space-y-1 pl-10 pr-2">
                       {item.children.map((child) => {
-                        const childIsActive =
-                          pathname.startsWith("/portfolio-produtos") &&
-                          currentPortfolioFilter === child.category;
+                        const childIsActive = child.category
+                          ? pathname.startsWith("/portfolio-produtos") &&
+                            currentPortfolioFilter === child.category
+                          : pathname === child.url || pathname.startsWith(`${child.url}/`);
 
                         return (
                           <NavLink
