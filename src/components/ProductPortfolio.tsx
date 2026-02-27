@@ -14,12 +14,26 @@ import certificationMedal from "@/assets/certificate-medal-svgrepo-com.svg";
 interface PortfolioItem {
   id: string;
   name: string;
+  baseName: string;
+  variationName: string;
+  groupKey: string;
   description: string;
   category: string;
   status: string;
   valorBase: string;
   certificacao: boolean;
 }
+
+interface PortfolioGroup {
+  groupKey: string;
+  baseName: string;
+  products: PortfolioItem[];
+}
+
+type PortfolioItemWithoutVariationData = Omit<
+  PortfolioItem,
+  "baseName" | "variationName" | "groupKey"
+>;
 
 const validCategoryFilters = [
   "all",
@@ -59,14 +73,99 @@ const statusToneMap: Record<string, string> = {
   "Em produção": "bg-amber-100 text-amber-800",
 };
 
+const defaultVariationLabel = "Padrão";
+
+const normalizeText = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const extractVariationCandidate = (name: string) => {
+  const trimmedName = name.trim();
+  const separators = [" - ", " | ", " – ", " — "];
+
+  for (const separator of separators) {
+    const splitIndex = trimmedName.lastIndexOf(separator);
+    if (splitIndex <= 0 || splitIndex >= trimmedName.length - separator.length) {
+      continue;
+    }
+
+    const baseName = trimmedName.slice(0, splitIndex).trim();
+    const variationName = trimmedName.slice(splitIndex + separator.length).trim();
+
+    if (baseName && variationName) {
+      return { baseName, variationName, isCandidate: true };
+    }
+  }
+
+  const parenthesesMatch = trimmedName.match(/^(.*)\s\(([^()]+)\)$/);
+  if (parenthesesMatch) {
+    const baseName = parenthesesMatch[1]?.trim();
+    const variationName = parenthesesMatch[2]?.trim();
+
+    if (baseName && variationName) {
+      return { baseName, variationName, isCandidate: true };
+    }
+  }
+
+  return {
+    baseName: trimmedName,
+    variationName: defaultVariationLabel,
+    isCandidate: false,
+  };
+};
+
+const appendVariationMetadata = (
+  items: PortfolioItemWithoutVariationData[]
+): PortfolioItem[] => {
+  const candidates = items.map((item) => {
+    const variationCandidate = extractVariationCandidate(item.name);
+    const candidateGroupKey = `${item.category}:${normalizeText(variationCandidate.baseName)}`;
+    return { item, variationCandidate, candidateGroupKey };
+  });
+
+  const candidateGroupCounts = new Map<string, number>();
+  candidates.forEach(({ variationCandidate, candidateGroupKey }) => {
+    if (!variationCandidate.isCandidate) return;
+
+    candidateGroupCounts.set(
+      candidateGroupKey,
+      (candidateGroupCounts.get(candidateGroupKey) ?? 0) + 1
+    );
+  });
+
+  return candidates.map(({ item, variationCandidate, candidateGroupKey }) => {
+    const shouldSplitVariation =
+      variationCandidate.isCandidate &&
+      (candidateGroupCounts.get(candidateGroupKey) ?? 0) > 1;
+
+    const baseName = shouldSplitVariation ? variationCandidate.baseName : item.name;
+
+    return {
+      ...item,
+      baseName,
+      variationName: shouldSplitVariation
+        ? variationCandidate.variationName
+        : defaultVariationLabel,
+      groupKey: `${item.category}:${normalizeText(baseName)}`,
+    };
+  });
+};
+
 const ProductPortfolio = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("Disponível");
   const [certificationFilter, setCertificationFilter] = useState<"all" | "required">("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [products, setProducts] = useState<PortfolioItem[]>([]);
+  const [selectedVariationByGroup, setSelectedVariationByGroup] = useState<
+    Record<string, string>
+  >({});
   const [loading, setLoading] = useState(true);
   const activeFilter = normalizeCategoryFilter(searchParams.get("categoria"));
 
@@ -95,7 +194,7 @@ const ProductPortfolio = () => {
           return;
         }
 
-        const productsWithMetrics = await Promise.all(
+        const productsWithMetrics: PortfolioItemWithoutVariationData[] = await Promise.all(
           data.map(async (product) => {
             const { data: positions, error: positionsError } = await supabase
               .from("product_positions")
@@ -143,7 +242,7 @@ const ProductPortfolio = () => {
           })
         );
 
-        setProducts(productsWithMetrics);
+        setProducts(appendVariationMetadata(productsWithMetrics));
       } catch (error) {
         console.error("Error:", error);
       } finally {
@@ -165,11 +264,46 @@ const ProductPortfolio = () => {
           const normalizedSearch = searchTerm.toLowerCase();
           return (
             product.name?.toLowerCase().includes(normalizedSearch) ||
+            product.baseName?.toLowerCase().includes(normalizedSearch) ||
+            (product.variationName !== defaultVariationLabel &&
+              product.variationName?.toLowerCase().includes(normalizedSearch)) ||
             product.description?.toLowerCase().includes(normalizedSearch)
           );
         }),
     [products, statusFilter, certificationFilter, activeFilter, searchTerm]
   );
+
+  const groupedProducts = useMemo<PortfolioGroup[]>(() => {
+    const groups = new Map<string, PortfolioGroup>();
+
+    filteredProducts.forEach((product) => {
+      const existingGroup = groups.get(product.groupKey);
+
+      if (existingGroup) {
+        existingGroup.products.push(product);
+        return;
+      }
+
+      groups.set(product.groupKey, {
+        groupKey: product.groupKey,
+        baseName: product.baseName,
+        products: [product],
+      });
+    });
+
+    return Array.from(groups.values());
+  }, [filteredProducts]);
+
+  const getSelectedProduct = (group: PortfolioGroup) => {
+    const selectedId = selectedVariationByGroup[group.groupKey];
+    return group.products.find((product) => product.id === selectedId) ?? group.products[0];
+  };
+
+  const getVariationOptionLabel = (product: PortfolioItem, hasVariations: boolean) => {
+    if (!hasVariations) return product.name;
+    if (product.variationName !== defaultVariationLabel) return product.variationName;
+    return product.name;
+  };
 
   const handleViewDetails = (product: PortfolioItem) => {
     const slug = product.name
@@ -270,69 +404,122 @@ const ProductPortfolio = () => {
             <div className="py-10 text-center text-sm text-muted-foreground">Carregando produtos...</div>
           )}
 
-          {!loading && filteredProducts.length === 0 && (
+          {!loading && groupedProducts.length === 0 && (
             <div className="py-10 text-center text-sm text-muted-foreground">
               Nenhum produto encontrado para os filtros selecionados.
             </div>
           )}
 
-          {!loading && filteredProducts.length > 0 && (
+          {!loading && groupedProducts.length > 0 && (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {filteredProducts.map((product) => (
-                <Card key={product.id} className="h-full border-border/80 shadow-sm transition-shadow hover:shadow-md">
-                  <CardHeader className="space-y-3 pb-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex min-w-0 items-start gap-2">
-                        {product.certificacao && (
-                          <img
-                            src={certificationMedal}
-                            alt="Produto com certificação obrigatória"
-                            className="mt-0.5 h-7 w-7 shrink-0"
-                          />
-                        )}
-                        <CardTitle className="line-clamp-2 text-base leading-tight">{product.name}</CardTitle>
+              {groupedProducts.map((group) => {
+                const selectedProduct = getSelectedProduct(group);
+                const hasVariations = group.products.length > 1;
+
+                return (
+                  <Card
+                    key={group.groupKey}
+                    className="h-full border-border/80 shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <CardHeader className="space-y-3 pb-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex min-w-0 items-start gap-2">
+                          {selectedProduct.certificacao && (
+                            <img
+                              src={certificationMedal}
+                              alt="Produto com certificação obrigatória"
+                              className="mt-0.5 h-7 w-7 shrink-0"
+                            />
+                          )}
+                          <CardTitle className="line-clamp-2 text-base leading-tight">
+                            {group.baseName}
+                          </CardTitle>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 rounded-lg border-border/80 bg-white px-2.5"
+                          onClick={() => handleViewDetails(selectedProduct)}
+                        >
+                          Abrir
+                          <ArrowUpRight className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8 rounded-lg border-border/80 bg-white px-2.5"
-                        onClick={() => handleViewDetails(product)}
-                      >
-                        Abrir
-                        <ArrowUpRight className="h-4 w-4" />
-                      </Button>
-                    </div>
 
-                    <div className="flex flex-wrap gap-1">
-                      <Badge
-                        variant="secondary"
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${categoryToneMap[product.category] || "bg-muted text-foreground"}`}
-                      >
-                        {categoryLabelMap[product.category] || product.category.toUpperCase()}
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusToneMap[product.status] || "bg-muted text-foreground"}`}
-                      >
-                        {product.status}
-                      </Badge>
-                    </div>
-                  </CardHeader>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge
+                          variant="secondary"
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${categoryToneMap[selectedProduct.category] || "bg-muted text-foreground"}`}
+                        >
+                          {categoryLabelMap[selectedProduct.category] ||
+                            selectedProduct.category.toUpperCase()}
+                        </Badge>
+                        <Badge
+                          variant="secondary"
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusToneMap[selectedProduct.status] || "bg-muted text-foreground"}`}
+                        >
+                          {selectedProduct.status}
+                        </Badge>
+                        {hasVariations && (
+                          <Badge
+                            variant="outline"
+                            className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                          >
+                            {group.products.length} variações
+                          </Badge>
+                        )}
+                      </div>
+                    </CardHeader>
 
-                  <CardContent className="space-y-4 pt-0">
-                    <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {product.description || "Sem descrição curta"}
-                    </p>
+                    <CardContent className="space-y-4 pt-0">
+                      {hasVariations && (
+                        <div className="space-y-1">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Variação
+                          </p>
+                          <Select
+                            value={selectedProduct.id}
+                            onValueChange={(value) =>
+                              setSelectedVariationByGroup((prev) => ({
+                                ...prev,
+                                [group.groupKey]: value,
+                              }))
+                            }
+                          >
+                            <SelectTrigger className="h-9 rounded-lg border-border/80 bg-white text-xs">
+                              <SelectValue placeholder="Selecione a variação" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {group.products.map((variationProduct) => (
+                                <SelectItem
+                                  key={variationProduct.id}
+                                  value={variationProduct.id}
+                                  className="text-xs"
+                                >
+                                  {getVariationOptionLabel(variationProduct, hasVariations)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
 
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-muted-foreground">Valor base</span>
-                      <span className="font-semibold text-foreground">
-                        {product.valorBase === "A definir" ? "A definir" : formatCurrency(product.valorBase)}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      <p className="line-clamp-2 text-sm text-muted-foreground">
+                        {selectedProduct.description || "Sem descrição curta"}
+                      </p>
+
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-muted-foreground">Valor base</span>
+                        <span className="font-semibold text-foreground">
+                          {selectedProduct.valorBase === "A definir"
+                            ? "A definir"
+                            : formatCurrency(selectedProduct.valorBase)}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>
@@ -358,7 +545,7 @@ const ProductPortfolio = () => {
                   </tr>
                 )}
 
-                {!loading && filteredProducts.length === 0 && (
+                {!loading && groupedProducts.length === 0 && (
                   <tr>
                     <td className="px-4 py-10 text-center text-sm text-muted-foreground" colSpan={5}>
                       Nenhum produto encontrado para os filtros selecionados.
@@ -367,45 +554,81 @@ const ProductPortfolio = () => {
                 )}
 
                 {!loading &&
-                  filteredProducts.map((product) => (
-                    <tr key={product.id} className="bg-white transition-colors hover:bg-muted/25">
-                      <td className="px-4 py-3">
-                        <Badge
-                          variant="secondary"
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${categoryToneMap[product.category] || "bg-muted text-foreground"}`}
-                        >
-                          {categoryLabelMap[product.category] || product.category.toUpperCase()}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="max-w-[280px] truncate text-sm font-semibold text-foreground">
-                          {product.name}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge
-                          variant="secondary"
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusToneMap[product.status] || "bg-muted text-foreground"}`}
-                        >
-                          {product.status}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-foreground">
-                        {product.valorBase === "A definir" ? "A definir" : formatCurrency(product.valorBase)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-9 rounded-lg border-border/80 bg-white px-3"
-                          onClick={() => handleViewDetails(product)}
-                        >
-                          Abrir
-                          <ArrowUpRight className="h-4 w-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                  groupedProducts.map((group) => {
+                    const selectedProduct = getSelectedProduct(group);
+                    const hasVariations = group.products.length > 1;
+
+                    return (
+                      <tr key={group.groupKey} className="bg-white transition-colors hover:bg-muted/25">
+                        <td className="px-4 py-3">
+                          <Badge
+                            variant="secondary"
+                            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${categoryToneMap[selectedProduct.category] || "bg-muted text-foreground"}`}
+                          >
+                            {categoryLabelMap[selectedProduct.category] ||
+                              selectedProduct.category.toUpperCase()}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="max-w-[280px] truncate text-sm font-semibold text-foreground">
+                            {group.baseName}
+                          </p>
+                          {hasVariations && (
+                            <div className="mt-2 w-[240px]">
+                              <Select
+                                value={selectedProduct.id}
+                                onValueChange={(value) =>
+                                  setSelectedVariationByGroup((prev) => ({
+                                    ...prev,
+                                    [group.groupKey]: value,
+                                  }))
+                                }
+                              >
+                                <SelectTrigger className="h-9 rounded-lg border-border/80 bg-white text-xs">
+                                  <SelectValue placeholder="Selecione a variação" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {group.products.map((variationProduct) => (
+                                    <SelectItem
+                                      key={variationProduct.id}
+                                      value={variationProduct.id}
+                                      className="text-xs"
+                                    >
+                                      {getVariationOptionLabel(variationProduct, hasVariations)}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge
+                            variant="secondary"
+                            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusToneMap[selectedProduct.status] || "bg-muted text-foreground"}`}
+                          >
+                            {selectedProduct.status}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm font-semibold text-foreground">
+                          {selectedProduct.valorBase === "A definir"
+                            ? "A definir"
+                            : formatCurrency(selectedProduct.valorBase)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-9 rounded-lg border-border/80 bg-white px-3"
+                            onClick={() => handleViewDetails(selectedProduct)}
+                          >
+                            Abrir
+                            <ArrowUpRight className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
