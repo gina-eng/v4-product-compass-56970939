@@ -130,6 +130,12 @@ const Login = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {reason === "expired" && (
+                <p className="login-page__alert">
+                  Sua sessão expirou após 6 horas. Faça login novamente para continuar.
+                </p>
+              )}
+
               {reason === "domain" && (
                 <p className="login-page__alert">
                   Apenas usuários com e-mail @{ALLOWED_EMAIL_DOMAIN} podem entrar.

@@ -1,6 +1,11 @@
+import type { Session } from "@supabase/supabase-js";
+
 export const ALLOWED_EMAIL_DOMAIN = "v4company.com";
 export const LOCAL_PREVIEW_EMAIL = "preview@localhost";
 const LOCAL_PREVIEW_AUTH_KEY = "v4_local_preview_auth";
+const AUTH_ZERO_MARK_ISO = "2026-02-27T20:40:21Z";
+const AUTH_ZERO_MARK_MS = Date.parse(AUTH_ZERO_MARK_ISO);
+export const AUTH_SESSION_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
 export const isAllowedV4Email = (email?: string | null): boolean => {
   if (!email) return false;
@@ -20,4 +25,34 @@ export const enableLocalPreviewAuth = () => {
 
 export const disableLocalPreviewAuth = () => {
   window.localStorage.removeItem(LOCAL_PREVIEW_AUTH_KEY);
+};
+
+const parseTimestamp = (value?: string | null): number => {
+  if (!value) return NaN;
+  return Date.parse(value);
+};
+
+const resolveSessionSignInTimestamp = (session: Session): number => {
+  const signInMs = parseTimestamp(session.user.last_sign_in_at);
+  if (Number.isFinite(signInMs)) return signInMs;
+
+  const createdMs = parseTimestamp(session.user.created_at);
+  if (Number.isFinite(createdMs)) return createdMs;
+
+  return 0;
+};
+
+export const shouldForceSessionReauth = (session: Session, now = Date.now()): boolean => {
+  const signInMs = resolveSessionSignInTimestamp(session);
+  if (!signInMs) return true;
+  if (signInMs < AUTH_ZERO_MARK_MS) return true;
+
+  return now - signInMs >= AUTH_SESSION_MAX_AGE_MS;
+};
+
+export const getSessionRemainingMs = (session: Session, now = Date.now()): number => {
+  const signInMs = resolveSessionSignInTimestamp(session);
+  if (!signInMs || signInMs < AUTH_ZERO_MARK_MS) return 0;
+
+  return Math.max(0, AUTH_SESSION_MAX_AGE_MS - (now - signInMs));
 };

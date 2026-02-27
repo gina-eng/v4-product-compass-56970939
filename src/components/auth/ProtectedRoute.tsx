@@ -2,27 +2,51 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { isAllowedV4Email, isLocalPreviewAuthEnabled } from "@/lib/auth";
+import {
+  getSessionRemainingMs,
+  isAllowedV4Email,
+  isLocalPreviewAuthEnabled,
+  shouldForceSessionReauth,
+} from "@/lib/auth";
 
 const ProtectedRoute = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isDomainDenied, setIsDomainDenied] = useState(false);
+  const [authFailureReason, setAuthFailureReason] = useState<"domain" | "expired" | null>(null);
 
   useEffect(() => {
     let isMounted = true;
+    let logoutTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearLogoutTimer = () => {
+      if (!logoutTimer) return;
+      clearTimeout(logoutTimer);
+      logoutTimer = null;
+    };
+
+    const forceSignOut = async (reason: "expired" | "domain") => {
+      clearLogoutTimer();
+      if (!isMounted) return;
+
+      setAuthFailureReason(reason);
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      await supabase.auth.signOut();
+    };
 
     if (isLocalPreviewAuthEnabled()) {
       setIsAuthenticated(true);
       setIsLoading(false);
-      setIsDomainDenied(false);
+      setAuthFailureReason(null);
       return () => {
         isMounted = false;
+        clearLogoutTimer();
       };
     }
 
     const syncSession = async (session: Session | null) => {
+      clearLogoutTimer();
       if (!isMounted) return;
 
       if (!session) {
@@ -32,14 +56,21 @@ const ProtectedRoute = () => {
       }
 
       if (!isAllowedV4Email(session.user.email)) {
-        setIsDomainDenied(true);
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        await supabase.auth.signOut();
+        await forceSignOut("domain");
         return;
       }
 
-      setIsDomainDenied(false);
+      if (shouldForceSessionReauth(session)) {
+        await forceSignOut("expired");
+        return;
+      }
+
+      const remainingMs = getSessionRemainingMs(session);
+      logoutTimer = setTimeout(() => {
+        void forceSignOut("expired");
+      }, remainingMs);
+
+      setAuthFailureReason(null);
       setIsAuthenticated(true);
       setIsLoading(false);
     };
@@ -59,6 +90,7 @@ const ProtectedRoute = () => {
 
     return () => {
       isMounted = false;
+      clearLogoutTimer();
       subscription.unsubscribe();
     };
   }, []);
@@ -76,8 +108,8 @@ const ProtectedRoute = () => {
     const nextPath = `${location.pathname}${location.search}${location.hash}`;
 
     params.set("next", nextPath || "/");
-    if (isDomainDenied) {
-      params.set("reason", "domain");
+    if (authFailureReason) {
+      params.set("reason", authFailureReason);
     }
 
     return <Navigate replace to={`/login?${params.toString()}`} />;
