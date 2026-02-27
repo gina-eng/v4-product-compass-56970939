@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { isAllowedV4Email } from "@/lib/auth";
+import { isAllowedV4Email, isLocalPreviewAuthEnabled } from "@/lib/auth";
 
 const ProtectedRoute = () => {
   const location = useLocation();
@@ -12,6 +12,15 @@ const ProtectedRoute = () => {
 
   useEffect(() => {
     let isMounted = true;
+
+    if (isLocalPreviewAuthEnabled()) {
+      setIsAuthenticated(true);
+      setIsLoading(false);
+      setIsDomainDenied(false);
+      return () => {
+        isMounted = false;
+      };
+    }
 
     const syncSession = async (session: Session | null) => {
       if (!isMounted) return;

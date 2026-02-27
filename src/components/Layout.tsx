@@ -1,9 +1,10 @@
-import { ComponentType, ReactNode, useMemo, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { ComponentType, ReactNode, useEffect, useMemo, useState } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   BookMarked,
   Cog,
   Home,
+  LogOut,
   Menu,
   Network,
   Package,
@@ -11,8 +12,15 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import logo from "@/assets/product-compass-logo.svg";
+import headerLogo from "@/assets/product-compass-logo.svg";
+import sidebarLogo from "@/assets/group-289027.svg";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  LOCAL_PREVIEW_EMAIL,
+  disableLocalPreviewAuth,
+  isLocalPreviewAuthEnabled,
+} from "@/lib/auth";
+import "./Layout.css";
 
 interface LayoutProps {
   children: ReactNode;
@@ -60,19 +68,6 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
   },
 ];
 
-const resolveActiveArea = (pathname: string) => {
-  if (pathname.startsWith("/definicao-tier-wtp")) return "Definição de TIER e WTP";
-  if (pathname.startsWith("/produto/")) return "Detalhes do Produto";
-  if (pathname.startsWith("/stack-digital/plataforma/")) return "Detalhes da Plataforma";
-  if (pathname.startsWith("/stack-digital/quadrante-gartner")) return "Quadrante Gartner";
-  if (pathname.startsWith("/portfolio-produtos")) return "Portfólio de Produtos";
-  if (pathname.startsWith("/stack-digital")) return "Stack Digital";
-  if (pathname.startsWith("/admin")) return "Área Administrativa";
-  if (pathname.startsWith("/sistemas")) return "Sistemas Operacionais";
-  if (pathname.startsWith("/materiais-apoio")) return "Artefatos";
-  return "Visão Geral";
-};
-
 const AppNavigation = ({
   pathname,
   search,
@@ -82,7 +77,10 @@ const AppNavigation = ({
   search: string;
   onNavigate?: () => void;
 }) => {
-  const activeArea = useMemo(() => resolveActiveArea(pathname), [pathname]);
+  const navigate = useNavigate();
+  const [userEmail, setUserEmail] = useState("");
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
   const currentPortfolioFilter = useMemo(() => {
     const rawFilter = new URLSearchParams(search).get("categoria")?.toLowerCase() || "all";
     return ["all", "destrava_receita", "saber", "ter", "executar", "potencializar"].includes(rawFilter)
@@ -90,17 +88,54 @@ const AppNavigation = ({
       : "all";
   }, [search]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncEmail = async () => {
+      if (isLocalPreviewAuthEnabled()) {
+        setUserEmail(LOCAL_PREVIEW_EMAIL);
+        return;
+      }
+
+      const { data } = await supabase.auth.getSession();
+      if (!isMounted) return;
+      setUserEmail(data.session?.user.email ?? "");
+    };
+
+    void syncEmail();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
+      setUserEmail(session?.user.email ?? "");
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    disableLocalPreviewAuth();
+    await supabase.auth.signOut();
+    onNavigate?.();
+    navigate("/login", { replace: true });
+  };
+
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="sidebar-nav flex h-full w-full flex-col">
       <div className="mb-6 rounded-xl px-2 py-2">
         <NavLink to="/" onClick={onNavigate} aria-label="Ir para Visão Geral" className="inline-flex">
-          <img src={logo} alt="Product Compass" className="h-9 w-auto" />
+          <img src={sidebarLogo} alt="Product Marketing" className="h-9 w-auto" />
         </NavLink>
       </div>
 
       {navigationGroups.map((group) => (
         <section key={group.label} className="mb-5">
-          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/90">
+          <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/70">
             {group.label}
           </p>
           <nav className="space-y-1">
@@ -125,10 +160,10 @@ const AppNavigation = ({
                     to={item.url}
                     onClick={onNavigate}
                     className={[
-                      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                      "flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-medium transition-all duration-200",
                       isActive
-                        ? "bg-white text-foreground shadow-[0_1px_2px_rgba(15,23,42,0.10)]"
-                        : "text-muted-foreground hover:bg-white/75 hover:text-foreground",
+                        ? "border-white/25 bg-white/15 text-white shadow-[0_8px_16px_-12px_rgba(0,0,0,0.8)] backdrop-blur-sm"
+                        : "border-transparent text-white/80 hover:border-white/20 hover:bg-white/10 hover:text-white",
                     ].join(" ")}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
@@ -150,10 +185,10 @@ const AppNavigation = ({
                             to={child.url}
                             onClick={onNavigate}
                             className={[
-                              "block rounded-lg px-3 py-1.5 text-xs font-semibold tracking-[0.02em] transition-all duration-200",
+                              "block rounded-lg border px-3 py-1.5 text-xs font-semibold tracking-[0.02em] transition-all duration-200",
                               childIsActive
-                                ? "bg-white text-primary shadow-[0_1px_2px_rgba(15,23,42,0.10)]"
-                                : "text-muted-foreground hover:bg-white/70 hover:text-foreground",
+                                ? "border-white/30 bg-white/15 text-white"
+                                : "border-transparent text-white/70 hover:border-white/20 hover:bg-white/10 hover:text-white",
                             ].join(" ")}
                           >
                             {child.title}
@@ -169,17 +204,17 @@ const AppNavigation = ({
         </section>
       ))}
 
-      <div className="mt-auto rounded-xl border border-border/70 bg-white p-3 shadow-[0_14px_24px_-22px_rgba(15,23,42,0.55)]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-          Contexto Ativo
-        </p>
-        <p className="mt-2 text-sm font-semibold text-foreground">{activeArea}</p>
-        <Badge
-          variant="secondary"
-          className="mt-3 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary hover:bg-primary/10"
+      <div className="sidebar-access-card mt-auto">
+        <p className="sidebar-access-card__label">Acesso via</p>
+        <p className="sidebar-access-card__email">{userEmail || "Carregando e-mail..."}</p>
+        <Button
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+          className="sidebar-access-card__logout"
         >
-          Navegação principal
-        </Badge>
+          <LogOut className="h-4 w-4" />
+          {isSigningOut ? "Saindo..." : "Logoff"}
+        </Button>
       </div>
     </div>
   );
@@ -200,7 +235,7 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
-        <aside className="hidden w-[272px] shrink-0 border-r border-sidebar-border bg-sidebar px-4 py-4 lg:sticky lg:top-0 lg:flex lg:h-screen lg:self-start lg:overflow-y-auto">
+        <aside className="sidebar-surface hidden w-[272px] shrink-0 border-r px-4 py-4 lg:sticky lg:top-0 lg:flex lg:h-screen lg:self-start lg:overflow-y-auto">
           <AppNavigation pathname={location.pathname} search={location.search} />
         </aside>
 
@@ -208,7 +243,7 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
           <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border/70 bg-background/95 px-4 py-3 backdrop-blur lg:hidden">
             <div className="flex items-center">
               <NavLink to="/" aria-label="Ir para Visão Geral" onClick={() => setMobileOpen(false)}>
-                <img src={logo} alt="Product Compass" className="h-8 w-auto" />
+                <img src={headerLogo} alt="Product Compass" className="h-8 w-auto" />
               </NavLink>
             </div>
             <Button
@@ -227,7 +262,7 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
               onClick={() => setMobileOpen(false)}
             >
               <aside
-                className="h-full w-[288px] border-r border-sidebar-border bg-sidebar p-4"
+                className="sidebar-surface h-full w-[288px] border-r p-4"
                 onClick={(event) => event.stopPropagation()}
               >
                 <AppNavigation

@@ -1,0 +1,69 @@
+.sidebar-surface {
+  position: relative;
+  border-right-color: rgba(255, 255, 255, 0.14);
+  background:
+    radial-gradient(75rem 40rem at 18% 12%, rgba(229, 9, 20, 0.35), rgba(229, 9, 20, 0)),
+    radial-gradient(56rem 28rem at 88% 82%, rgba(255, 72, 31, 0.16), rgba(255, 72, 31, 0)),
+    linear-gradient(132deg, #040404 0%, #120000 48%, #280001 100%);
+}
+
+.sidebar-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(130deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 38%),
+    radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 45%);
+  mix-blend-mode: screen;
+}
+
+.sidebar-nav {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-access-card {
+  border-radius: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04) 45%),
+    linear-gradient(132deg, rgba(229, 9, 20, 0.2), rgba(31, 2, 4, 0.72));
+  padding: 0.9rem;
+  box-shadow:
+    0 16px 28px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+.sidebar-access-card__label {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.sidebar-access-card__email {
+  margin: 0.5rem 0 0;
+  overflow-wrap: anywhere;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: rgba(255, 247, 245, 0.98);
+}
+
+.sidebar-access-card__logout {
+  margin-top: 0.75rem;
+  width: 100%;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: linear-gradient(140deg, #ff481f 0%, #e50914 55%, #650e0f 100%);
+  box-shadow: 0 14px 20px rgba(90, 5, 8, 0.34);
+}
+
+.sidebar-access-card__logout:hover {
+  filter: brightness(1.05);
+}

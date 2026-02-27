@@ -4,8 +4,13 @@ import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { ALLOWED_EMAIL_DOMAIN, isAllowedV4Email } from "@/lib/auth";
-import logo from "@/assets/product-compass-logo.svg";
+import {
+  ALLOWED_EMAIL_DOMAIN,
+  enableLocalPreviewAuth,
+  isAllowedV4Email,
+} from "@/lib/auth";
+import topLogo from "@/assets/group-289027.svg";
+import "./Login.css";
 
 const Login = () => {
   const [searchParams] = useSearchParams();
@@ -51,12 +56,29 @@ const Login = () => {
     };
   }, [nextPath]);
 
+  const resolveOAuthRedirectTo = () => {
+    const search = nextPath && nextPath !== "/" ? `?next=${encodeURIComponent(nextPath)}` : "";
+    const envBaseUrl = import.meta.env.VITE_AUTH_REDIRECT_BASE_URL?.trim();
+
+    if (envBaseUrl) {
+      const base = new URL(envBaseUrl, window.location.origin);
+      return `${base.origin}/login${search}`;
+    }
+
+    const current = new URL(window.location.href);
+    const normalizedHost =
+      current.hostname === "127.0.0.1" || current.hostname === "::1"
+        ? "localhost"
+        : current.hostname;
+
+    return `${current.protocol}//${normalizedHost}${current.port ? `:${current.port}` : ""}/login${search}`;
+  };
+
   const handleSignIn = async () => {
     setLoginError(null);
     setIsSigningIn(true);
 
-    const search = nextPath && nextPath !== "/" ? `?next=${encodeURIComponent(nextPath)}` : "";
-    const redirectTo = `${window.location.origin}/login${search}`;
+    const redirectTo = resolveOAuthRedirectTo();
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -75,49 +97,75 @@ const Login = () => {
     }
   };
 
+  const handleLocalPreview = () => {
+    enableLocalPreviewAuth();
+    setRedirectPath(nextPath);
+  };
+
   if (redirectPath) {
     return <Navigate replace to={redirectPath} />;
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md border-border/80 shadow-lg">
-        <CardHeader className="space-y-4">
-          <img src={logo} alt="Product Compass" className="h-10 w-auto" />
-          <div className="space-y-1">
-            <CardTitle>Acesso Restrito</CardTitle>
-            <CardDescription>
-              Faça login com sua conta <strong>@{ALLOWED_EMAIL_DOMAIN}</strong> para acessar o portfólio.
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {reason === "domain" && (
-            <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              Apenas usuários com e-mail @{ALLOWED_EMAIL_DOMAIN} podem entrar.
+    <div className="login-page">
+      <div className="login-page__mesh" aria-hidden="true" />
+      <main className="login-page__content">
+        <img src={topLogo} alt="Product Marketing" className="login-page__top-logo" />
+        <div className="login-page__shell">
+          <section className="login-page__brand-panel">
+            <h1 className="login-page__brand-title">
+              Apenas <span>resultado</span> importa.
+            </h1>
+            <p className="login-page__brand-description">
+              O portfólio de Produtos e Serviços da V4 Company
             </p>
-          )}
+          </section>
 
-          {loginError && (
-            <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {loginError}
-            </p>
-          )}
+          <Card className="login-page__card">
+            <CardHeader className="items-center space-y-2 pb-4 text-center">
+              <CardTitle className="login-page__card-title">Acesso Restrito</CardTitle>
+              <CardDescription className="login-page__card-description">
+                Faça login com sua conta <strong>@{ALLOWED_EMAIL_DOMAIN}</strong> para acessar o
+                portfólio.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {reason === "domain" && (
+                <p className="login-page__alert">
+                  Apenas usuários com e-mail @{ALLOWED_EMAIL_DOMAIN} podem entrar.
+                </p>
+              )}
 
-          <Button
-            className="w-full"
-            onClick={handleSignIn}
-            disabled={isSigningIn || isLoadingSession}
-          >
-            <LogIn className="mr-2 h-4 w-4" />
-            {isSigningIn ? "Redirecionando..." : "Entrar com Google"}
-          </Button>
+              {loginError && <p className="login-page__alert">{loginError}</p>}
 
-          {isLoadingSession && (
-            <p className="text-center text-xs text-muted-foreground">Verificando sessão...</p>
-          )}
-        </CardContent>
-      </Card>
+              <Button
+                className="login-page__cta w-full"
+                onClick={handleSignIn}
+                disabled={isSigningIn || isLoadingSession}
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                {isSigningIn ? "Redirecionando..." : "Entrar com Google"}
+              </Button>
+
+              {import.meta.env.DEV && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border-[#d8d3d7] bg-white text-[#1d2330] hover:bg-[#f4f4f6]"
+                  onClick={handleLocalPreview}
+                  disabled={isLoadingSession}
+                >
+                  Entrar em modo pré-visualização local
+                </Button>
+              )}
+
+              {isLoadingSession && (
+                <p className="login-page__session-status">Verificando sessão...</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   );
 };
