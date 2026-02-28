@@ -12,7 +12,6 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import headerLogo from "@/assets/product-compass-logo.svg";
 import sidebarLogo from "@/assets/group-289027.svg";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -223,6 +222,37 @@ const AppNavigation = ({
 export const Layout = ({ children, showHeader = true }: LayoutProps) => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMobileHeaderVisible, setIsMobileHeaderVisible] = useState(true);
+  const [isMobileHeaderExpanded, setIsMobileHeaderExpanded] = useState(true);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const isAtTop = currentScrollY <= 24;
+
+      setIsMobileHeaderExpanded(isAtTop);
+
+      if (mobileOpen || isAtTop) {
+        setIsMobileHeaderVisible(true);
+        lastScrollY = currentScrollY;
+        return;
+      }
+
+      const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+      if (scrollDelta < 6) return;
+
+      const isScrollingDown = currentScrollY > lastScrollY;
+      setIsMobileHeaderVisible(!isScrollingDown);
+      lastScrollY = currentScrollY;
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [mobileOpen]);
 
   if (!showHeader) {
     return (
@@ -240,15 +270,26 @@ export const Layout = ({ children, showHeader = true }: LayoutProps) => {
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border/70 bg-background/95 px-4 py-3 backdrop-blur lg:hidden">
+          <header
+            className={[
+              "sticky top-0 z-40 flex items-center justify-between overflow-hidden border-b border-white/15 bg-[#140003] bg-[image:url('/login-bg.svg')] bg-cover bg-left px-4 text-white transition-[max-height,padding,transform,opacity] duration-300 ease-out lg:hidden",
+              isMobileHeaderExpanded ? "max-h-24 py-4" : "max-h-20 py-3",
+              isMobileHeaderVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none",
+            ].join(" ")}
+          >
             <div className="flex items-center">
               <NavLink to="/" aria-label="Ir para Visão Geral" onClick={() => setMobileOpen(false)}>
-                <img src={headerLogo} alt="Product Compass" className="h-8 w-auto" />
+                <img
+                  src={sidebarLogo}
+                  alt="Product Marketing"
+                  className={isMobileHeaderExpanded ? "h-9 w-auto" : "h-8 w-auto"}
+                />
               </NavLink>
             </div>
             <Button
               variant="ghost"
               size="icon"
+              className="text-white hover:bg-white/10 hover:text-white"
               onClick={() => setMobileOpen((state) => !state)}
               aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
             >
