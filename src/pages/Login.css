@@ -3,6 +3,8 @@
 .login-page {
   display: grid;
   min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
   place-items: center;
   padding: clamp(1rem, 2vw, 2rem);
   --liquid-glass-offset-y: 1000px;
