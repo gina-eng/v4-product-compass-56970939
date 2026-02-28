@@ -9,7 +9,7 @@ import {
   enableLocalPreviewAuth,
   isAllowedV4Email,
 } from "@/lib/auth";
-import topLogo from "@/assets/group-289027.svg";
+import sideLogo from "@/assets/group-289027-login.svg";
 import "./Login.css";
 
 const Login = () => {
@@ -108,28 +108,21 @@ const Login = () => {
 
   return (
     <div className="login-page">
-      <div className="login-page__mesh" aria-hidden="true" />
-      <main className="login-page__content">
-        <img src={topLogo} alt="Product Marketing" className="login-page__top-logo" />
-        <div className="login-page__shell">
-          <section className="login-page__brand-panel">
-            <h1 className="login-page__brand-title">
-              Apenas <span>resultado</span> importa.
-            </h1>
-            <p className="login-page__brand-description">
-              O portfólio de Produtos e Serviços da V4 Company
-            </p>
-          </section>
+      <main className="login-page__content login-page__content--compact">
+        <div className="login-page__left">
+          <img src={sideLogo} alt="Product Marketing" className="login-page__side-logo" />
+        </div>
 
-          <Card className="login-page__card">
-            <CardHeader className="items-center space-y-2 pb-4 text-center">
-              <CardTitle className="login-page__card-title">Acesso Restrito</CardTitle>
-              <CardDescription className="login-page__card-description">
-                Faça login com sua conta <strong>@{ALLOWED_EMAIL_DOMAIN}</strong> para acessar o
-                portfólio.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <Card className="login-page__card login-page__card--solo">
+          <CardHeader className="login-page__card-header">
+            <CardTitle className="login-page__card-title">Acesso Restrito</CardTitle>
+            <CardDescription className="login-page__card-description">
+              Faça login com sua conta <strong>@{ALLOWED_EMAIL_DOMAIN}</strong> para acessar o
+              portfólio.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="login-page__card-content">
+            <div className="login-page__alerts">
               {reason === "expired" && (
                 <p className="login-page__alert">
                   Sua sessão expirou após 6 horas. Faça login novamente para continuar.
@@ -143,13 +136,15 @@ const Login = () => {
               )}
 
               {loginError && <p className="login-page__alert">{loginError}</p>}
+            </div>
 
+            <div className="login-page__actions">
               <Button
                 className="login-page__cta w-full"
                 onClick={handleSignIn}
                 disabled={isSigningIn || isLoadingSession}
               >
-                <LogIn className="mr-2 h-4 w-4" />
+                <LogIn className="h-4 w-4" />
                 {isSigningIn ? "Redirecionando..." : "Entrar com Google"}
               </Button>
 
@@ -157,20 +152,18 @@ const Login = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full border-[#d8d3d7] bg-white text-[#1d2330] hover:bg-[#f4f4f6]"
+                  className="login-page__preview-cta w-full"
                   onClick={handleLocalPreview}
                   disabled={isLoadingSession}
                 >
                   Entrar em modo pré-visualização local
                 </Button>
               )}
+            </div>
 
-              {isLoadingSession && (
-                <p className="login-page__session-status">Verificando sessão...</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+            {isLoadingSession && <p className="login-page__session-status">Verificando sessão...</p>}
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
