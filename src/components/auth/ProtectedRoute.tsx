@@ -4,7 +4,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
   getSessionRemainingMs,
-  isAllowedV4Email,
+  isAllowedAppEmail,
   isLocalPreviewAuthEnabled,
   shouldForceSessionReauth,
 } from "@/lib/auth";
@@ -13,7 +13,7 @@ const ProtectedRoute = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authFailureReason, setAuthFailureReason] = useState<"domain" | "expired" | null>(null);
+  const [authFailureReason, setAuthFailureReason] = useState<"access" | "expired" | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -25,7 +25,7 @@ const ProtectedRoute = () => {
       logoutTimer = null;
     };
 
-    const forceSignOut = async (reason: "expired" | "domain") => {
+    const forceSignOut = async (reason: "expired" | "access") => {
       clearLogoutTimer();
       if (!isMounted) return;
 
@@ -55,8 +55,9 @@ const ProtectedRoute = () => {
         return;
       }
 
-      if (!isAllowedV4Email(session.user.email)) {
-        await forceSignOut("domain");
+      const hasAccess = await isAllowedAppEmail(session.user.email);
+      if (!hasAccess) {
+        await forceSignOut("access");
         return;
       }
 

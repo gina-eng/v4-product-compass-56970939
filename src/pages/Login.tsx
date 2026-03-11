@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ALLOWED_EMAIL_DOMAIN,
   enableLocalPreviewAuth,
-  isAllowedV4Email,
+  isAllowedAppEmail,
 } from "@/lib/auth";
 import sideLogo from "@/assets/group-289027-login.svg";
 import "./Login.css";
@@ -18,6 +20,9 @@ const Login = () => {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
+  const [showPasswordLogin, setShowPasswordLogin] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const reason = searchParams.get("reason");
   const nextPath = useMemo(() => {
@@ -39,8 +44,12 @@ const Login = () => {
         return;
       }
 
-      if (!isAllowedV4Email(session.user.email)) {
+      const hasAccess = await isAllowedAppEmail(session.user.email);
+      if (!isMounted) return;
+
+      if (!hasAccess) {
         await supabase.auth.signOut();
+        if (!isMounted) return;
         setIsLoadingSession(false);
         return;
       }
@@ -74,7 +83,7 @@ const Login = () => {
     return `${current.protocol}//${normalizedHost}${current.port ? `:${current.port}` : ""}/login${search}`;
   };
 
-  const handleSignIn = async () => {
+  const handleGoogleSignIn = async () => {
     setLoginError(null);
     setIsSigningIn(true);
 
@@ -93,6 +102,44 @@ const Login = () => {
 
     if (error) {
       setLoginError(error.message);
+      setIsSigningIn(false);
+    }
+  };
+
+  const handlePasswordSignIn = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoginError(null);
+    setIsSigningIn(true);
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail || !password) {
+      setLoginError("Preencha e-mail e senha para entrar.");
+      setIsSigningIn(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+
+      if (error || !data.session) {
+        setLoginError(error?.message ?? "Não foi possível autenticar com e-mail e senha.");
+        return;
+      }
+
+      const hasAccess = await isAllowedAppEmail(data.session.user.email);
+      if (!hasAccess) {
+        await supabase.auth.signOut();
+        setLoginError(
+          "Seu e-mail não está liberado para acesso. Solicite inclusão na lista de e-mails autorizados.",
+        );
+        return;
+      }
+
+      setRedirectPath(nextPath);
+    } finally {
       setIsSigningIn(false);
     }
   };
@@ -129,9 +176,9 @@ const Login = () => {
                 </p>
               )}
 
-              {reason === "domain" && (
+              {(reason === "domain" || reason === "access") && (
                 <p className="login-page__alert">
-                  Apenas usuários com e-mail @{ALLOWED_EMAIL_DOMAIN} podem entrar.
+                  Seu e-mail não tem acesso liberado ao sistema.
                 </p>
               )}
 
@@ -141,12 +188,70 @@ const Login = () => {
             <div className="login-page__actions">
               <Button
                 className="login-page__cta w-full"
-                onClick={handleSignIn}
+                onClick={handleGoogleSignIn}
                 disabled={isSigningIn || isLoadingSession}
               >
                 <LogIn className="h-4 w-4" />
-                {isSigningIn ? "Redirecionando..." : "Entrar com Google"}
+                Entrar com Google
               </Button>
+
+              <button
+                type="button"
+                className="login-page__alt-toggle"
+                onClick={() => {
+                  setLoginError(null);
+                  setShowPasswordLogin((current) => !current);
+                }}
+                disabled={isSigningIn || isLoadingSession}
+              >
+                {showPasswordLogin ? "Ocultar acesso alternativo" : "Problemas para entrar?"}
+              </button>
+
+              {showPasswordLogin && (
+                <>
+                  <p className="login-page__divider" aria-hidden="true">
+                    <span>Acesso alternativo</span>
+                  </p>
+
+                  <form className="login-page__form" onSubmit={handlePasswordSignIn}>
+                    <div className="login-page__field">
+                      <Label htmlFor="login-email">E-mail</Label>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        placeholder="voce@empresa.com"
+                        disabled={isSigningIn || isLoadingSession}
+                        required
+                      />
+                    </div>
+
+                    <div className="login-page__field">
+                      <Label htmlFor="login-password">Senha</Label>
+                      <Input
+                        id="login-password"
+                        type="password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        placeholder="••••••••"
+                        disabled={isSigningIn || isLoadingSession}
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="login-page__password-cta w-full"
+                      disabled={isSigningIn || isLoadingSession}
+                    >
+                      {isSigningIn ? "Entrando..." : "Entrar com e-mail e senha"}
+                    </Button>
+                  </form>
+                </>
+              )}
 
               {import.meta.env.DEV && (
                 <Button

@@ -15,6 +15,7 @@ import PlatformDetails from "./pages/PlatformDetails";
 import PlatformGartnerQuadrantPage from "./pages/PlatformGartnerQuadrantPage";
 import TierWtpDefinition from "./pages/TierWtpDefinition";
 import Login from "./pages/Login";
+import AllowedLoginUsers from "./pages/AllowedLoginUsers";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const LegacyPlatformDetailsRedirect = () => {
@@ -56,6 +57,7 @@ const App = () => {
               />
               <Route path="/plataforma/:slug" element={<LegacyPlatformDetailsRedirect />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/usuarios-liberados" element={<AllowedLoginUsers />} />
               <Route path="/sistemas" element={<Systems />} />
               <Route path="/produto/:slug" element={<ProductDetails />} />
               <Route path="/materiais-apoio" element={<SupportMaterials />} />

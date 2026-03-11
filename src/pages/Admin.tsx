@@ -20,12 +20,13 @@ import SalesMaterials from "@/components/SalesMaterials";
 import OperationalMaterials from "@/components/OperationalMaterials";
 import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { Plus, Edit, Trash2, Search, ExternalLink, Copy } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ExternalLink, Copy, Users } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 import { Checkbox } from "@/components/ui/checkbox";
 import UseCaseMap from "@/components/UseCaseMap";
 import PlatformManagementTab from "@/components/admin/PlatformManagementTab";
+import { useNavigate } from "react-router-dom";
 
 interface SpicedData {
   situation: { objetivo: string; perguntas: string; observar: string };
@@ -184,6 +185,7 @@ const initialTierWtpForm: TierWtpFormState = {
 };
 
 const Admin = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { settings, updateSetting, isTableAvailable } = useSiteSettings();
 
@@ -1544,6 +1546,10 @@ const Admin = () => {
       <div className="space-y-8 animate-fade-in">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Área Administrativa</h1>
+          <Button variant="outline" onClick={() => navigate("/admin/usuarios-liberados")}>
+            <Users className="h-4 w-4 mr-2" />
+            Usuários Externos
+          </Button>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">

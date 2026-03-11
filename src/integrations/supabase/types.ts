@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      allowed_login_emails: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       org_members: {
         Row: {
           created_at: string
@@ -563,6 +590,13 @@ export type Database = {
       }
     }
     Functions: {
+      admin_upsert_external_login_users: {
+        Args: { p_emails: string[]; p_notes?: string[]; p_password?: string }
+        Returns: {
+          action: string
+          email: string
+        }[]
+      }
       is_internal_user: { Args: never; Returns: boolean }
     }
     Enums: {

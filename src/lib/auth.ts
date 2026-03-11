@@ -1,16 +1,42 @@
 import type { Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
 export const ALLOWED_EMAIL_DOMAIN = "v4company.com";
 export const LOCAL_PREVIEW_EMAIL = "preview@localhost";
+const ALLOWED_LOGIN_EMAILS_TABLE = "allowed_login_emails" as const;
 const LOCAL_PREVIEW_AUTH_KEY = "v4_local_preview_auth";
 const AUTH_ZERO_MARK_ISO = "2026-02-27T20:40:21Z";
 const AUTH_ZERO_MARK_MS = Date.parse(AUTH_ZERO_MARK_ISO);
 export const AUTH_SESSION_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 
-export const isAllowedV4Email = (email?: string | null): boolean => {
-  if (!email) return false;
+const normalizeEmail = (email?: string | null) => email?.trim().toLowerCase() ?? "";
 
-  return email.trim().toLowerCase().endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
+export const isAllowedV4Email = (email?: string | null): boolean => {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return false;
+
+  return normalizedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
+};
+
+export const isAllowedAppEmail = async (email?: string | null): Promise<boolean> => {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return false;
+  if (isAllowedV4Email(normalizedEmail)) return true;
+
+  const { data, error } = await supabase
+    .from(ALLOWED_LOGIN_EMAILS_TABLE)
+    .select("id")
+    .eq("email", normalizedEmail)
+    .eq("is_active", true)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Failed to validate login access list", error);
+    return false;
+  }
+
+  return Boolean(data?.id);
 };
 
 export const isLocalPreviewAuthEnabled = (): boolean => {
