@@ -131,9 +131,6 @@ export const calculateFaturamentoFromData = (
   // Faturamento Ancoragem = (CSP Direto × markup) + (CSP Overhead × markup_overhead)
   const faturamentoAncoragem = (totalCSPDireto * markup) + (totalCSPOverhead * markupOverhead);
   
-  console.log(`[CALC] Produto ID: ${product.categoria}`);
-  console.log(`[CALC] Fórmula: (${totalCSPDireto} × ${markup}) + (${totalCSPOverhead} × ${markupOverhead}) = ${faturamentoAncoragem}`);
-  
   return faturamentoAncoragem;
 };
 

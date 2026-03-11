@@ -199,8 +199,6 @@ const Admin = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
   
-  // Cache para valores calculados por produto
-  const [calculatedValues, setCalculatedValues] = useState<{[key: string]: number}>({});
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -364,6 +362,7 @@ const Admin = () => {
   };
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('products')
@@ -430,22 +429,7 @@ const Admin = () => {
       
       setProducts(formattedProducts);
       setFilteredProducts(formattedProducts);
-      
-      // Calcular valores automaticamente para todos os produtos
-      const calculatedVals: {[key: string]: number} = {};
-      for (const product of formattedProducts) {
-        const calculatedValue = await calculateFaturamentoSemDesconto(product.id, product.markup || 1.0);
-        calculatedVals[product.id] = calculatedValue;
-        
-        // Atualizar o campo valor no banco se estiver desatualizado
-        if (product.valor !== calculatedValue.toFixed(2)) {
-          await supabase
-            .from('products')
-            .update({ valor: calculatedValue.toFixed(2) })
-            .eq('id', product.id);
-        }
-      }
-      setCalculatedValues(calculatedVals);
+      setLoading(false);
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
       toast({
@@ -453,7 +437,6 @@ const Admin = () => {
         description: "Erro ao carregar produtos",
         variant: "destructive"
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -466,22 +449,13 @@ const Admin = () => {
         .order('nome');
 
       if (error) throw error;
-      
-      // Recalcular e atualizar CPH se necessário (migração para 160 horas)
-      if (data) {
-        for (const position of data) {
-          const cphCorreto = (position.investimento_total / 160).toFixed(2);
-          if (position.cph.toFixed(2) !== cphCorreto) {
-            await supabase
-              .from('positions')
-              .update({ cph: parseFloat(cphCorreto) })
-              .eq('id', position.id);
-            position.cph = parseFloat(cphCorreto);
-          }
-        }
-      }
-      
-      setPositions(data || []);
+
+      const normalizedPositions = (data || []).map((position) => ({
+        ...position,
+        cph: Number((position.investimento_total / 160).toFixed(2)),
+      }));
+
+      setPositions(normalizedPositions);
     } catch (error) {
       console.error('Erro ao buscar posições:', error);
     }
@@ -1310,12 +1284,6 @@ const Admin = () => {
           valor: faturamentoSemDesconto.toFixed(2)
         })
         .eq('id', productId);
-        
-      // Atualizar cache para os cards
-      setCalculatedValues(prev => ({
-        ...prev,
-        [productId]: faturamentoSemDesconto
-      }));
       
       // Recalcular produtos para atualizar valores
       await fetchProducts();

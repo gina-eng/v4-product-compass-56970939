@@ -35,6 +35,15 @@ type PortfolioItemWithoutVariationData = Omit<
   "baseName" | "variationName" | "groupKey"
 >;
 
+interface ProductPositionRow {
+  product_id: string;
+  horas_alocadas: number;
+  positions: {
+    cph: number;
+    nome: string;
+  } | null;
+}
+
 const validCategoryFilters = [
   "all",
   "destrava_receita",
@@ -179,14 +188,28 @@ const ProductPortfolio = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .order("updated_at", { ascending: false });
+        const [{ data, error }, { data: positionsData, error: positionsError }] =
+          await Promise.all([
+            supabase
+              .from("products")
+              .select("*")
+              .order("updated_at", { ascending: false }),
+            supabase
+              .from("product_positions")
+              .select(`
+                product_id,
+                horas_alocadas,
+                positions (cph, nome)
+              `),
+          ]);
 
         if (error) {
           console.error("Error fetching products:", error);
           return;
+        }
+
+        if (positionsError) {
+          console.error("Error fetching positions:", positionsError);
         }
 
         if (!data) {
@@ -194,53 +217,47 @@ const ProductPortfolio = () => {
           return;
         }
 
-        const productsWithMetrics: PortfolioItemWithoutVariationData[] = await Promise.all(
-          data.map(async (product) => {
-            const { data: positions, error: positionsError } = await supabase
-              .from("product_positions")
-              .select(
-                `
-                *,
-                positions (*)
-              `
-              )
-              .eq("product_id", product.id);
+        const positionsByProductId = new Map<string, ProductPositionRow[]>();
+        ((positionsData || []) as ProductPositionRow[]).forEach((positionRow) => {
+          const current = positionsByProductId.get(positionRow.product_id) || [];
+          current.push(positionRow);
+          positionsByProductId.set(positionRow.product_id, current);
+        });
 
-            if (positionsError) {
-              console.error("Error fetching positions:", positionsError);
-            }
+        const productsWithMetrics: PortfolioItemWithoutVariationData[] = data.map((product) => {
+          const positionsForProduct = (positionsByProductId.get(product.id) || []).map((positionRow) => ({
+            horas_alocadas: Number(positionRow.horas_alocadas) || 0,
+            positions: {
+              cph: Number(positionRow.positions?.cph) || 0,
+              nome: positionRow.positions?.nome || "",
+            },
+          }));
 
-            let faturamentoSemDesconto = 0;
+          const productData = {
+            markup: Number(product.markup) || 1,
+            markup_overhead: Number(product.markup_overhead) || 1,
+            categoria: product.categoria,
+            usa_dedicacao: product.usa_dedicacao || false,
+          };
 
-            if (positions && positions.length > 0) {
-              const productData = {
-                markup: Number(product.markup) || 1,
-                markup_overhead: Number(product.markup_overhead) || 1,
-                categoria: product.categoria,
-                usa_dedicacao: product.usa_dedicacao || false,
-              };
+          const nivelDedicacao =
+            product.usa_dedicacao && product.categoria === "executar" ? 0.1 : 1;
 
-              const nivelDedicacao =
-                product.usa_dedicacao && product.categoria === "executar" ? 0.1 : 1;
+          const faturamentoSemDesconto =
+            positionsForProduct.length > 0
+              ? calculateFaturamentoFromData(positionsForProduct, productData, nivelDedicacao)
+              : 0;
 
-              faturamentoSemDesconto = calculateFaturamentoFromData(
-                positions,
-                productData,
-                nivelDedicacao
-              );
-            }
-
-            return {
-              id: product.id,
-              name: product.produto,
-              description: product.descricao_card?.trim() || product.description || "",
-              category: product.categoria,
-              status: product.status === "Em homologação" ? "Em produção" : product.status,
-              valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
-              certificacao: Boolean(product.certificacao),
-            };
-          })
-        );
+          return {
+            id: product.id,
+            name: product.produto,
+            description: product.descricao_card?.trim() || product.description || "",
+            category: product.categoria,
+            status: product.status === "Em homologação" ? "Em produção" : product.status,
+            valorBase: faturamentoSemDesconto > 0 ? faturamentoSemDesconto.toString() : "A definir",
+            certificacao: Boolean(product.certificacao),
+          };
+        });
 
         setProducts(appendVariationMetadata(productsWithMetrics));
       } catch (error) {

@@ -25,6 +25,13 @@ type BatchRow = {
   notes: string;
 };
 
+type SupabaseErrorLike = {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+};
+
 const DEFAULT_EXTERNAL_PASSWORD = "v4@company";
 
 const createBatchRow = (): BatchRow => ({
@@ -37,6 +44,29 @@ const initialEditForm = {
   email: "",
   notes: "",
   is_active: true,
+};
+
+const resolveSupabaseErrorMessage = (error: unknown) => {
+  const fallback = "Verifique os e-mails informados e tente novamente.";
+
+  if (!error || typeof error !== "object") return fallback;
+
+  const parsed = error as SupabaseErrorLike;
+  const code = parsed.code || "";
+  const message = parsed.message || "";
+  const details = parsed.details || "";
+  const hint = parsed.hint || "";
+
+  if (code === "PGRST202" || message.includes("Could not find the function")) {
+    return "A função SQL admin_upsert_external_login_users não foi encontrada. Rode a migration mais recente no Supabase.";
+  }
+
+  if (message.toLowerCase().includes("permission denied")) {
+    return "Permissão negada no banco. Verifique se as migrations de permissão e da RPC foram aplicadas.";
+  }
+
+  const composed = [message, details, hint].filter(Boolean).join(" ");
+  return composed || fallback;
 };
 
 const AllowedLoginUsers = () => {
@@ -174,7 +204,7 @@ const AllowedLoginUsers = () => {
       console.error("Erro ao adicionar usuários em lote:", error);
       toast({
         title: "Erro ao adicionar usuários",
-        description: "Verifique os e-mails informados e tente novamente.",
+        description: resolveSupabaseErrorMessage(error),
         variant: "destructive",
       });
     } finally {
