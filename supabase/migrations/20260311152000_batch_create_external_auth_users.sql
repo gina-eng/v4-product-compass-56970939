@@ -113,7 +113,7 @@ BEGIN
         'authenticated',
         'authenticated',
         normalized_email,
-        crypt(trim(p_password), gen_salt('bf')),
+        extensions.crypt(trim(p_password), extensions.gen_salt('bf'::text)),
         now(),
         now(),
         jsonb_build_object('provider', 'email', 'providers', array['email']),
@@ -148,7 +148,7 @@ BEGIN
     ELSE
       UPDATE auth.users
       SET
-        encrypted_password = crypt(trim(p_password), gen_salt('bf')),
+        encrypted_password = extensions.crypt(trim(p_password), extensions.gen_salt('bf'::text)),
         email_confirmed_at = COALESCE(email_confirmed_at, now()),
         updated_at = now()
       WHERE id = user_id;
