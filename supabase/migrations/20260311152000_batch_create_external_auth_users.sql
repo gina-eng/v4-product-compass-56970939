@@ -48,6 +48,7 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+#variable_conflict use_column
 DECLARE
   requester_email TEXT := COALESCE(lower(auth.jwt() ->> 'email'), '');
   normalized_email TEXT;
@@ -77,7 +78,7 @@ BEGIN
 
     INSERT INTO public.allowed_login_emails (email, notes, is_active)
     VALUES (normalized_email, normalized_note, true)
-    ON CONFLICT (email) DO UPDATE
+    ON CONFLICT ON CONSTRAINT allowed_login_emails_email_unique DO UPDATE
     SET
       notes = COALESCE(EXCLUDED.notes, public.allowed_login_emails.notes),
       is_active = true,
