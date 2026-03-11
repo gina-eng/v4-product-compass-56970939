@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Trash2 } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -19,10 +20,12 @@ type BatchUpsertResult = {
   action: string;
 };
 
-type BatchRow = {
-  id: string;
-  email: string;
-  notes: string;
+type AllowedUsersGroup = {
+  key: string;
+  groupId: string | null;
+  groupNote: string | null;
+  users: AllowedLoginEmail[];
+  createdAt: string;
 };
 
 type SupabaseErrorLike = {
@@ -33,17 +36,20 @@ type SupabaseErrorLike = {
 };
 
 const DEFAULT_EXTERNAL_PASSWORD = "v4@company";
-
-const createBatchRow = (): BatchRow => ({
-  id: crypto.randomUUID(),
-  email: "",
-  notes: "",
-});
+const EMAIL_SPLIT_REGEX = /[\n;,]+/g;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const initialEditForm = {
   email: "",
   notes: "",
   is_active: true,
+};
+
+const parseEmailLines = (value: string) => {
+  return value
+    .split(EMAIL_SPLIT_REGEX)
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
 };
 
 const resolveSupabaseErrorMessage = (error: unknown) => {
@@ -80,7 +86,51 @@ const AllowedLoginUsers = () => {
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState(initialEditForm);
   const [batchPassword, setBatchPassword] = useState(DEFAULT_EXTERNAL_PASSWORD);
-  const [batchRows, setBatchRows] = useState<BatchRow[]>([createBatchRow()]);
+  const [batchEmailsInput, setBatchEmailsInput] = useState("");
+  const [batchGroupNote, setBatchGroupNote] = useState("");
+
+  const parsedUniqueEmails = useMemo(
+    () => Array.from(new Set(parseEmailLines(batchEmailsInput))),
+    [batchEmailsInput],
+  );
+
+  const groupedUsers = useMemo<AllowedUsersGroup[]>(() => {
+    const groups = new Map<string, AllowedUsersGroup>();
+
+    users.forEach((user) => {
+      const key = user.import_group_id ?? `single:${user.id}`;
+      const currentGroup = groups.get(key);
+      const groupNote = user.import_group_note ?? user.notes ?? null;
+
+      if (!currentGroup) {
+        groups.set(key, {
+          key,
+          groupId: user.import_group_id,
+          groupNote,
+          users: [user],
+          createdAt: user.created_at,
+        });
+        return;
+      }
+
+      currentGroup.users.push(user);
+
+      if (!currentGroup.groupNote && groupNote) {
+        currentGroup.groupNote = groupNote;
+      }
+
+      if (new Date(user.created_at).getTime() > new Date(currentGroup.createdAt).getTime()) {
+        currentGroup.createdAt = user.created_at;
+      }
+    });
+
+    return Array.from(groups.values())
+      .map((group) => ({
+        ...group,
+        users: [...group.users].sort((a, b) => a.email.localeCompare(b.email)),
+      }))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [users]);
 
   const fetchAllowedUsers = useCallback(async () => {
     try {
@@ -108,7 +158,8 @@ const AllowedLoginUsers = () => {
   }, [fetchAllowedUsers]);
 
   const resetBatchForm = () => {
-    setBatchRows([createBatchRow()]);
+    setBatchEmailsInput("");
+    setBatchGroupNote("");
     setBatchPassword(DEFAULT_EXTERNAL_PASSWORD);
   };
 
@@ -126,39 +177,25 @@ const AllowedLoginUsers = () => {
     setEditForm(initialEditForm);
   };
 
-  const addBatchRow = () => {
-    setBatchRows((current) => [...current, createBatchRow()]);
-  };
-
-  const updateBatchRow = (rowId: string, field: "email" | "notes", value: string) => {
-    setBatchRows((current) =>
-      current.map((row) => (row.id === rowId ? { ...row, [field]: value } : row)),
-    );
-  };
-
-  const removeBatchRow = (rowId: string) => {
-    setBatchRows((current) => {
-      if (current.length === 1) {
-        return [{ ...current[0], email: "", notes: "" }];
-      }
-
-      return current.filter((row) => row.id !== rowId);
-    });
-  };
-
   const handleSubmitBatch = async () => {
     const normalizedPassword = batchPassword.trim();
-    const normalizedRows = batchRows
-      .map((row) => ({
-        email: row.email.trim().toLowerCase(),
-        notes: row.notes.trim(),
-      }))
-      .filter((row) => row.email.length > 0);
+    const normalizedGroupNote = batchGroupNote.trim();
+    const emails = parsedUniqueEmails;
 
-    if (normalizedRows.length === 0) {
+    if (emails.length === 0) {
       toast({
         title: "Sem e-mails para adicionar",
-        description: "Preencha ao menos um e-mail antes de continuar.",
+        description: "Cole ao menos um e-mail (um por linha) antes de continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const invalidEmails = emails.filter((email) => !EMAIL_REGEX.test(email));
+    if (invalidEmails.length > 0) {
+      toast({
+        title: "E-mails inválidos",
+        description: `Revise os e-mails inválidos: ${invalidEmails.slice(0, 3).join(", ")}`,
         variant: "destructive",
       });
       return;
@@ -173,11 +210,8 @@ const AllowedLoginUsers = () => {
       return;
     }
 
-    const deduplicatedByEmail = Array.from(
-      new Map(normalizedRows.map((row) => [row.email, row])).values(),
-    );
-    const emails = deduplicatedByEmail.map((row) => row.email);
-    const notes = deduplicatedByEmail.map((row) => row.notes);
+    const notes = emails.map(() => normalizedGroupNote);
+    const groupId = crypto.randomUUID();
 
     setIsSubmittingBatch(true);
     try {
@@ -185,6 +219,8 @@ const AllowedLoginUsers = () => {
         p_emails: emails,
         p_notes: notes,
         p_password: normalizedPassword,
+        p_group_id: groupId,
+        p_group_note: normalizedGroupNote || null,
       });
 
       if (error) throw error;
@@ -331,7 +367,7 @@ const AllowedLoginUsers = () => {
             <CardTitle>Adicionar múltiplos usuários</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-[minmax(240px,360px)_auto]">
+            <div className="grid gap-3 md:grid-cols-2">
               <div>
                 <Label htmlFor="default-password">Senha padrão para os novos usuários</Label>
                 <Input
@@ -342,51 +378,29 @@ const AllowedLoginUsers = () => {
                 />
               </div>
 
-              <div className="flex items-end">
-                <Button variant="outline" onClick={addBatchRow} disabled={isSubmittingBatch}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Novo campo de e-mail
-                </Button>
+              <div>
+                <Label htmlFor="batch-group-note">Observação para todo o grupo</Label>
+                <Input
+                  id="batch-group-note"
+                  value={batchGroupNote}
+                  onChange={(event) => setBatchGroupNote(event.target.value)}
+                  placeholder="Ex: Equipe parceira ACME"
+                />
               </div>
             </div>
 
-            <div className="space-y-3">
-              {batchRows.map((row, index) => (
-                <div key={row.id} className="grid gap-3 md:grid-cols-[1fr_1fr_auto]">
-                  <div>
-                    <Label htmlFor={`batch-email-${row.id}`}>E-mail {index + 1}</Label>
-                    <Input
-                      id={`batch-email-${row.id}`}
-                      type="email"
-                      value={row.email}
-                      onChange={(event) => updateBatchRow(row.id, "email", event.target.value)}
-                      placeholder="cliente@empresa.com"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor={`batch-notes-${row.id}`}>Observações</Label>
-                    <Input
-                      id={`batch-notes-${row.id}`}
-                      value={row.notes}
-                      onChange={(event) => updateBatchRow(row.id, "notes", event.target.value)}
-                      placeholder="Ex: parceiro externo"
-                    />
-                  </div>
-
-                  <div className="flex items-end">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeBatchRow(row.id)}
-                      disabled={isSubmittingBatch}
-                      title="Remover campo"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-2">
+              <Label htmlFor="batch-emails-input">E-mails (um por linha)</Label>
+              <Textarea
+                id="batch-emails-input"
+                value={batchEmailsInput}
+                onChange={(event) => setBatchEmailsInput(event.target.value)}
+                placeholder={"cliente1@empresa.com\ncliente2@empresa.com\ncliente3@empresa.com"}
+                className="min-h-[180px]"
+              />
+              <p className="text-xs text-muted-foreground">
+                {parsedUniqueEmails.length} e-mails únicos prontos para processamento.
+              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -465,49 +479,73 @@ const AllowedLoginUsers = () => {
             ) : users.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhum e-mail externo cadastrado.</p>
             ) : (
-              <div className="overflow-hidden rounded-xl border border-border/70">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>E-mail</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Observações</TableHead>
-                      <TableHead>Criado em</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.email}</TableCell>
-                        <TableCell>
-                          <Badge variant={user.is_active ? "default" : "secondary"}>
-                            {user.is_active ? "Ativo" : "Inativo"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="max-w-[380px] text-sm text-muted-foreground">
-                          {user.notes || "—"}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {new Date(user.created_at).toLocaleDateString("pt-BR")}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleToggleStatus(user)}>
-                              {user.is_active ? "Desativar" : "Ativar"}
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => startEditUser(user)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleDelete(user)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <div className="space-y-4">
+                {groupedUsers.map((group) => (
+                  <div key={group.key} className="overflow-hidden rounded-xl border border-border/70">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 bg-muted/20 px-4 py-3">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <Badge variant={group.groupId ? "default" : "secondary"}>
+                          {group.groupId ? "Grupo" : "Individual"}
+                        </Badge>
+                        <p className="truncate text-sm font-medium">
+                          {group.groupId
+                            ? group.groupNote || "Grupo sem observação"
+                            : group.users[0]?.notes || "Sem observação"}
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {group.users.length} {group.users.length === 1 ? "usuário" : "usuários"}
+                      </p>
+                    </div>
+
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>E-mail</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Observações</TableHead>
+                          <TableHead>Criado em</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {group.users.map((user) => (
+                          <TableRow key={user.id}>
+                            <TableCell className="font-medium">{user.email}</TableCell>
+                            <TableCell>
+                              <Badge variant={user.is_active ? "default" : "secondary"}>
+                                {user.is_active ? "Ativo" : "Inativo"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="max-w-[380px] text-sm text-muted-foreground">
+                              {user.notes || group.groupNote || "—"}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {new Date(user.created_at).toLocaleDateString("pt-BR")}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleToggleStatus(user)}
+                                >
+                                  {user.is_active ? "Desativar" : "Ativar"}
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => startEditUser(user)}>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => handleDelete(user)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ))}
               </div>
             )}
           </CardContent>

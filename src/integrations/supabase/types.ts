@@ -19,6 +19,8 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          import_group_id: string | null
+          import_group_note: string | null
           is_active: boolean
           notes: string | null
           updated_at: string
@@ -27,6 +29,8 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          import_group_id?: string | null
+          import_group_note?: string | null
           is_active?: boolean
           notes?: string | null
           updated_at?: string
@@ -35,6 +39,8 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          import_group_id?: string | null
+          import_group_note?: string | null
           is_active?: boolean
           notes?: string | null
           updated_at?: string
@@ -591,7 +597,13 @@ export type Database = {
     }
     Functions: {
       admin_upsert_external_login_users: {
-        Args: { p_emails: string[]; p_notes?: string[]; p_password?: string }
+        Args: {
+          p_emails: string[]
+          p_group_id?: string | null
+          p_group_note?: string | null
+          p_notes?: string[]
+          p_password?: string
+        }
         Returns: {
           action: string
           email: string
