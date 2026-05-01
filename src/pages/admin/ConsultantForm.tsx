@@ -21,6 +21,7 @@ import {
   upsertConsultant,
 } from "@/features/consultants/storage";
 import type { Consultant } from "@/features/consultants/types";
+import { listUnits, type V4Unit } from "@/features/units/storage";
 
 const EMPTY: Consultant = {
   id: "",
