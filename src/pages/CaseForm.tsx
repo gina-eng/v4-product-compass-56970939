@@ -146,7 +146,7 @@ const CaseForm = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     for (let i = 1; i <= STEPS.length; i += 1) {
       if (!validateStep(i, record).isValid) {
         toast({
@@ -160,15 +160,19 @@ const CaseForm = () => {
       }
     }
     const finalStatus = computeFinalStatus(record);
-    upsertCase({ ...record, status: finalStatus });
-    setSubmitted(true);
-    toast({
-      title: "Case registrado!",
-      description:
-        finalStatus === "completo"
-          ? "Já está disponível na base."
-          : "Registrado sem evidência — fica pendente de curadoria.",
-    });
+    try {
+      await upsertCase({ ...record, status: finalStatus });
+      setSubmitted(true);
+      toast({
+        title: "Case registrado!",
+        description:
+          finalStatus === "completo"
+            ? "Já está disponível na base."
+            : "Registrado sem evidência — fica pendente de curadoria.",
+      });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao registrar case", description: err instanceof Error ? err.message : "" });
+    }
   };
 
   if (submitted) {
