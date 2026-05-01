@@ -1,0 +1,1 @@
+DELETE FROM public.cases WHERE id::text LIKE 'example-%' OR owner_email IN ('marina.costa@v4company.com','rafael.silva@v4company.com','joana.lima@v4company.com','pedro.alves@v4company.com','carla.mendes@v4company.com');
