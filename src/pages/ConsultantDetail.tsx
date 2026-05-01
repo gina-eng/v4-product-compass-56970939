@@ -177,7 +177,34 @@ const Section = ({
 
 const ConsultantDetail = () => {
   const { id } = useParams();
-  const consultant = id ? getConsultant(id) : undefined;
+  const [consultant, setConsultant] = useState<Consultant | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    void getConsultant(id).then((c) => {
+      if (cancelled) return;
+      setConsultant(c ?? null);
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
+          Carregando consultor…
+        </div>
+      </Layout>
+    );
+  }
 
   if (!consultant) {
     return (
@@ -272,15 +299,6 @@ const ConsultantDetail = () => {
                   <Mail className="h-3.5 w-3.5" />
                   {consultant.email}
                 </span>
-                <Button asChild variant="outline" size="sm" className="h-7 px-2.5 text-xs">
-                  <a
-                    href={buildWhatsappUrl(consultant.phone)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <WhatsAppIcon className="mr-1.5 h-3.5 w-3.5" /> {consultant.phone}
-                  </a>
-                </Button>
                 {consultant.linkedinUrl && (
                   <Button asChild variant="outline" size="sm" className="h-7 px-2.5 text-xs">
                     <a
