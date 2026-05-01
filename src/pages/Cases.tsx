@@ -450,25 +450,6 @@ const Cases = () => {
     }
   };
 
-  const handleSeed = async () => {
-    try {
-      const count = await seedExampleCases();
-      await refresh();
-      toast({ title: `${count} cases de exemplo carregados`, description: "Use para visualizar a experiência com a base populada." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao carregar exemplos", description: err instanceof Error ? err.message : "" });
-    }
-  };
-
-  const handleClearExamples = async () => {
-    try {
-      const count = await clearExampleCases();
-      await refresh();
-      toast({ title: `${count} exemplos removidos` });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao remover exemplos", description: err instanceof Error ? err.message : "" });
-    }
-  };
 
   const renderFiltersBar = () => (
     <div className="space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
