@@ -1,0 +1,17 @@
+export const SECTORS: string[] = [
+  "Indústria e Manufatura",
+  "Varejo e Atacado",
+  "Agronegócio",
+  "Serviços Financeiros",
+  "Saúde e Ciências da Vida",
+  "Educação",
+  "Tecnologia / Inovação",
+  "Construção e Imóveis",
+  "Transportes e Logística",
+  "Alimentação e Bebidas",
+  "Comunicação e Entretenimento",
+  "Hospitality / Turismo / Lazer",
+  "Saúde Pública e Setor Governamental",
+  "Experiências complementares",
+  "Saúde",
+];

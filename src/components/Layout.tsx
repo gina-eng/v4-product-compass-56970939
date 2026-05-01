@@ -8,7 +8,9 @@ import {
   Menu,
   Network,
   Package,
+  Sparkles,
   Table2,
+  Users,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,6 +65,8 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
       { title: "Stack Digital", url: "/stack-digital", icon: Network },
       { title: "Sistemas Operacionais", url: "/sistemas", icon: Cog },
       { title: "Artefatos", url: "/materiais-apoio", icon: BookMarked },
+      { title: "Zyman AI (Cases)", url: "/cases", icon: Sparkles },
+      { title: "Consultores Certificados", url: "/consultores", icon: Users },
     ],
   },
 ];

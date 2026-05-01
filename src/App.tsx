@@ -16,6 +16,13 @@ import PlatformGartnerQuadrantPage from "./pages/PlatformGartnerQuadrantPage";
 import TierWtpDefinition from "./pages/TierWtpDefinition";
 import Login from "./pages/Login";
 import AllowedLoginUsers from "./pages/AllowedLoginUsers";
+import Cases from "./pages/Cases";
+import CaseForm from "./pages/CaseForm";
+import CaseDetail from "./pages/CaseDetail";
+import Consultants from "./pages/Consultants";
+import ConsultantDetail from "./pages/ConsultantDetail";
+import ConsultantsAdmin from "./pages/admin/ConsultantsAdmin";
+import ConsultantForm from "./pages/admin/ConsultantForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const LegacyPlatformDetailsRedirect = () => {
@@ -61,6 +68,15 @@ const App = () => {
               <Route path="/sistemas" element={<Systems />} />
               <Route path="/produto/:slug" element={<ProductDetails />} />
               <Route path="/materiais-apoio" element={<SupportMaterials />} />
+              <Route path="/cases" element={<Cases />} />
+              <Route path="/cases/novo" element={<CaseForm />} />
+              <Route path="/cases/:id" element={<CaseDetail />} />
+              <Route path="/cases/:id/editar" element={<CaseForm />} />
+              <Route path="/consultores" element={<Consultants />} />
+              <Route path="/consultores/:id" element={<ConsultantDetail />} />
+              <Route path="/admin/consultores" element={<ConsultantsAdmin />} />
+              <Route path="/admin/consultores/novo" element={<ConsultantForm />} />
+              <Route path="/admin/consultores/:id/editar" element={<ConsultantForm />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>

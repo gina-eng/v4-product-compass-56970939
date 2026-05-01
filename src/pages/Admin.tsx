@@ -1512,12 +1512,18 @@ const Admin = () => {
   return (
     <Layout showHeader={true}>
       <div className="space-y-8 animate-fade-in">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h1 className="text-3xl font-bold">Área Administrativa</h1>
-          <Button variant="outline" onClick={() => navigate("/admin/usuarios-liberados")}>
-            <Users className="h-4 w-4 mr-2" />
-            Usuários Externos
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" onClick={() => navigate("/admin/consultores")}>
+              <Users className="h-4 w-4 mr-2" />
+              Consultores Certificados
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/admin/usuarios-liberados")}>
+              <Users className="h-4 w-4 mr-2" />
+              Usuários Externos
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
