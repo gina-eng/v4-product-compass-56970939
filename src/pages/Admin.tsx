@@ -1519,6 +1519,10 @@ const Admin = () => {
               <Users className="h-4 w-4 mr-2" />
               Consultores Certificados
             </Button>
+            <Button variant="outline" onClick={() => navigate("/admin/unidades")}>
+              <Users className="h-4 w-4 mr-2" />
+              Unidades V4
+            </Button>
             <Button variant="outline" onClick={() => navigate("/admin/usuarios-liberados")}>
               <Users className="h-4 w-4 mr-2" />
               Usuários Externos
