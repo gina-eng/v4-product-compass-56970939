@@ -230,8 +230,7 @@ const CaseDetail = () => {
 
   useEffect(() => {
     if (!id) return;
-    const r = getCase(id);
-    setRecord(r ?? null);
+    void getCase(id).then((r) => setRecord(r ?? null));
   }, [id]);
 
   useEffect(() => {
