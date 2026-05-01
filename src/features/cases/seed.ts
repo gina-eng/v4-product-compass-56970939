@@ -527,17 +527,23 @@ const exampleCases: CaseRecord[] = [
   },
 ];
 
-export const seedExampleCases = (): number => {
-  exampleCases.forEach((c) => upsertCase(c));
+export const seedExampleCases = async (): Promise<number> => {
+  for (const c of exampleCases) {
+    await upsertCase(c);
+  }
   return exampleCases.length;
 };
 
-export const clearExampleCases = (): number => {
-  const all = listCases();
+export const clearExampleCases = async (): Promise<number> => {
+  const all = await listCases();
   const examples = all.filter((c) => c.id.startsWith(EXAMPLE_PREFIX));
-  examples.forEach((c) => deleteCase(c.id));
+  for (const c of examples) {
+    await deleteCase(c.id);
+  }
   return examples.length;
 };
 
-export const hasExampleCases = (): boolean =>
-  listCases().some((c) => c.id.startsWith(EXAMPLE_PREFIX));
+export const hasExampleCases = async (): Promise<boolean> => {
+  const all = await listCases();
+  return all.some((c) => c.id.startsWith(EXAMPLE_PREFIX));
+};

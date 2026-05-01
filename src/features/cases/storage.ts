@@ -211,7 +211,7 @@ export const upsertCase = async (record: CaseRecord): Promise<CaseRecord> => {
   const payload = recordToRow({ ...record, id: safeId });
   const { data, error } = await supabase
     .from("cases")
-    .upsert(payload, { onConflict: "id" })
+    .upsert([payload], { onConflict: "id" })
     .select()
     .single();
   if (error) throw error;
