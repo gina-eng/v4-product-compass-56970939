@@ -1,77 +1,116 @@
-import { MOCK_CONSULTANTS } from "./mock";
+import { supabase } from "@/integrations/supabase/client";
 import type { Consultant } from "./types";
 
-const STORAGE_KEY = "v4-consultants-v1";
-const SEEDED_KEY = "v4-consultants-seeded-v1";
+type ConsultantRow = {
+  id: string;
+  name: string;
+  headline: string;
+  photo_url: string | null;
+  unit: string | null;
+  city: string;
+  state: string;
+  email: string;
+  linkedin_url: string;
+  primary_sector: string;
+  secondary_sector: string | null;
+  professional_profile: string;
+  pains_tackled: string;
+  value_areas: string;
+  highlight_projects: string;
+  competencies: string;
+  education: string;
+  languages: string;
+};
 
-const safeParse = (raw: string | null): Consultant[] => {
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed as Consultant[];
-  } catch {
+const rowToConsultant = (row: ConsultantRow): Consultant => ({
+  id: row.id,
+  name: row.name,
+  headline: row.headline ?? "",
+  photoUrl: row.photo_url ?? "",
+  unit: row.unit ?? "",
+  city: row.city ?? "",
+  state: row.state ?? "",
+  email: row.email ?? "",
+  linkedinUrl: row.linkedin_url ?? "",
+  primarySector: row.primary_sector ?? "",
+  secondarySector: row.secondary_sector ?? "",
+  professionalProfile: row.professional_profile ?? "",
+  painsTackled: row.pains_tackled ?? "",
+  valueAreas: row.value_areas ?? "",
+  highlightProjects: row.highlight_projects ?? "",
+  competencies: row.competencies ?? "",
+  education: row.education ?? "",
+  languages: row.languages ?? "",
+});
+
+const consultantToRow = (c: Consultant): Omit<ConsultantRow, "id"> & { id?: string } => ({
+  ...(c.id ? { id: c.id } : {}),
+  name: c.name,
+  headline: c.headline,
+  photo_url: c.photoUrl?.trim() || null,
+  unit: c.unit?.trim() || null,
+  city: c.city,
+  state: c.state,
+  email: c.email,
+  linkedin_url: c.linkedinUrl,
+  primary_sector: c.primarySector,
+  secondary_sector: c.secondarySector?.trim() || null,
+  professional_profile: c.professionalProfile,
+  pains_tackled: c.painsTackled,
+  value_areas: c.valueAreas,
+  highlight_projects: c.highlightProjects,
+  competencies: c.competencies,
+  education: c.education,
+  languages: c.languages,
+});
+
+export const listConsultants = async (): Promise<Consultant[]> => {
+  const { data, error } = await supabase
+    .from("consultants")
+    .select("*")
+    .order("name", { ascending: true });
+  if (error) {
+    console.error("Erro ao listar consultores:", error);
     return [];
   }
+  return (data as ConsultantRow[]).map(rowToConsultant);
 };
 
-const seedIfNeeded = (): void => {
-  if (typeof window === "undefined") return;
-  if (window.localStorage.getItem(SEEDED_KEY)) return;
-  if (window.localStorage.getItem(STORAGE_KEY)) {
-    window.localStorage.setItem(SEEDED_KEY, "1");
-    return;
+export const getConsultant = async (id: string): Promise<Consultant | undefined> => {
+  const { data, error } = await supabase
+    .from("consultants")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) {
+    console.error("Erro ao buscar consultor:", error);
+    return undefined;
   }
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_CONSULTANTS));
-  window.localStorage.setItem(SEEDED_KEY, "1");
+  return data ? rowToConsultant(data as ConsultantRow) : undefined;
 };
 
-export const listConsultants = (): Consultant[] => {
-  if (typeof window === "undefined") return [];
-  seedIfNeeded();
-  return safeParse(window.localStorage.getItem(STORAGE_KEY));
-};
-
-export const getConsultant = (id: string): Consultant | undefined =>
-  listConsultants().find((c) => c.id === id);
-
-export const upsertConsultant = (record: Consultant): Consultant => {
-  const all = listConsultants();
-  const index = all.findIndex((c) => c.id === record.id);
-  if (index >= 0) {
-    all[index] = record;
-  } else {
-    all.unshift(record);
+export const upsertConsultant = async (record: Consultant): Promise<Consultant> => {
+  const payload = consultantToRow(record);
+  if (record.id) {
+    const { data, error } = await supabase
+      .from("consultants")
+      .update(payload)
+      .eq("id", record.id)
+      .select()
+      .single();
+    if (error) throw error;
+    return rowToConsultant(data as ConsultantRow);
   }
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  return record;
+  const { data, error } = await supabase
+    .from("consultants")
+    .insert(payload)
+    .select()
+    .single();
+  if (error) throw error;
+  return rowToConsultant(data as ConsultantRow);
 };
 
-export const deleteConsultant = (id: string): void => {
-  const all = listConsultants().filter((c) => c.id !== id);
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-};
-
-export const resetToMock = (): void => {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_CONSULTANTS));
-  window.localStorage.setItem(SEEDED_KEY, "1");
-};
-
-export const slugify = (input: string): string =>
-  input
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 60) || `consultor-${Date.now()}`;
-
-export const generateConsultantId = (name: string): string => {
-  const base = slugify(name);
-  const all = listConsultants();
-  const taken = new Set(all.map((c) => c.id));
-  if (!taken.has(base)) return base;
-  let i = 2;
-  while (taken.has(`${base}-${i}`)) i += 1;
-  return `${base}-${i}`;
+export const deleteConsultant = async (id: string): Promise<void> => {
+  const { error } = await supabase.from("consultants").delete().eq("id", id);
+  if (error) throw error;
 };

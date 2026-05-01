@@ -4,7 +4,6 @@ export interface Consultant {
   headline: string;
   city: string;
   state: string;
-  phone: string;
   email: string;
   linkedinUrl: string;
   photoUrl?: string;
