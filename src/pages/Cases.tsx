@@ -600,17 +600,6 @@ const Cases = () => {
             </p>
           </div>
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            <div className="flex justify-end">
-              {exampleLoaded ? (
-                <Button variant="ghost" size="sm" onClick={handleClearExamples}>
-                  <Eraser className="mr-1.5 h-3.5 w-3.5" /> Limpar exemplos
-                </Button>
-              ) : (
-                <Button variant="ghost" size="sm" onClick={handleSeed}>
-                  <FlaskConical className="mr-1.5 h-3.5 w-3.5" /> Carregar exemplos
-                </Button>
-              )}
-            </div>
             <div className="flex flex-wrap justify-end gap-2">
               <Button asChild variant="outline" size="default">
                 <a
