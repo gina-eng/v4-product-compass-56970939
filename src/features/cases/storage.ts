@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import type {
   CaseRecord,
   ChannelInvestment,
@@ -15,8 +16,6 @@ import type {
   SalesModel,
   V4Product,
 } from "./options";
-
-type Json = unknown;
 
 interface CaseRow {
   id: string;
