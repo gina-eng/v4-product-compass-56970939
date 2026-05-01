@@ -60,7 +60,7 @@ const CaseForm = () => {
       }
 
       if (id) {
-        const existing = getCase(id);
+        const existing = await getCase(id);
         if (existing) {
           setRecord(existing);
           return;
@@ -75,8 +75,7 @@ const CaseForm = () => {
     if (!record.ownerEmail) return;
     if (submitted) return;
     const handle = window.setTimeout(() => {
-      const saved = upsertCase(record);
-      setLastSavedAt(saved.updatedAt);
+      void upsertCase(record).then((saved) => setLastSavedAt(saved.updatedAt)).catch((err) => console.error("Erro ao auto-salvar:", err));
     }, 600);
     return () => window.clearTimeout(handle);
   }, [record, submitted]);
@@ -137,13 +136,14 @@ const CaseForm = () => {
     goToStep(record.currentStep + 1);
   };
 
-  const handleSaveDraft = () => {
-    const saved = upsertCase({ ...record, status: "rascunho" });
-    setLastSavedAt(saved.updatedAt);
-    toast({
-      title: "Rascunho salvo",
-      description: "Você pode retomar este case a qualquer momento.",
-    });
+  const handleSaveDraft = async () => {
+    try {
+      const saved = await upsertCase({ ...record, status: "rascunho" });
+      setLastSavedAt(saved.updatedAt);
+      toast({ title: "Rascunho salvo", description: "Você pode retomar este case a qualquer momento." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao salvar", description: err instanceof Error ? err.message : "" });
+    }
   };
 
   const handleSubmit = () => {
