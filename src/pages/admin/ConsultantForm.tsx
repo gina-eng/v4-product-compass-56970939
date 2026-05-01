@@ -295,18 +295,6 @@ const ConsultantFormPage = () => {
                   />
                 </Field>
 
-                <Field
-                  label="Telefone (com DDD)"
-                  required
-                  error={errors.phone}
-                  hint="Será usado pra montar o link wa.me/55…"
-                >
-                  <Input
-                    value={form.phone}
-                    onChange={(e) => update("phone", e.target.value)}
-                    placeholder="(11) 97222-1762"
-                  />
-                </Field>
 
                 <Field
                   label="URL do LinkedIn"

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -17,6 +18,7 @@ import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getConsultant } from "@/features/consultants/storage";
+import type { Consultant } from "@/features/consultants/types";
 import { cn } from "@/lib/utils";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (

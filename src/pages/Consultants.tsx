@@ -124,7 +124,7 @@ const Consultants = () => {
   const [consultants, setConsultants] = useState<Consultant[]>([]);
 
   useEffect(() => {
-    setConsultants(listConsultants());
+    void listConsultants().then(setConsultants);
   }, []);
 
   const unitOptions = useMemo(() => {
