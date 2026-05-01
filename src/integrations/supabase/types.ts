@@ -47,6 +47,225 @@ export type Database = {
         }
         Relationships: []
       }
+      cases: {
+        Row: {
+          attributed_revenue: string
+          client_city: string
+          client_cnpj: string
+          client_name: string
+          client_state: string
+          client_status: string
+          collaborators: Json
+          created_at: string
+          current_step: number
+          dashboard_url: string
+          executar_channels: Json
+          executar_creatives: Json
+          executar_creatives_communication: string
+          executar_professionals: Json
+          executar_strategies: Json
+          final_notes: string
+          id: string
+          initial_challenges: Json
+          initial_challenges_other: string
+          media_investment: string
+          nicho: string
+          operation_reach: string
+          owner_email: string
+          owner_user_id: string | null
+          potencializar_indicator: string
+          potencializar_value_model: string
+          presentation_url: string
+          previous_attempt: string
+          previous_failure_reason: string
+          primary_driver: string
+          primary_metrics: Json
+          problem: string
+          products: Json
+          restrictions: Json
+          restrictions_other: string
+          root_cause: string
+          saber_directions: Json
+          saber_execution: string
+          sales_model: string
+          secondary_metrics: Json
+          segment: string
+          status: string
+          ter_value_perception: string
+          testimonial_url: string
+          time_to_result: string
+          updated_at: string
+          v4_unit: string
+        }
+        Insert: {
+          attributed_revenue?: string
+          client_city?: string
+          client_cnpj?: string
+          client_name?: string
+          client_state?: string
+          client_status?: string
+          collaborators?: Json
+          created_at?: string
+          current_step?: number
+          dashboard_url?: string
+          executar_channels?: Json
+          executar_creatives?: Json
+          executar_creatives_communication?: string
+          executar_professionals?: Json
+          executar_strategies?: Json
+          final_notes?: string
+          id?: string
+          initial_challenges?: Json
+          initial_challenges_other?: string
+          media_investment?: string
+          nicho?: string
+          operation_reach?: string
+          owner_email?: string
+          owner_user_id?: string | null
+          potencializar_indicator?: string
+          potencializar_value_model?: string
+          presentation_url?: string
+          previous_attempt?: string
+          previous_failure_reason?: string
+          primary_driver?: string
+          primary_metrics?: Json
+          problem?: string
+          products?: Json
+          restrictions?: Json
+          restrictions_other?: string
+          root_cause?: string
+          saber_directions?: Json
+          saber_execution?: string
+          sales_model?: string
+          secondary_metrics?: Json
+          segment?: string
+          status?: string
+          ter_value_perception?: string
+          testimonial_url?: string
+          time_to_result?: string
+          updated_at?: string
+          v4_unit?: string
+        }
+        Update: {
+          attributed_revenue?: string
+          client_city?: string
+          client_cnpj?: string
+          client_name?: string
+          client_state?: string
+          client_status?: string
+          collaborators?: Json
+          created_at?: string
+          current_step?: number
+          dashboard_url?: string
+          executar_channels?: Json
+          executar_creatives?: Json
+          executar_creatives_communication?: string
+          executar_professionals?: Json
+          executar_strategies?: Json
+          final_notes?: string
+          id?: string
+          initial_challenges?: Json
+          initial_challenges_other?: string
+          media_investment?: string
+          nicho?: string
+          operation_reach?: string
+          owner_email?: string
+          owner_user_id?: string | null
+          potencializar_indicator?: string
+          potencializar_value_model?: string
+          presentation_url?: string
+          previous_attempt?: string
+          previous_failure_reason?: string
+          primary_driver?: string
+          primary_metrics?: Json
+          problem?: string
+          products?: Json
+          restrictions?: Json
+          restrictions_other?: string
+          root_cause?: string
+          saber_directions?: Json
+          saber_execution?: string
+          sales_model?: string
+          secondary_metrics?: Json
+          segment?: string
+          status?: string
+          ter_value_perception?: string
+          testimonial_url?: string
+          time_to_result?: string
+          updated_at?: string
+          v4_unit?: string
+        }
+        Relationships: []
+      }
+      consultants: {
+        Row: {
+          city: string
+          competencies: string
+          created_at: string
+          education: string
+          email: string
+          headline: string
+          highlight_projects: string
+          id: string
+          languages: string
+          linkedin_url: string
+          name: string
+          pains_tackled: string
+          photo_url: string | null
+          primary_sector: string
+          professional_profile: string
+          secondary_sector: string | null
+          state: string
+          unit: string | null
+          updated_at: string
+          value_areas: string
+        }
+        Insert: {
+          city?: string
+          competencies?: string
+          created_at?: string
+          education?: string
+          email?: string
+          headline?: string
+          highlight_projects?: string
+          id?: string
+          languages?: string
+          linkedin_url?: string
+          name: string
+          pains_tackled?: string
+          photo_url?: string | null
+          primary_sector?: string
+          professional_profile?: string
+          secondary_sector?: string | null
+          state?: string
+          unit?: string | null
+          updated_at?: string
+          value_areas?: string
+        }
+        Update: {
+          city?: string
+          competencies?: string
+          created_at?: string
+          education?: string
+          email?: string
+          headline?: string
+          highlight_projects?: string
+          id?: string
+          languages?: string
+          linkedin_url?: string
+          name?: string
+          pains_tackled?: string
+          photo_url?: string | null
+          primary_sector?: string
+          professional_profile?: string
+          secondary_sector?: string | null
+          state?: string
+          unit?: string | null
+          updated_at?: string
+          value_areas?: string
+        }
+        Relationships: []
+      }
       org_members: {
         Row: {
           created_at: string
