@@ -599,8 +599,8 @@ export type Database = {
       admin_upsert_external_login_users: {
         Args: {
           p_emails: string[]
-          p_group_id?: string | null
-          p_group_note?: string | null
+          p_group_id?: string
+          p_group_note?: string
           p_notes?: string[]
           p_password?: string
         }
@@ -609,7 +609,16 @@ export type Database = {
           email: string
         }[]
       }
+      crypt: { Args: { password: string; salt: string }; Returns: string }
+      gen_salt:
+        | { Args: { algorithm: string }; Returns: string }
+        | { Args: { algorithm: string; rounds: number }; Returns: string }
+      is_allowed_portfolio_email: {
+        Args: { target_email: string }
+        Returns: boolean
+      }
       is_internal_user: { Args: never; Returns: boolean }
+      is_v4_email: { Args: never; Returns: boolean }
     }
     Enums: {
       categoria_produto:
