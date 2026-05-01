@@ -21,6 +21,7 @@ import {
   upsertConsultant,
 } from "@/features/consultants/storage";
 import type { Consultant } from "@/features/consultants/types";
+import { listUnits, type V4Unit } from "@/features/units/storage";
 
 const EMPTY: Consultant = {
   id: "",
@@ -105,6 +106,11 @@ const ConsultantFormPage = () => {
 
   const [form, setForm] = useState<Consultant>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof Consultant, string>>>({});
+  const [units, setUnits] = useState<V4Unit[]>([]);
+
+  useEffect(() => {
+    void listUnits().then(setUnits);
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -262,11 +268,25 @@ const ConsultantFormPage = () => {
                 </Field>
 
                 <Field label="Unidade" required error={errors.unit}>
-                  <Input
+                  <Select
                     value={form.unit ?? ""}
-                    onChange={(e) => update("unit", e.target.value)}
-                    placeholder="V4 Jundiaí"
-                  />
+                    onValueChange={(v) => update("unit", v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          units.length ? "Selecione a unidade" : "Nenhuma unidade cadastrada"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {units.map((u) => (
+                        <SelectItem key={u.id} value={u.name}>
+                          {u.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
 
                 <Field label="Cidade" required error={errors.city}>

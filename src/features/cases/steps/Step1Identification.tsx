@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,11 +14,11 @@ import { SearchableSelect } from "../components/SearchableSelect";
 import {
   BRAZIL_STATES,
   OPERATION_REACH_OPTIONS,
-  V4_UNITS_MOCK,
 } from "../options";
 import type { ClientStatus, OperationReach } from "../options";
 import type { CaseRecord } from "../types";
 import { formatCnpj } from "../format";
+import { listUnits } from "@/features/units/storage";
 
 const STATE_OPTIONS = BRAZIL_STATES.map((s) => s.label);
 const STATE_LABEL_TO_VALUE = Object.fromEntries(BRAZIL_STATES.map((s) => [s.label, s.value]));
@@ -30,6 +31,12 @@ interface StepProps {
 }
 
 export const Step1Identification = ({ record, errors, update }: StepProps) => {
+  const [unitOptions, setUnitOptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    void listUnits().then((rows) => setUnitOptions(rows.map((r) => r.name)));
+  }, []);
+
   const updateCollaborator = (index: number, value: string) => {
     const next = [...record.collaborators];
     next[index] = value;
@@ -61,9 +68,9 @@ export const Step1Identification = ({ record, errors, update }: StepProps) => {
         <FieldShell label="Unidade V4" required error={errors.v4Unit}>
           <SearchableSelect
             value={record.v4Unit}
-            options={V4_UNITS_MOCK}
+            options={unitOptions}
             onChange={(v) => update({ v4Unit: v })}
-            placeholder="Selecione a unidade"
+            placeholder={unitOptions.length ? "Selecione a unidade" : "Nenhuma unidade cadastrada"}
             searchPlaceholder="Buscar unidade..."
             emptyText="Nenhuma unidade encontrada."
           />
