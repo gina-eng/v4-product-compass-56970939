@@ -17,7 +17,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { SECTORS } from "@/features/consultants/options";
 import {
-  generateConsultantId,
   getConsultant,
   upsertConsultant,
 } from "@/features/consultants/storage";
@@ -29,7 +28,6 @@ const EMPTY: Consultant = {
   headline: "",
   city: "",
   state: "",
-  phone: "",
   email: "",
   linkedinUrl: "",
   photoUrl: "",
@@ -51,7 +49,6 @@ const REQUIRED_FIELDS: { key: keyof Consultant; label: string }[] = [
   { key: "city", label: "Cidade" },
   { key: "state", label: "Estado" },
   { key: "email", label: "E-mail" },
-  { key: "phone", label: "Telefone" },
   { key: "linkedinUrl", label: "LinkedIn" },
   { key: "photoUrl", label: "URL da foto" },
   { key: "unit", label: "Unidade" },
@@ -110,8 +107,11 @@ const ConsultantFormPage = () => {
   const [errors, setErrors] = useState<Partial<Record<keyof Consultant, string>>>({});
 
   useEffect(() => {
-    if (id) {
-      const existing = getConsultant(id);
+    if (!id) return;
+    let cancelled = false;
+    void (async () => {
+      const existing = await getConsultant(id);
+      if (cancelled) return;
       if (existing) {
         setForm({
           ...EMPTY,
@@ -128,7 +128,10 @@ const ConsultantFormPage = () => {
         });
         navigate("/admin/consultores");
       }
-    }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [id, navigate, toast]);
 
   const update = <K extends keyof Consultant>(key: K, value: Consultant[K]) => {
@@ -163,7 +166,7 @@ const ConsultantFormPage = () => {
     return Object.keys(next).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) {
       toast({
@@ -173,19 +176,26 @@ const ConsultantFormPage = () => {
       });
       return;
     }
-    const finalId = form.id || generateConsultantId(form.name);
-    const saved = upsertConsultant({
-      ...form,
-      id: finalId,
-      unit: form.unit?.trim() || undefined,
-      secondarySector: form.secondarySector?.trim() || undefined,
-      photoUrl: form.photoUrl?.trim() || undefined,
-    });
-    toast({
-      title: isEdit ? "Consultor atualizado" : "Consultor cadastrado",
-      description: saved.name,
-    });
-    navigate("/admin/consultores");
+    try {
+      const saved = await upsertConsultant({
+        ...form,
+        unit: form.unit?.trim() || undefined,
+        secondarySector: form.secondarySector?.trim() || undefined,
+        photoUrl: form.photoUrl?.trim() || undefined,
+      });
+      toast({
+        title: isEdit ? "Consultor atualizado" : "Consultor cadastrado",
+        description: saved.name,
+      });
+      navigate("/admin/consultores");
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Erro ao salvar consultor",
+        description: err instanceof Error ? err.message : "Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const photoPreview = useMemo(() => {
