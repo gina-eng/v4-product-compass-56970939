@@ -230,8 +230,7 @@ const CaseDetail = () => {
 
   useEffect(() => {
     if (!id) return;
-    const r = getCase(id);
-    setRecord(r ?? null);
+    void getCase(id).then((r) => setRecord(r ?? null));
   }, [id]);
 
   useEffect(() => {
@@ -274,11 +273,15 @@ const CaseDetail = () => {
     return null;
   }
 
-  const handleDelete = () => {
-    deleteCase(record.id);
-    setConfirmDelete(false);
-    toast({ title: "Case removido" });
-    navigate("/cases", { replace: true });
+  const handleDelete = async () => {
+    try {
+      await deleteCase(record.id);
+      setConfirmDelete(false);
+      toast({ title: "Case removido" });
+      navigate("/cases", { replace: true });
+    } catch (err) {
+      toast({ title: "Erro ao remover", description: err instanceof Error ? err.message : "", variant: "destructive" });
+    }
   };
 
   const roas = computeRoas(record.attributedRevenue, record.mediaInvestment);

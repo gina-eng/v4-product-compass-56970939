@@ -6,7 +6,7 @@ import {
   ExternalLink,
   Pencil,
   Plus,
-  RotateCcw,
+  
   Search,
   Trash2,
   Users,
@@ -29,7 +29,6 @@ import { useToast } from "@/hooks/use-toast";
 import {
   deleteConsultant,
   listConsultants,
-  resetToMock,
 } from "@/features/consultants/storage";
 import type { Consultant } from "@/features/consultants/types";
 
@@ -47,12 +46,14 @@ const ConsultantsAdmin = () => {
   const [consultants, setConsultants] = useState<Consultant[]>([]);
   const [search, setSearch] = useState("");
   const [pendingDelete, setPendingDelete] = useState<Consultant | null>(null);
-  const [confirmReset, setConfirmReset] = useState(false);
 
-  const refresh = () => setConsultants(listConsultants());
+  const refresh = async () => {
+    const list = await listConsultants();
+    setConsultants(list);
+  };
 
   useEffect(() => {
-    refresh();
+    void refresh();
   }, []);
 
   const filtered = useMemo(() => {
@@ -75,22 +76,21 @@ const ConsultantsAdmin = () => {
     );
   }, [consultants, search]);
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!pendingDelete) return;
-    deleteConsultant(pendingDelete.id);
-    toast({ title: "Consultor removido", description: pendingDelete.name });
-    setPendingDelete(null);
-    refresh();
-  };
-
-  const handleReset = () => {
-    resetToMock();
-    setConfirmReset(false);
-    refresh();
-    toast({
-      title: "Base restaurada",
-      description: "Os consultores de exemplo foram recarregados.",
-    });
+    try {
+      await deleteConsultant(pendingDelete.id);
+      toast({ title: "Consultor removido", description: pendingDelete.name });
+      setPendingDelete(null);
+      await refresh();
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Erro ao remover consultor",
+        description: err instanceof Error ? err.message : "Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -116,9 +116,6 @@ const ConsultantsAdmin = () => {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setConfirmReset(true)}>
-              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Restaurar exemplos
-            </Button>
             <Button asChild>
               <Link to="/admin/consultores/novo">
                 <Plus className="mr-1.5 h-4 w-4" /> Novo consultor
@@ -266,22 +263,6 @@ const ConsultantsAdmin = () => {
             >
               Excluir
             </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Restaurar consultores de exemplo?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Todos os cadastros atuais serão substituídos pelos 7 consultores de
-              exemplo. Use isso apenas em ambiente de testes.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleReset}>Restaurar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
