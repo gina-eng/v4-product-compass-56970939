@@ -29,7 +29,6 @@ import { useToast } from "@/hooks/use-toast";
 import {
   deleteConsultant,
   listConsultants,
-  resetToMock,
 } from "@/features/consultants/storage";
 import type { Consultant } from "@/features/consultants/types";
 
@@ -47,12 +46,14 @@ const ConsultantsAdmin = () => {
   const [consultants, setConsultants] = useState<Consultant[]>([]);
   const [search, setSearch] = useState("");
   const [pendingDelete, setPendingDelete] = useState<Consultant | null>(null);
-  const [confirmReset, setConfirmReset] = useState(false);
 
-  const refresh = () => setConsultants(listConsultants());
+  const refresh = async () => {
+    const list = await listConsultants();
+    setConsultants(list);
+  };
 
   useEffect(() => {
-    refresh();
+    void refresh();
   }, []);
 
   const filtered = useMemo(() => {
