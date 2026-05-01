@@ -290,12 +290,11 @@ const Cases = () => {
     void sync();
   }, []);
 
-  const [exampleLoaded, setExampleLoaded] = useState(false);
+  const [exampleLoaded] = useState(false);
 
   const refresh = async () => {
     const list = await listCases();
     setCases(list);
-    setExampleLoaded(list.some((c) => c.id.startsWith("example-")));
   };
 
   useEffect(() => {
