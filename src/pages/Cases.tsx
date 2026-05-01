@@ -46,11 +46,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { LOCAL_PREVIEW_EMAIL, isLocalPreviewAuthEnabled } from "@/lib/auth";
 import { clearAllDrafts, deleteCase, listCases } from "@/features/cases/storage";
 import { fuzzyMatch } from "@/features/cases/search";
-import {
-  clearExampleCases,
-  hasExampleCases,
-  seedExampleCases,
-} from "@/features/cases/seed";
 import type { CaseRecord } from "@/features/cases/types";
 import {
   computeVariation,
