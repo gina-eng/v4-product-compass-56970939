@@ -295,10 +295,16 @@ const Cases = () => {
     void sync();
   }, []);
 
-  const refresh = () => setCases(listCases());
+  const [exampleLoaded, setExampleLoaded] = useState(false);
+
+  const refresh = async () => {
+    const list = await listCases();
+    setCases(list);
+    setExampleLoaded(list.some((c) => c.id.startsWith("example-")));
+  };
 
   useEffect(() => {
-    refresh();
+    void refresh();
   }, []);
 
   const toggleProduct = (product: V4Product) => {
@@ -438,29 +444,36 @@ const Cases = () => {
     };
   }, [cases, myEmailLower]);
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!pendingDelete) return;
-    deleteCase(pendingDelete);
-    setPendingDelete(null);
-    refresh();
-    toast({ title: "Case removido" });
+    try {
+      await deleteCase(pendingDelete);
+      setPendingDelete(null);
+      await refresh();
+      toast({ title: "Case removido" });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao remover", description: err instanceof Error ? err.message : "" });
+    }
   };
 
-  const exampleLoaded = hasExampleCases();
-
-  const handleSeed = () => {
-    const count = seedExampleCases();
-    refresh();
-    toast({
-      title: `${count} cases de exemplo carregados`,
-      description: "Use para visualizar a experiência com a base populada.",
-    });
+  const handleSeed = async () => {
+    try {
+      const count = await seedExampleCases();
+      await refresh();
+      toast({ title: `${count} cases de exemplo carregados`, description: "Use para visualizar a experiência com a base populada." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao carregar exemplos", description: err instanceof Error ? err.message : "" });
+    }
   };
 
-  const handleClearExamples = () => {
-    const count = clearExampleCases();
-    refresh();
-    toast({ title: `${count} exemplos removidos` });
+  const handleClearExamples = async () => {
+    try {
+      const count = await clearExampleCases();
+      await refresh();
+      toast({ title: `${count} exemplos removidos` });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao remover exemplos", description: err instanceof Error ? err.message : "" });
+    }
   };
 
   const renderFiltersBar = () => (
@@ -844,13 +857,17 @@ const Cases = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                const count = clearAllDrafts();
-                setConfirmClearDrafts(false);
-                refresh();
-                toast({
-                  title: count === 0 ? "Nenhum rascunho encontrado" : `${count} ${count === 1 ? "rascunho removido" : "rascunhos removidos"}`,
-                });
+              onClick={async () => {
+                try {
+                  const count = await clearAllDrafts();
+                  setConfirmClearDrafts(false);
+                  await refresh();
+                  toast({
+                    title: count === 0 ? "Nenhum rascunho encontrado" : `${count} ${count === 1 ? "rascunho removido" : "rascunhos removidos"}`,
+                  });
+                } catch (err) {
+                  toast({ variant: "destructive", title: "Erro ao limpar rascunhos", description: err instanceof Error ? err.message : "" });
+                }
               }}
               className="bg-destructive hover:bg-destructive/90"
             >
