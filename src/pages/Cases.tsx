@@ -662,18 +662,13 @@ const Cases = () => {
                 <EmptyState
                   icon={Compass}
                   title="Nenhum case publicado ainda"
-                  description="Quando os primeiros cases forem registrados pelas unidades, eles aparecerão aqui pra todo mundo explorar. Para visualizar como será a experiência, carregue exemplos."
+                  description="Quando os primeiros cases forem registrados pelas unidades, eles aparecerão aqui pra todo mundo explorar."
                   cta={
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      <Button size="sm" variant="outline" onClick={handleSeed}>
-                        <FlaskConical className="mr-1.5 h-3.5 w-3.5" /> Carregar exemplos
-                      </Button>
-                      <Button asChild size="sm">
-                        <Link to="/cases/novo">
-                          <Plus className="mr-1.5 h-4 w-4" /> Registrar primeiro case
-                        </Link>
-                      </Button>
-                    </div>
+                    <Button asChild size="sm">
+                      <Link to="/cases/novo">
+                        <Plus className="mr-1.5 h-4 w-4" /> Registrar primeiro case
+                      </Link>
+                    </Button>
                   }
                 />
               )
