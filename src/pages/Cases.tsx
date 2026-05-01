@@ -46,11 +46,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { LOCAL_PREVIEW_EMAIL, isLocalPreviewAuthEnabled } from "@/lib/auth";
 import { clearAllDrafts, deleteCase, listCases } from "@/features/cases/storage";
 import { fuzzyMatch } from "@/features/cases/search";
-import {
-  clearExampleCases,
-  hasExampleCases,
-  seedExampleCases,
-} from "@/features/cases/seed";
 import type { CaseRecord } from "@/features/cases/types";
 import {
   computeVariation,
@@ -295,12 +290,11 @@ const Cases = () => {
     void sync();
   }, []);
 
-  const [exampleLoaded, setExampleLoaded] = useState(false);
+  const [exampleLoaded] = useState(false);
 
   const refresh = async () => {
     const list = await listCases();
     setCases(list);
-    setExampleLoaded(list.some((c) => c.id.startsWith("example-")));
   };
 
   useEffect(() => {
@@ -456,25 +450,6 @@ const Cases = () => {
     }
   };
 
-  const handleSeed = async () => {
-    try {
-      const count = await seedExampleCases();
-      await refresh();
-      toast({ title: `${count} cases de exemplo carregados`, description: "Use para visualizar a experiência com a base populada." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao carregar exemplos", description: err instanceof Error ? err.message : "" });
-    }
-  };
-
-  const handleClearExamples = async () => {
-    try {
-      const count = await clearExampleCases();
-      await refresh();
-      toast({ title: `${count} exemplos removidos` });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao remover exemplos", description: err instanceof Error ? err.message : "" });
-    }
-  };
 
   const renderFiltersBar = () => (
     <div className="space-y-3 rounded-2xl border border-border/70 bg-card p-4 shadow-sm">
@@ -625,17 +600,6 @@ const Cases = () => {
             </p>
           </div>
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            <div className="flex justify-end">
-              {exampleLoaded ? (
-                <Button variant="ghost" size="sm" onClick={handleClearExamples}>
-                  <Eraser className="mr-1.5 h-3.5 w-3.5" /> Limpar exemplos
-                </Button>
-              ) : (
-                <Button variant="ghost" size="sm" onClick={handleSeed}>
-                  <FlaskConical className="mr-1.5 h-3.5 w-3.5" /> Carregar exemplos
-                </Button>
-              )}
-            </div>
             <div className="flex flex-wrap justify-end gap-2">
               <Button asChild variant="outline" size="default">
                 <a
@@ -698,18 +662,13 @@ const Cases = () => {
                 <EmptyState
                   icon={Compass}
                   title="Nenhum case publicado ainda"
-                  description="Quando os primeiros cases forem registrados pelas unidades, eles aparecerão aqui pra todo mundo explorar. Para visualizar como será a experiência, carregue exemplos."
+                  description="Quando os primeiros cases forem registrados pelas unidades, eles aparecerão aqui pra todo mundo explorar."
                   cta={
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      <Button size="sm" variant="outline" onClick={handleSeed}>
-                        <FlaskConical className="mr-1.5 h-3.5 w-3.5" /> Carregar exemplos
-                      </Button>
-                      <Button asChild size="sm">
-                        <Link to="/cases/novo">
-                          <Plus className="mr-1.5 h-4 w-4" /> Registrar primeiro case
-                        </Link>
-                      </Button>
-                    </div>
+                    <Button asChild size="sm">
+                      <Link to="/cases/novo">
+                        <Plus className="mr-1.5 h-4 w-4" /> Registrar primeiro case
+                      </Link>
+                    </Button>
                   }
                 />
               )
