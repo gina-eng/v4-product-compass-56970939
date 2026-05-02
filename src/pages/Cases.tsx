@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   AlertCircle,
+  BarChart3,
   Compass,
   Eraser,
   FileSpreadsheet,
@@ -46,6 +47,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LOCAL_PREVIEW_EMAIL, isLocalPreviewAuthEnabled } from "@/lib/auth";
 import { clearAllDrafts, deleteCase, listCases } from "@/features/cases/storage";
 import { fuzzyMatch } from "@/features/cases/search";
+import { CasesRanking } from "@/features/cases/components/CasesRanking";
 import type { CaseRecord } from "@/features/cases/types";
 import {
   computeVariation,
@@ -638,6 +640,10 @@ const Cases = () => {
                 <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
               )}
             </TabsTrigger>
+            <TabsTrigger value="ranking">
+              <BarChart3 className="mr-1.5 h-3.5 w-3.5" />
+              Ranking
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="explorar" className="space-y-4">
@@ -786,6 +792,10 @@ const Cases = () => {
                 </div>
               </>
             )}
+          </TabsContent>
+
+          <TabsContent value="ranking" className="space-y-4">
+            <CasesRanking cases={cases} />
           </TabsContent>
         </Tabs>
       </section>
