@@ -418,7 +418,6 @@ const CaseDetail = () => {
         <SectionShell title="Identificação">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Cliente" value={record.clientName} />
-            <Field label="CNPJ" value={record.clientCnpj} />
             <Field
               label="Status do cliente"
               value={record.clientStatus === "ativo" ? "Ativo" : record.clientStatus === "inativo" ? "Inativo" : ""}

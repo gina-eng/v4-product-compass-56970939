@@ -601,14 +601,18 @@ const Cases = () => {
           </div>
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
             <div className="flex flex-wrap justify-end gap-2">
-              <Button asChild variant="outline" size="default">
-                <a
-                  href="https://chat.google.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <GoogleChatIcon className="mr-1.5 h-4 w-4" /> Conversar com Zyman AI
-                </a>
+              <Button
+                variant="outline"
+                size="default"
+                disabled
+                aria-disabled="true"
+                title="Em breve"
+              >
+                <GoogleChatIcon className="mr-1.5 h-4 w-4" />
+                Conversar com Zyman AI
+                <span className="ml-2 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+                  Em breve
+                </span>
               </Button>
               <Button asChild size="default">
                 <Link to="/cases/novo">
