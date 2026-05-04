@@ -320,41 +320,43 @@ const ConsultantDetail = () => {
         </Section>
 
         <Section icon={Briefcase} title="Experiência Setorial">
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-baseline gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                  Setor principal
-                </span>
-                <span className="text-sm font-semibold text-primary">
-                  {consultant.primarySector}
-                </span>
-              </div>
-              {consultant.primarySectorExperience ? (
-                <RichText text={consultant.primarySectorExperience} />
-              ) : (
-                <p className="text-sm italic text-muted-foreground/70">
-                  Descrição da experiência ainda não preenchida.
-                </p>
-              )}
-            </div>
-            {consultant.secondarySector && (
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                    Setor complementar
-                  </span>
-                  <span className="text-sm font-semibold text-foreground">
-                    {consultant.secondarySector}
-                  </span>
-                </div>
-                {consultant.secondarySectorExperience ? (
-                  <RichText text={consultant.secondarySectorExperience} />
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-5 shadow-sm">
+              <div className="absolute inset-y-0 left-0 w-1 bg-primary" />
+              <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-primary">
+                Setor principal
+              </span>
+              <h3 className="mt-2 text-xl font-bold leading-tight text-primary md:text-2xl">
+                {consultant.primarySector}
+              </h3>
+              <div className="mt-3 border-t border-primary/15 pt-3">
+                {consultant.primarySectorExperience ? (
+                  <RichText text={consultant.primarySectorExperience} />
                 ) : (
                   <p className="text-sm italic text-muted-foreground/70">
                     Descrição da experiência ainda não preenchida.
                   </p>
                 )}
+              </div>
+            </div>
+            {consultant.secondarySector && (
+              <div className="relative overflow-hidden rounded-xl border border-border bg-muted/30 p-5 shadow-sm">
+                <div className="absolute inset-y-0 left-0 w-1 bg-foreground/40" />
+                <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                  Setor complementar
+                </span>
+                <h3 className="mt-2 text-xl font-bold leading-tight text-foreground md:text-2xl">
+                  {consultant.secondarySector}
+                </h3>
+                <div className="mt-3 border-t border-border pt-3">
+                  {consultant.secondarySectorExperience ? (
+                    <RichText text={consultant.secondarySectorExperience} />
+                  ) : (
+                    <p className="text-sm italic text-muted-foreground/70">
+                      Descrição da experiência ainda não preenchida.
+                    </p>
+                  )}
+                </div>
               </div>
             )}
           </div>

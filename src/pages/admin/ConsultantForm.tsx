@@ -16,6 +16,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { SECTORS } from "@/features/consultants/options";
+import { SearchableSelect } from "@/features/cases/components/SearchableSelect";
 import {
   getConsultant,
   upsertConsultant,
@@ -276,25 +277,19 @@ const ConsultantFormPage = () => {
                 </Field>
 
                 <Field label="Unidade" required error={errors.unit}>
-                  <Select
+                  <SearchableSelect
                     value={form.unit ?? ""}
-                    onValueChange={(v) => update("unit", v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={
-                          units.length ? "Selecione a unidade" : "Nenhuma unidade cadastrada"
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {units.map((u) => (
-                        <SelectItem key={u.id} value={u.name}>
-                          {u.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    options={units.map((u) => u.name)}
+                    onChange={(v) => update("unit", v)}
+                    placeholder={
+                      units.length
+                        ? "Selecione a unidade"
+                        : "Nenhuma unidade cadastrada"
+                    }
+                    searchPlaceholder="Buscar unidade..."
+                    emptyText="Nenhuma unidade encontrada."
+                    allowClear={false}
+                  />
                 </Field>
 
                 <Field label="Cidade" required error={errors.city}>

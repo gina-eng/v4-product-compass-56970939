@@ -19,6 +19,7 @@ interface SearchableSelectProps {
   placeholder?: string;
   searchPlaceholder?: string;
   emptyText?: string;
+  allowClear?: boolean;
 }
 
 export const SearchableSelect = ({
@@ -28,6 +29,7 @@ export const SearchableSelect = ({
   placeholder = "Selecione",
   searchPlaceholder = "Buscar...",
   emptyText = "Nenhum resultado.",
+  allowClear = true,
 }: SearchableSelectProps) => {
   const [open, setOpen] = useState(false);
 
@@ -64,7 +66,11 @@ export const SearchableSelect = ({
                     key={option}
                     value={option}
                     onSelect={() => {
-                      onChange(option === value ? "" : option);
+                      if (option === value) {
+                        if (allowClear) onChange("");
+                      } else {
+                        onChange(option);
+                      }
                       setOpen(false);
                     }}
                   >
