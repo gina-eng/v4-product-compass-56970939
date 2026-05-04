@@ -319,6 +319,47 @@ const ConsultantDetail = () => {
           <RichText text={consultant.professionalProfile} />
         </Section>
 
+        <Section icon={Briefcase} title="Experiência Setorial">
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-baseline gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                  Setor principal
+                </span>
+                <span className="text-sm font-semibold text-primary">
+                  {consultant.primarySector}
+                </span>
+              </div>
+              {consultant.primarySectorExperience ? (
+                <RichText text={consultant.primarySectorExperience} />
+              ) : (
+                <p className="text-sm italic text-muted-foreground/70">
+                  Descrição da experiência ainda não preenchida.
+                </p>
+              )}
+            </div>
+            {consultant.secondarySector && (
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                    Setor complementar
+                  </span>
+                  <span className="text-sm font-semibold text-foreground">
+                    {consultant.secondarySector}
+                  </span>
+                </div>
+                {consultant.secondarySectorExperience ? (
+                  <RichText text={consultant.secondarySectorExperience} />
+                ) : (
+                  <p className="text-sm italic text-muted-foreground/70">
+                    Descrição da experiência ainda não preenchida.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </Section>
+
         <Section icon={Sparkles} title="Projetos Destaque">
           <RichText text={consultant.highlightProjects} />
         </Section>

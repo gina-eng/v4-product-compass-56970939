@@ -12,7 +12,9 @@ type ConsultantRow = {
   email: string;
   linkedin_url: string;
   primary_sector: string;
+  primary_sector_experience: string | null;
   secondary_sector: string | null;
+  secondary_sector_experience: string | null;
   professional_profile: string;
   pains_tackled: string;
   value_areas: string;
@@ -33,7 +35,9 @@ const rowToConsultant = (row: ConsultantRow): Consultant => ({
   email: row.email ?? "",
   linkedinUrl: row.linkedin_url ?? "",
   primarySector: row.primary_sector ?? "",
+  primarySectorExperience: row.primary_sector_experience ?? "",
   secondarySector: row.secondary_sector ?? "",
+  secondarySectorExperience: row.secondary_sector_experience ?? "",
   professionalProfile: row.professional_profile ?? "",
   painsTackled: row.pains_tackled ?? "",
   valueAreas: row.value_areas ?? "",
@@ -54,7 +58,9 @@ const consultantToRow = (c: Consultant): Omit<ConsultantRow, "id"> & { id?: stri
   email: c.email,
   linkedin_url: c.linkedinUrl,
   primary_sector: c.primarySector,
+  primary_sector_experience: c.primarySectorExperience?.trim() || null,
   secondary_sector: c.secondarySector?.trim() || null,
+  secondary_sector_experience: c.secondarySectorExperience?.trim() || null,
   professional_profile: c.professionalProfile,
   pains_tackled: c.painsTackled,
   value_areas: c.valueAreas,

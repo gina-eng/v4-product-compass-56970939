@@ -11,7 +11,9 @@ export interface Consultant {
   unit?: string;
 
   primarySector: string;
+  primarySectorExperience: string;
   secondarySector?: string;
+  secondarySectorExperience?: string;
 
   professionalProfile: string;
   painsTackled: string;

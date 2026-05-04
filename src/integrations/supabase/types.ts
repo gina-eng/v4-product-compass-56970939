@@ -213,8 +213,10 @@ export type Database = {
           pains_tackled: string
           photo_url: string | null
           primary_sector: string
+          primary_sector_experience: string | null
           professional_profile: string
           secondary_sector: string | null
+          secondary_sector_experience: string | null
           state: string
           unit: string | null
           updated_at: string
@@ -235,8 +237,10 @@ export type Database = {
           pains_tackled?: string
           photo_url?: string | null
           primary_sector?: string
+          primary_sector_experience?: string | null
           professional_profile?: string
           secondary_sector?: string | null
+          secondary_sector_experience?: string | null
           state?: string
           unit?: string | null
           updated_at?: string
@@ -257,8 +261,10 @@ export type Database = {
           pains_tackled?: string
           photo_url?: string | null
           primary_sector?: string
+          primary_sector_experience?: string | null
           professional_profile?: string
           secondary_sector?: string | null
+          secondary_sector_experience?: string | null
           state?: string
           unit?: string | null
           updated_at?: string

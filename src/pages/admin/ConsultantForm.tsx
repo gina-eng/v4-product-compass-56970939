@@ -34,7 +34,9 @@ const EMPTY: Consultant = {
   photoUrl: "",
   unit: "",
   primarySector: "",
+  primarySectorExperience: "",
   secondarySector: "",
+  secondarySectorExperience: "",
   professionalProfile: "",
   painsTackled: "",
   valueAreas: "",
@@ -54,7 +56,9 @@ const REQUIRED_FIELDS: { key: keyof Consultant; label: string }[] = [
   { key: "photoUrl", label: "URL da foto" },
   { key: "unit", label: "Unidade" },
   { key: "primarySector", label: "Setor principal" },
+  { key: "primarySectorExperience", label: "Descrição da experiência (setor principal)" },
   { key: "secondarySector", label: "Setor complementar" },
+  { key: "secondarySectorExperience", label: "Descrição da experiência (setor complementar)" },
   { key: "professionalProfile", label: "Perfil profissional" },
   { key: "painsTackled", label: "Dores que sei atacar" },
   { key: "valueAreas", label: "Áreas onde mais gero valor" },
@@ -124,6 +128,8 @@ const ConsultantFormPage = () => {
           ...existing,
           unit: existing.unit ?? "",
           secondarySector: existing.secondarySector ?? "",
+          primarySectorExperience: existing.primarySectorExperience ?? "",
+          secondarySectorExperience: existing.secondarySectorExperience ?? "",
           photoUrl: existing.photoUrl ?? "",
         });
       } else {
@@ -187,6 +193,8 @@ const ConsultantFormPage = () => {
         ...form,
         unit: form.unit?.trim() || undefined,
         secondarySector: form.secondarySector?.trim() || undefined,
+        primarySectorExperience: form.primarySectorExperience?.trim() ?? "",
+        secondarySectorExperience: form.secondarySectorExperience?.trim() || undefined,
         photoUrl: form.photoUrl?.trim() || undefined,
       });
       toast({
@@ -353,45 +361,81 @@ const ConsultantFormPage = () => {
               </h2>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Setor principal" required error={errors.primarySector}>
-                  <Select
-                    value={form.primarySector}
-                    onValueChange={(v) => update("primarySector", v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o setor principal" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-72">
-                      {SECTORS.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
+                <div className="space-y-4">
+                  <Field label="Setor principal" required error={errors.primarySector}>
+                    <Select
+                      value={form.primarySector}
+                      onValueChange={(v) => update("primarySector", v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o setor principal" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {SECTORS.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
 
-                <Field
-                  label="Setor complementar"
-                  required
-                  error={errors.secondarySector}
-                >
-                  <Select
-                    value={form.secondarySector ?? ""}
-                    onValueChange={(v) => update("secondarySector", v)}
+                  <Field
+                    label="Descrição da experiência"
+                    required
+                    error={errors.primarySectorExperience}
+                    hint="Descreva sua vivência neste setor: tipos de empresas, projetos e contexto."
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o setor complementar" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-72">
-                      {SECTORS.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
+                    <Textarea
+                      rows={5}
+                      value={form.primarySectorExperience ?? ""}
+                      onChange={(e) =>
+                        update("primarySectorExperience", e.target.value)
+                      }
+                      placeholder="Ex.: 6 anos atuando em indústrias de bens de consumo, liderando projetos de…"
+                    />
+                  </Field>
+                </div>
+
+                <div className="space-y-4">
+                  <Field
+                    label="Setor complementar"
+                    required
+                    error={errors.secondarySector}
+                  >
+                    <Select
+                      value={form.secondarySector ?? ""}
+                      onValueChange={(v) => update("secondarySector", v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o setor complementar" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {SECTORS.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+
+                  <Field
+                    label="Descrição da experiência"
+                    required
+                    error={errors.secondarySectorExperience}
+                    hint="Descreva sua vivência neste setor: tipos de empresas, projetos e contexto."
+                  >
+                    <Textarea
+                      rows={5}
+                      value={form.secondarySectorExperience ?? ""}
+                      onChange={(e) =>
+                        update("secondarySectorExperience", e.target.value)
+                      }
+                      placeholder="Ex.: 3 anos como consultor em varejo de moda, com foco em…"
+                    />
+                  </Field>
+                </div>
               </div>
             </CardContent>
           </Card>
