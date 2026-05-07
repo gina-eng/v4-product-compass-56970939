@@ -133,6 +133,12 @@ const ConsultantFormPage = () => {
           secondarySectorExperience: existing.secondarySectorExperience ?? "",
           photoUrl: existing.photoUrl ?? "",
         });
+        if (existing.primarySector && !SECTORS.includes(existing.primarySector)) {
+          setPrimarySectorOther(true);
+        }
+        if (existing.secondarySector && !SECTORS.includes(existing.secondarySector)) {
+          setSecondarySectorOther(true);
+        }
       } else {
         toast({
           title: "Consultor não encontrado",
