@@ -414,7 +414,6 @@ const ConsultantFormPage = () => {
 
                   <Field
                     label="Descrição da experiência"
-                    required
                     error={errors.secondarySectorExperience}
                     hint="Descreva sua vivência neste setor: tipos de empresas, projetos e contexto."
                   >
