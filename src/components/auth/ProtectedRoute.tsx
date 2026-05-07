@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react";
-import type { Session } from "@supabase/supabase-js";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  getSessionRemainingMs,
-  isAllowedAppEmail,
-  isLocalPreviewAuthEnabled,
-  shouldForceSessionReauth,
-} from "@/lib/auth";
+import { Outlet } from "react-router-dom";
 
+// Sistema totalmente público — sem checagem de sessão.
 const ProtectedRoute = () => {
+  return <Outlet />;
+};
+
+export default ProtectedRoute;
+
+// Mantido apenas para evitar quebrar imports antigos abaixo.
+const _Unused = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
