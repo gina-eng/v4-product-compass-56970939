@@ -420,12 +420,16 @@ const ConsultantFormPage = () => {
                     error={errors.secondarySector}
                   >
                     <Select
-                      value={
-                        SECTORS.includes(form.secondarySector ?? "")
-                          ? (form.secondarySector ?? "")
-                          : ((form.secondarySector ?? "") ? "Outro" : "")
-                      }
-                      onValueChange={(v) => update("secondarySector", v === "Outro" ? "" : v)}
+                      value={secondarySectorOther ? "Outro" : (form.secondarySector ?? "")}
+                      onValueChange={(v) => {
+                        if (v === "Outro") {
+                          setSecondarySectorOther(true);
+                          update("secondarySector", "");
+                        } else {
+                          setSecondarySectorOther(false);
+                          update("secondarySector", v);
+                        }
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o setor complementar" />
@@ -438,7 +442,7 @@ const ConsultantFormPage = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                    {!SECTORS.includes(form.secondarySector ?? "") && (form.secondarySector ?? "") !== "" && (
+                    {secondarySectorOther && (
                       <Input
                         className="mt-2"
                         value={form.secondarySector ?? ""}
