@@ -371,10 +371,10 @@ const ConsultantFormPage = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                    {(!SECTORS.includes(form.primarySector) || form.primarySector === "") && (
+                    {!SECTORS.includes(form.primarySector) && form.primarySector !== "" && (
                       <Input
                         className="mt-2"
-                        value={SECTORS.includes(form.primarySector) ? "" : form.primarySector}
+                        value={form.primarySector}
                         onChange={(e) => update("primarySector", e.target.value)}
                         placeholder="Digite o setor principal"
                       />
