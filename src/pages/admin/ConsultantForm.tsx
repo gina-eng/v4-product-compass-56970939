@@ -357,8 +357,8 @@ const ConsultantFormPage = () => {
                 <div className="space-y-4">
                   <Field label="Setor principal" required error={errors.primarySector}>
                     <Select
-                      value={form.primarySector}
-                      onValueChange={(v) => update("primarySector", v)}
+                      value={SECTORS.includes(form.primarySector) ? form.primarySector : (form.primarySector ? "Outro" : "")}
+                      onValueChange={(v) => update("primarySector", v === "Outro" ? "" : v)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o setor principal" />
@@ -371,6 +371,14 @@ const ConsultantFormPage = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                    {(!SECTORS.includes(form.primarySector) || form.primarySector === "") && (
+                      <Input
+                        className="mt-2"
+                        value={SECTORS.includes(form.primarySector) ? "" : form.primarySector}
+                        onChange={(e) => update("primarySector", e.target.value)}
+                        placeholder="Digite o setor principal"
+                      />
+                    )}
                   </Field>
 
                   <Field
