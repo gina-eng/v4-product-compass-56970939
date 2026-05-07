@@ -110,6 +110,8 @@ const ConsultantFormPage = () => {
   const [form, setForm] = useState<Consultant>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof Consultant, string>>>({});
   const [units, setUnits] = useState<V4Unit[]>([]);
+  const [primarySectorOther, setPrimarySectorOther] = useState(false);
+  const [secondarySectorOther, setSecondarySectorOther] = useState(false);
 
   useEffect(() => {
     void listUnits().then(setUnits);
