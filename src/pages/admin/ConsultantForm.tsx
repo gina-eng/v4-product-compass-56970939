@@ -58,8 +58,6 @@ const REQUIRED_FIELDS: { key: keyof Consultant; label: string }[] = [
   { key: "unit", label: "Unidade" },
   { key: "primarySector", label: "Setor principal" },
   { key: "primarySectorExperience", label: "Descrição da experiência (setor principal)" },
-  { key: "secondarySector", label: "Setor complementar" },
-  { key: "secondarySectorExperience", label: "Descrição da experiência (setor complementar)" },
   { key: "professionalProfile", label: "Perfil profissional" },
   { key: "painsTackled", label: "Dores que sei atacar" },
   { key: "valueAreas", label: "Áreas onde mais gero valor" },
@@ -395,7 +393,6 @@ const ConsultantFormPage = () => {
                 <div className="space-y-4">
                   <Field
                     label="Setor complementar"
-                    required
                     error={errors.secondarySector}
                   >
                     <Select
@@ -417,7 +414,6 @@ const ConsultantFormPage = () => {
 
                   <Field
                     label="Descrição da experiência"
-                    required
                     error={errors.secondarySectorExperience}
                     hint="Descreva sua vivência neste setor: tipos de empresas, projetos e contexto."
                   >
