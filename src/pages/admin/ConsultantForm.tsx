@@ -110,6 +110,8 @@ const ConsultantFormPage = () => {
   const [form, setForm] = useState<Consultant>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof Consultant, string>>>({});
   const [units, setUnits] = useState<V4Unit[]>([]);
+  const [primarySectorOther, setPrimarySectorOther] = useState(false);
+  const [secondarySectorOther, setSecondarySectorOther] = useState(false);
 
   useEffect(() => {
     void listUnits().then(setUnits);
@@ -131,6 +133,12 @@ const ConsultantFormPage = () => {
           secondarySectorExperience: existing.secondarySectorExperience ?? "",
           photoUrl: existing.photoUrl ?? "",
         });
+        if (existing.primarySector && !SECTORS.includes(existing.primarySector)) {
+          setPrimarySectorOther(true);
+        }
+        if (existing.secondarySector && !SECTORS.includes(existing.secondarySector)) {
+          setSecondarySectorOther(true);
+        }
       } else {
         toast({
           title: "Consultor não encontrado",
@@ -357,8 +365,16 @@ const ConsultantFormPage = () => {
                 <div className="space-y-4">
                   <Field label="Setor principal" required error={errors.primarySector}>
                     <Select
-                      value={form.primarySector}
-                      onValueChange={(v) => update("primarySector", v)}
+                      value={primarySectorOther ? "Outro" : form.primarySector}
+                      onValueChange={(v) => {
+                        if (v === "Outro") {
+                          setPrimarySectorOther(true);
+                          update("primarySector", "");
+                        } else {
+                          setPrimarySectorOther(false);
+                          update("primarySector", v);
+                        }
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o setor principal" />
@@ -371,6 +387,14 @@ const ConsultantFormPage = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                    {primarySectorOther && (
+                      <Input
+                        className="mt-2"
+                        value={form.primarySector}
+                        onChange={(e) => update("primarySector", e.target.value)}
+                        placeholder="Digite o setor principal"
+                      />
+                    )}
                   </Field>
 
                   <Field
@@ -396,8 +420,16 @@ const ConsultantFormPage = () => {
                     error={errors.secondarySector}
                   >
                     <Select
-                      value={form.secondarySector ?? ""}
-                      onValueChange={(v) => update("secondarySector", v)}
+                      value={secondarySectorOther ? "Outro" : (form.secondarySector ?? "")}
+                      onValueChange={(v) => {
+                        if (v === "Outro") {
+                          setSecondarySectorOther(true);
+                          update("secondarySector", "");
+                        } else {
+                          setSecondarySectorOther(false);
+                          update("secondarySector", v);
+                        }
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o setor complementar" />
@@ -410,6 +442,14 @@ const ConsultantFormPage = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                    {secondarySectorOther && (
+                      <Input
+                        className="mt-2"
+                        value={form.secondarySector ?? ""}
+                        onChange={(e) => update("secondarySector", e.target.value)}
+                        placeholder="Digite o setor complementar"
+                      />
+                    )}
                   </Field>
 
                   <Field
