@@ -369,7 +369,7 @@ const ConsultantFormPage = () => {
                       onValueChange={(v) => {
                         if (v === "Outro") {
                           setPrimarySectorOther(true);
-                          update("primarySector", "");
+                          if (!primarySectorOther) update("primarySector", "");
                         } else {
                           setPrimarySectorOther(false);
                           update("primarySector", v);
@@ -388,12 +388,17 @@ const ConsultantFormPage = () => {
                       </SelectContent>
                     </Select>
                     {primarySectorOther && (
-                      <Input
-                        className="mt-2"
-                        value={form.primarySector}
-                        onChange={(e) => update("primarySector", e.target.value)}
-                        placeholder="Digite o setor principal"
-                      />
+                      <>
+                        <Label className="mt-2 text-[11px] text-muted-foreground">
+                          Especifique o setor
+                        </Label>
+                        <Input
+                          className="mt-1"
+                          value={form.primarySector}
+                          onChange={(e) => update("primarySector", e.target.value)}
+                          placeholder="Digite o setor principal"
+                        />
+                      </>
                     )}
                   </Field>
 
@@ -424,7 +429,7 @@ const ConsultantFormPage = () => {
                       onValueChange={(v) => {
                         if (v === "Outro") {
                           setSecondarySectorOther(true);
-                          update("secondarySector", "");
+                          if (!secondarySectorOther) update("secondarySector", "");
                         } else {
                           setSecondarySectorOther(false);
                           update("secondarySector", v);
@@ -443,12 +448,17 @@ const ConsultantFormPage = () => {
                       </SelectContent>
                     </Select>
                     {secondarySectorOther && (
-                      <Input
-                        className="mt-2"
-                        value={form.secondarySector ?? ""}
-                        onChange={(e) => update("secondarySector", e.target.value)}
-                        placeholder="Digite o setor complementar"
-                      />
+                      <>
+                        <Label className="mt-2 text-[11px] text-muted-foreground">
+                          Especifique o setor
+                        </Label>
+                        <Input
+                          className="mt-1"
+                          value={form.secondarySector ?? ""}
+                          onChange={(e) => update("secondarySector", e.target.value)}
+                          placeholder="Digite o setor complementar"
+                        />
+                      </>
                     )}
                   </Field>
 
