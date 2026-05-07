@@ -393,7 +393,6 @@ const ConsultantFormPage = () => {
                 <div className="space-y-4">
                   <Field
                     label="Setor complementar"
-                    required
                     error={errors.secondarySector}
                   >
                     <Select
