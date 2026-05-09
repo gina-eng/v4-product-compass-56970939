@@ -49,151 +49,157 @@ export type Database = {
       }
       cases: {
         Row: {
-          attributed_revenue: string
-          client_city: string
-          client_cnpj: string
-          client_name: string
-          client_state: string
-          client_status: string
-          collaborators: Json
-          created_at: string
-          current_step: number
-          dashboard_url: string
-          executar_channels: Json
-          executar_creatives: Json
-          executar_creatives_communication: string
-          executar_professionals: Json
-          executar_strategies: Json
-          final_notes: string
+          attributed_revenue: string | null
+          client_city: string | null
+          client_cnpj: string | null
+          client_name: string | null
+          client_state: string | null
+          client_status: string | null
+          collaborators: Json | null
+          created_at: string | null
+          current_step: number | null
+          dashboard_url: string | null
+          executar_channels: Json | null
+          executar_creatives: Json | null
+          executar_creatives_communication: string | null
+          executar_professionals: Json | null
+          executar_strategies: Json | null
+          final_notes: string | null
           id: string
-          initial_challenges: Json
-          initial_challenges_other: string
-          media_investment: string
-          nicho: string
-          operation_reach: string
-          owner_email: string
+          initial_challenges: string | null
+          initial_challenges_other: string | null
+          media_investment: string | null
+          nicho: string | null
+          operation_reach: string | null
+          owner_email: string | null
           owner_user_id: string | null
-          potencializar_indicator: string
-          potencializar_value_model: string
-          presentation_url: string
-          previous_attempt: string
-          previous_failure_reason: string
-          primary_driver: string
-          primary_metrics: Json
-          problem: string
-          products: Json
-          restrictions: Json
-          restrictions_other: string
-          root_cause: string
-          saber_directions: Json
-          saber_execution: string
-          sales_model: string
-          secondary_metrics: Json
-          segment: string
-          status: string
-          ter_value_perception: string
-          testimonial_url: string
-          time_to_result: string
-          updated_at: string
-          v4_unit: string
+          "palavras-chave": number | null
+          potencializar_indicator: string | null
+          potencializar_value_model: string | null
+          presentation_url: string | null
+          previous_attempt: string | null
+          previous_failure_reason: string | null
+          primary_driver: string | null
+          primary_metrics: Json | null
+          problem: string | null
+          products: Json | null
+          restrictions: Json | null
+          restrictions_other: string | null
+          resumo: number | null
+          root_cause: string | null
+          saber_directions: Json | null
+          saber_execution: string | null
+          sales_model: string | null
+          secondary_metrics: Json | null
+          segment: string | null
+          status: string | null
+          ter_value_perception: string | null
+          testimonial_url: string | null
+          time_to_result: string | null
+          updated_at: string | null
+          v4_unit: string | null
         }
         Insert: {
-          attributed_revenue?: string
-          client_city?: string
-          client_cnpj?: string
-          client_name?: string
-          client_state?: string
-          client_status?: string
-          collaborators?: Json
-          created_at?: string
-          current_step?: number
-          dashboard_url?: string
-          executar_channels?: Json
-          executar_creatives?: Json
-          executar_creatives_communication?: string
-          executar_professionals?: Json
-          executar_strategies?: Json
-          final_notes?: string
+          attributed_revenue?: string | null
+          client_city?: string | null
+          client_cnpj?: string | null
+          client_name?: string | null
+          client_state?: string | null
+          client_status?: string | null
+          collaborators?: Json | null
+          created_at?: string | null
+          current_step?: number | null
+          dashboard_url?: string | null
+          executar_channels?: Json | null
+          executar_creatives?: Json | null
+          executar_creatives_communication?: string | null
+          executar_professionals?: Json | null
+          executar_strategies?: Json | null
+          final_notes?: string | null
           id?: string
-          initial_challenges?: Json
-          initial_challenges_other?: string
-          media_investment?: string
-          nicho?: string
-          operation_reach?: string
-          owner_email?: string
+          initial_challenges?: string | null
+          initial_challenges_other?: string | null
+          media_investment?: string | null
+          nicho?: string | null
+          operation_reach?: string | null
+          owner_email?: string | null
           owner_user_id?: string | null
-          potencializar_indicator?: string
-          potencializar_value_model?: string
-          presentation_url?: string
-          previous_attempt?: string
-          previous_failure_reason?: string
-          primary_driver?: string
-          primary_metrics?: Json
-          problem?: string
-          products?: Json
-          restrictions?: Json
-          restrictions_other?: string
-          root_cause?: string
-          saber_directions?: Json
-          saber_execution?: string
-          sales_model?: string
-          secondary_metrics?: Json
-          segment?: string
-          status?: string
-          ter_value_perception?: string
-          testimonial_url?: string
-          time_to_result?: string
-          updated_at?: string
-          v4_unit?: string
+          "palavras-chave"?: number | null
+          potencializar_indicator?: string | null
+          potencializar_value_model?: string | null
+          presentation_url?: string | null
+          previous_attempt?: string | null
+          previous_failure_reason?: string | null
+          primary_driver?: string | null
+          primary_metrics?: Json | null
+          problem?: string | null
+          products?: Json | null
+          restrictions?: Json | null
+          restrictions_other?: string | null
+          resumo?: number | null
+          root_cause?: string | null
+          saber_directions?: Json | null
+          saber_execution?: string | null
+          sales_model?: string | null
+          secondary_metrics?: Json | null
+          segment?: string | null
+          status?: string | null
+          ter_value_perception?: string | null
+          testimonial_url?: string | null
+          time_to_result?: string | null
+          updated_at?: string | null
+          v4_unit?: string | null
         }
         Update: {
-          attributed_revenue?: string
-          client_city?: string
-          client_cnpj?: string
-          client_name?: string
-          client_state?: string
-          client_status?: string
-          collaborators?: Json
-          created_at?: string
-          current_step?: number
-          dashboard_url?: string
-          executar_channels?: Json
-          executar_creatives?: Json
-          executar_creatives_communication?: string
-          executar_professionals?: Json
-          executar_strategies?: Json
-          final_notes?: string
+          attributed_revenue?: string | null
+          client_city?: string | null
+          client_cnpj?: string | null
+          client_name?: string | null
+          client_state?: string | null
+          client_status?: string | null
+          collaborators?: Json | null
+          created_at?: string | null
+          current_step?: number | null
+          dashboard_url?: string | null
+          executar_channels?: Json | null
+          executar_creatives?: Json | null
+          executar_creatives_communication?: string | null
+          executar_professionals?: Json | null
+          executar_strategies?: Json | null
+          final_notes?: string | null
           id?: string
-          initial_challenges?: Json
-          initial_challenges_other?: string
-          media_investment?: string
-          nicho?: string
-          operation_reach?: string
-          owner_email?: string
+          initial_challenges?: string | null
+          initial_challenges_other?: string | null
+          media_investment?: string | null
+          nicho?: string | null
+          operation_reach?: string | null
+          owner_email?: string | null
           owner_user_id?: string | null
-          potencializar_indicator?: string
-          potencializar_value_model?: string
-          presentation_url?: string
-          previous_attempt?: string
-          previous_failure_reason?: string
-          primary_driver?: string
-          primary_metrics?: Json
-          problem?: string
-          products?: Json
-          restrictions?: Json
-          restrictions_other?: string
-          root_cause?: string
-          saber_directions?: Json
-          saber_execution?: string
-          sales_model?: string
-          secondary_metrics?: Json
-          segment?: string
-          status?: string
-          ter_value_perception?: string
-          testimonial_url?: string
-          time_to_result?: string
-          updated_at?: string
-          v4_unit?: string
+          "palavras-chave"?: number | null
+          potencializar_indicator?: string | null
+          potencializar_value_model?: string | null
+          presentation_url?: string | null
+          previous_attempt?: string | null
+          previous_failure_reason?: string | null
+          primary_driver?: string | null
+          primary_metrics?: Json | null
+          problem?: string | null
+          products?: Json | null
+          restrictions?: Json | null
+          restrictions_other?: string | null
+          resumo?: number | null
+          root_cause?: string | null
+          saber_directions?: Json | null
+          saber_execution?: string | null
+          sales_model?: string | null
+          secondary_metrics?: Json | null
+          segment?: string | null
+          status?: string | null
+          ter_value_perception?: string | null
+          testimonial_url?: string | null
+          time_to_result?: string | null
+          updated_at?: string | null
+          v4_unit?: string | null
         }
         Relationships: []
       }
