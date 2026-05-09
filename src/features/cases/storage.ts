@@ -207,7 +207,10 @@ export const upsertCase = async (record: CaseRecord): Promise<CaseRecord> => {
       : typeof crypto !== "undefined" && "randomUUID" in crypto
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random()}`;
-  const payload = recordToRow({ ...record, id: safeId });
+  const payload = {
+    ...recordToRow({ ...record, id: safeId }),
+    filled_at: new Date().toISOString(),
+  };
   const { data, error } = await supabase
     .from("cases")
     .upsert([payload], { onConflict: "id" })
