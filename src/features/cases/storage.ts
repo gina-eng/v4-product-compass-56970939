@@ -213,7 +213,7 @@ export const upsertCase = async (record: CaseRecord): Promise<CaseRecord> => {
   };
   const { data, error } = await supabase
     .from("cases")
-    .upsert([payload], { onConflict: "id" })
+    .upsert([payload as never], { onConflict: "id" })
     .select()
     .single();
   if (error) throw error;
