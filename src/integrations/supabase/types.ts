@@ -64,6 +64,7 @@ export type Database = {
           executar_creatives_communication: string | null
           executar_professionals: Json | null
           executar_strategies: Json | null
+          filled_at: string | null
           final_notes: string | null
           id: string
           initial_challenges: string | null
@@ -72,7 +73,6 @@ export type Database = {
           nicho: string | null
           operation_reach: string | null
           owner_email: string | null
-          owner_user_id: string | null
           "palavras-chave": number | null
           potencializar_indicator: string | null
           potencializar_value_model: string | null
@@ -115,6 +115,7 @@ export type Database = {
           executar_creatives_communication?: string | null
           executar_professionals?: Json | null
           executar_strategies?: Json | null
+          filled_at?: string | null
           final_notes?: string | null
           id?: string
           initial_challenges?: string | null
@@ -123,7 +124,6 @@ export type Database = {
           nicho?: string | null
           operation_reach?: string | null
           owner_email?: string | null
-          owner_user_id?: string | null
           "palavras-chave"?: number | null
           potencializar_indicator?: string | null
           potencializar_value_model?: string | null
@@ -166,6 +166,7 @@ export type Database = {
           executar_creatives_communication?: string | null
           executar_professionals?: Json | null
           executar_strategies?: Json | null
+          filled_at?: string | null
           final_notes?: string | null
           id?: string
           initial_challenges?: string | null
@@ -174,7 +175,6 @@ export type Database = {
           nicho?: string | null
           operation_reach?: string | null
           owner_email?: string | null
-          owner_user_id?: string | null
           "palavras-chave"?: number | null
           potencializar_indicator?: string | null
           potencializar_value_model?: string | null
