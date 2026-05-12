@@ -78,6 +78,7 @@ const rowToRecord = (row: CaseRow): CaseRecord => ({
 
   ownerEmail: str(row.owner_email),
   v4Unit: str(row.v4_unit),
+  idUnits: str((row as unknown as { id_units?: string }).id_units),
   clientName: str(row.client_name),
   clientCnpj: str(row.client_cnpj),
   clientStatus: (row.client_status as ClientStatus) || "",
