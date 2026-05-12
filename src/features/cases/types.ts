@@ -108,6 +108,7 @@ export const emptyCase = (ownerEmail = ""): CaseRecord => ({
   currentStep: 1,
   ownerEmail,
   v4Unit: "",
+  idUnits: "",
   clientName: "",
   clientCnpj: "",
   clientStatus: "",
