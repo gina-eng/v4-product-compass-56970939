@@ -48,6 +48,7 @@ export interface CaseRecord {
   // Etapa 1 — identificação
   ownerEmail: string;
   v4Unit: string;
+  idUnits: string;
   clientName: string;
   clientCnpj: string;
   clientStatus: ClientStatus | "";
@@ -107,6 +108,7 @@ export const emptyCase = (ownerEmail = ""): CaseRecord => ({
   currentStep: 1,
   ownerEmail,
   v4Unit: "",
+  idUnits: "",
   clientName: "",
   clientCnpj: "",
   clientStatus: "",

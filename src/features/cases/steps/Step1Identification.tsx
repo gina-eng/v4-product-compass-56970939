@@ -31,10 +31,11 @@ interface StepProps {
 }
 
 export const Step1Identification = ({ record, errors, update }: StepProps) => {
-  const [unitOptions, setUnitOptions] = useState<string[]>([]);
+  const [units, setUnits] = useState<{ id: string; name: string }[]>([]);
+  const unitOptions = units.map((u) => u.name);
 
   useEffect(() => {
-    void listUnits().then((rows) => setUnitOptions(rows.map((r) => r.name)));
+    void listUnits().then((rows) => setUnits(rows));
   }, []);
 
   const updateCollaborator = (index: number, value: string) => {
@@ -69,7 +70,10 @@ export const Step1Identification = ({ record, errors, update }: StepProps) => {
           <SearchableSelect
             value={record.v4Unit}
             options={unitOptions}
-            onChange={(v) => update({ v4Unit: v })}
+            onChange={(v) => {
+              const found = units.find((u) => u.name === v);
+              update({ v4Unit: v, idUnits: found?.id ?? "" });
+            }}
             placeholder={unitOptions.length ? "Selecione a unidade" : "Nenhuma unidade cadastrada"}
             searchPlaceholder="Buscar unidade..."
             emptyText="Nenhuma unidade encontrada."

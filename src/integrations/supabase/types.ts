@@ -67,6 +67,7 @@ export type Database = {
           filled_at: string | null
           final_notes: string | null
           id: string
+          id_units: string | null
           initial_challenges: string | null
           initial_challenges_other: string | null
           media_investment: string | null
@@ -118,6 +119,7 @@ export type Database = {
           filled_at?: string | null
           final_notes?: string | null
           id?: string
+          id_units?: string | null
           initial_challenges?: string | null
           initial_challenges_other?: string | null
           media_investment?: string | null
@@ -169,6 +171,7 @@ export type Database = {
           filled_at?: string | null
           final_notes?: string | null
           id?: string
+          id_units?: string | null
           initial_challenges?: string | null
           initial_challenges_other?: string | null
           media_investment?: string | null
@@ -808,22 +811,22 @@ export type Database = {
       v4_units: {
         Row: {
           created_at: string
-          id: string
           id_tenant: string | null
+          id_units: string
           name: string
           updated_at: string
         }
         Insert: {
           created_at?: string
-          id?: string
           id_tenant?: string | null
+          id_units?: string
           name: string
           updated_at?: string
         }
         Update: {
           created_at?: string
-          id?: string
           id_tenant?: string | null
+          id_units?: string
           name?: string
           updated_at?: string
         }
