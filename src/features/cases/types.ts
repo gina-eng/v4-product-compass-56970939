@@ -48,6 +48,7 @@ export interface CaseRecord {
   // Etapa 1 — identificação
   ownerEmail: string;
   v4Unit: string;
+  idUnits: string;
   clientName: string;
   clientCnpj: string;
   clientStatus: ClientStatus | "";
