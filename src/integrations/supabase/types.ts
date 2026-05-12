@@ -73,7 +73,7 @@ export type Database = {
           nicho: string | null
           operation_reach: string | null
           owner_email: string | null
-          "palavras-chave": number | null
+          palavras_chave: string | null
           potencializar_indicator: string | null
           potencializar_value_model: string | null
           presentation_url: string | null
@@ -85,7 +85,7 @@ export type Database = {
           products: Json | null
           restrictions: Json | null
           restrictions_other: string | null
-          resumo: number | null
+          resumo: string | null
           root_cause: string | null
           saber_directions: Json | null
           saber_execution: string | null
@@ -124,7 +124,7 @@ export type Database = {
           nicho?: string | null
           operation_reach?: string | null
           owner_email?: string | null
-          "palavras-chave"?: number | null
+          palavras_chave?: string | null
           potencializar_indicator?: string | null
           potencializar_value_model?: string | null
           presentation_url?: string | null
@@ -136,7 +136,7 @@ export type Database = {
           products?: Json | null
           restrictions?: Json | null
           restrictions_other?: string | null
-          resumo?: number | null
+          resumo?: string | null
           root_cause?: string | null
           saber_directions?: Json | null
           saber_execution?: string | null
@@ -175,7 +175,7 @@ export type Database = {
           nicho?: string | null
           operation_reach?: string | null
           owner_email?: string | null
-          "palavras-chave"?: number | null
+          palavras_chave?: string | null
           potencializar_indicator?: string | null
           potencializar_value_model?: string | null
           presentation_url?: string | null
@@ -187,7 +187,7 @@ export type Database = {
           products?: Json | null
           restrictions?: Json | null
           restrictions_other?: string | null
-          resumo?: number | null
+          resumo?: string | null
           root_cause?: string | null
           saber_directions?: Json | null
           saber_execution?: string | null
