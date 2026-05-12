@@ -131,6 +131,7 @@ const recordToRow = (r: CaseRecord) => ({
   current_step: r.currentStep,
   owner_email: r.ownerEmail,
   v4_unit: r.v4Unit,
+  id_units: r.idUnits || null,
   client_name: r.clientName,
   client_cnpj: r.clientCnpj,
   client_status: r.clientStatus,
