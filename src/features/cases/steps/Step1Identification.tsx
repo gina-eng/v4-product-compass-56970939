@@ -70,7 +70,10 @@ export const Step1Identification = ({ record, errors, update }: StepProps) => {
           <SearchableSelect
             value={record.v4Unit}
             options={unitOptions}
-            onChange={(v) => update({ v4Unit: v })}
+            onChange={(v) => {
+              const found = units.find((u) => u.name === v);
+              update({ v4Unit: v, idUnits: found?.id ?? "" });
+            }}
             placeholder={unitOptions.length ? "Selecione a unidade" : "Nenhuma unidade cadastrada"}
             searchPlaceholder="Buscar unidade..."
             emptyText="Nenhuma unidade encontrada."
