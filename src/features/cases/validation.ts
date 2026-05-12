@@ -6,7 +6,7 @@ export interface StepValidation {
 }
 
 // Flip para `false` antes de publicar para reativar todas as validações.
-const BYPASS_VALIDATION = true;
+const BYPASS_VALIDATION = false;
 
 const isNonEmpty = (v: string | undefined | null) => Boolean(v && v.trim().length > 0);
 const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
