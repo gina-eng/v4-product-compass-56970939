@@ -31,10 +31,11 @@ interface StepProps {
 }
 
 export const Step1Identification = ({ record, errors, update }: StepProps) => {
-  const [unitOptions, setUnitOptions] = useState<string[]>([]);
+  const [units, setUnits] = useState<{ id: string; name: string }[]>([]);
+  const unitOptions = units.map((u) => u.name);
 
   useEffect(() => {
-    void listUnits().then((rows) => setUnitOptions(rows.map((r) => r.name)));
+    void listUnits().then((rows) => setUnits(rows));
   }, []);
 
   const updateCollaborator = (index: number, value: string) => {
