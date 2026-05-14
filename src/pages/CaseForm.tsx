@@ -4,8 +4,6 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
-  CloudUpload,
-  Save,
   Sparkles,
 } from "lucide-react";
 import { Layout } from "@/components/Layout";
@@ -34,7 +32,6 @@ import {
   validateStep,
 } from "@/features/cases/validation";
 import type { StepCompletion } from "@/features/cases/validation";
-import { formatRelativeDate } from "@/features/cases/format";
 
 const CaseForm = () => {
   const { id } = useParams();
@@ -42,7 +39,6 @@ const CaseForm = () => {
 
   const [record, setRecord] = useState<CaseRecord>(() => emptyCase());
   const [showStepErrors, setShowStepErrors] = useState(false);
-  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const initializedRef = useRef(false);
 
@@ -71,14 +67,8 @@ const CaseForm = () => {
     void seedEmail();
   }, [id]);
 
-  useEffect(() => {
-    if (!record.ownerEmail) return;
-    if (submitted) return;
-    const handle = window.setTimeout(() => {
-      void upsertCase(record).then((saved) => setLastSavedAt(saved.updatedAt)).catch((err) => console.error("Erro ao auto-salvar:", err));
-    }, 600);
-    return () => window.clearTimeout(handle);
-  }, [record, submitted]);
+  // Não auto-salva no banco: cases só são persistidos ao finalizar com todos os
+  // campos obrigatórios preenchidos, evitando registros incompletos na plataforma.
 
   const update = (patch: Partial<CaseRecord>) => {
     setRecord((prev) => ({ ...prev, ...patch }));
@@ -136,15 +126,6 @@ const CaseForm = () => {
     goToStep(record.currentStep + 1);
   };
 
-  const handleSaveDraft = async () => {
-    try {
-      const saved = await upsertCase({ ...record, status: "rascunho" });
-      setLastSavedAt(saved.updatedAt);
-      toast({ title: "Rascunho salvo", description: "Você pode retomar este case a qualquer momento." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao salvar", description: err instanceof Error ? err.message : "" });
-    }
-  };
 
   const handleSubmit = async () => {
     for (let i = 1; i <= STEPS.length; i += 1) {
@@ -244,9 +225,6 @@ const CaseForm = () => {
                 <span className="text-xs font-semibold text-foreground">{overallProgress}%</span>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleSaveDraft}>
-              <Save className="mr-1.5 h-3.5 w-3.5" /> Salvar rascunho
-            </Button>
           </div>
         </header>
 
@@ -265,12 +243,6 @@ const CaseForm = () => {
               <h2 className="mt-1 text-xl font-semibold text-foreground">{stepMeta.title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{stepMeta.subtitle}</p>
             </div>
-            {lastSavedAt && (
-              <div className="hidden items-center gap-1.5 rounded-full border border-border/60 bg-background px-3 py-1 text-[11px] text-muted-foreground sm:flex">
-                <CloudUpload className="h-3 w-3" />
-                Salvo {formatRelativeDate(lastSavedAt)}
-              </div>
-            )}
           </div>
 
           {record.currentStep === 1 && (
