@@ -130,15 +130,6 @@ const CaseForm = () => {
     goToStep(record.currentStep + 1);
   };
 
-  const handleSaveDraft = async () => {
-    try {
-      const saved = await upsertCase({ ...record, status: "rascunho" });
-      setLastSavedAt(saved.updatedAt);
-      toast({ title: "Rascunho salvo", description: "Você pode retomar este case a qualquer momento." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao salvar", description: err instanceof Error ? err.message : "" });
-    }
-  };
 
   const handleSubmit = async () => {
     for (let i = 1; i <= STEPS.length; i += 1) {
