@@ -247,12 +247,6 @@ const CaseForm = () => {
               <h2 className="mt-1 text-xl font-semibold text-foreground">{stepMeta.title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{stepMeta.subtitle}</p>
             </div>
-            {lastSavedAt && (
-              <div className="hidden items-center gap-1.5 rounded-full border border-border/60 bg-background px-3 py-1 text-[11px] text-muted-foreground sm:flex">
-                <CloudUpload className="h-3 w-3" />
-                Salvo {formatRelativeDate(lastSavedAt)}
-              </div>
-            )}
           </div>
 
           {record.currentStep === 1 && (
