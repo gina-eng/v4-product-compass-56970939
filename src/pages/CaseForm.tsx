@@ -238,9 +238,6 @@ const CaseForm = () => {
                 <span className="text-xs font-semibold text-foreground">{overallProgress}%</span>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleSaveDraft}>
-              <Save className="mr-1.5 h-3.5 w-3.5" /> Salvar rascunho
-            </Button>
           </div>
         </header>
 
