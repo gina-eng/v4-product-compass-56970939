@@ -32,7 +32,6 @@ import {
   validateStep,
 } from "@/features/cases/validation";
 import type { StepCompletion } from "@/features/cases/validation";
-import { formatRelativeDate } from "@/features/cases/format";
 
 const CaseForm = () => {
   const { id } = useParams();
@@ -40,7 +39,6 @@ const CaseForm = () => {
 
   const [record, setRecord] = useState<CaseRecord>(() => emptyCase());
   const [showStepErrors, setShowStepErrors] = useState(false);
-  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const initializedRef = useRef(false);
 
