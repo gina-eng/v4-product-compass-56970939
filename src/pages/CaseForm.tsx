@@ -71,14 +71,8 @@ const CaseForm = () => {
     void seedEmail();
   }, [id]);
 
-  useEffect(() => {
-    if (!record.ownerEmail) return;
-    if (submitted) return;
-    const handle = window.setTimeout(() => {
-      void upsertCase(record).then((saved) => setLastSavedAt(saved.updatedAt)).catch((err) => console.error("Erro ao auto-salvar:", err));
-    }, 600);
-    return () => window.clearTimeout(handle);
-  }, [record, submitted]);
+  // Não auto-salva no banco: cases só são persistidos ao finalizar com todos os
+  // campos obrigatórios preenchidos, evitando registros incompletos na plataforma.
 
   const update = (patch: Partial<CaseRecord>) => {
     setRecord((prev) => ({ ...prev, ...patch }));
