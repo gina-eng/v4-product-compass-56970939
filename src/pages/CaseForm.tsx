@@ -4,8 +4,6 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
-  CloudUpload,
-  Save,
   Sparkles,
 } from "lucide-react";
 import { Layout } from "@/components/Layout";
