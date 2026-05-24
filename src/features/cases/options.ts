@@ -6,7 +6,7 @@ export type PreviousAttempt =
   | "interna"
   | "freelancer"
   | "nao";
-export type CaseStatus = "rascunho" | "completo" | "sem_evidencia";
+export type CaseStatus = "completo" | "sem_evidencia";
 
 export const SALES_MODELS: { value: SalesModel; label: string; description: string }[] = [
   {

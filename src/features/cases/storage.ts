@@ -73,7 +73,7 @@ const rowToRecord = (row: CaseRow): CaseRecord => ({
   id: row.id,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
-  status: (row.status as CaseStatus) || "rascunho",
+  status: (row.status as CaseStatus) || "sem_evidencia",
   currentStep: row.current_step || 1,
 
   ownerEmail: str(row.owner_email),
@@ -225,14 +225,4 @@ export const upsertCase = async (record: CaseRecord): Promise<CaseRecord> => {
 export const deleteCase = async (id: string): Promise<void> => {
   const { error } = await supabase.from("cases").delete().eq("id", id);
   if (error) throw error;
-};
-
-export const clearAllDrafts = async (): Promise<number> => {
-  const { data, error } = await supabase
-    .from("cases")
-    .delete()
-    .eq("status", "rascunho")
-    .select("id");
-  if (error) throw error;
-  return (data ?? []).length;
 };

@@ -104,7 +104,7 @@ export const emptyCase = (ownerEmail = ""): CaseRecord => ({
   id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `case-${Date.now()}`,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  status: "rascunho",
+  status: "sem_evidencia",
   currentStep: 1,
   ownerEmail,
   v4Unit: "",

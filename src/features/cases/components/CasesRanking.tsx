@@ -84,7 +84,7 @@ type Stats = {
 };
 
 const computeStats = (records: CaseRecord[]): Stats => {
-  const published = records.filter((r) => r.status !== "rascunho");
+  const published = records;
 
   const now = new Date();
   const currentKey = monthKey(now);

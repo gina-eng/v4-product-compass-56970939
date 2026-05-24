@@ -4,10 +4,8 @@ import {
   AlertCircle,
   BarChart3,
   Compass,
-  Eraser,
   FileSpreadsheet,
   Filter,
-  FlaskConical,
   Plus,
   Search,
   Sparkles,
@@ -45,7 +43,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { LOCAL_PREVIEW_EMAIL, isLocalPreviewAuthEnabled } from "@/lib/auth";
-import { clearAllDrafts, deleteCase, listCases } from "@/features/cases/storage";
+import { deleteCase, listCases } from "@/features/cases/storage";
 import { fuzzyMatch } from "@/features/cases/search";
 import { CasesRanking } from "@/features/cases/components/CasesRanking";
 import type { CaseRecord } from "@/features/cases/types";
@@ -62,7 +60,6 @@ import {
   OPERATION_REACH_OPTIONS,
   SALES_MODELS,
   SEGMENTS_MOCK,
-  STEPS,
   V4_PRODUCTS,
 } from "@/features/cases/options";
 import type { V4Product } from "@/features/cases/options";
@@ -133,8 +130,6 @@ const CaseCard = ({
     ? isImprovement(variation, getMetricDirection(firstMetric.metricKey))
     : null;
   const extraMetrics = Math.max(0, record.primaryMetrics.length - 1);
-  const lastStep = STEPS.find((s) => s.id === record.currentStep);
-  const isDraft = record.status === "rascunho";
 
   const showWarning = record.status === "sem_evidencia";
 
@@ -188,7 +183,7 @@ const CaseCard = ({
           )}
         </div>
 
-        {!isDraft && firstMetric && firstMetric.label && firstMetric.before && firstMetric.after ? (
+        {firstMetric && firstMetric.label && firstMetric.before && firstMetric.after ? (
           <div className="flex items-baseline justify-between gap-2">
             <span className="truncate text-xs text-muted-foreground">
               {firstMetric.label}
@@ -212,28 +207,18 @@ const CaseCard = ({
               {formatVariation(variation)}
             </span>
           </div>
-        ) : isDraft ? (
-          <div className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground">
-            <span className="truncate">
-              Parou em <span className="text-foreground">{lastStep?.title ?? "Etapa 1"}</span>
-            </span>
-            <span className="font-semibold text-foreground">
-              {Math.round(((record.currentStep - 1) / STEPS.length) * 100)}%
-            </span>
-          </div>
         ) : null}
 
-        {(showWarning || isMine || isDraft) && (
+        {(showWarning || isMine) && (
           <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
             {showWarning && (
               <span className="inline-flex items-center gap-1 text-orange-600 dark:text-orange-400">
                 <AlertCircle className="h-3 w-3" /> sem evidência
               </span>
             )}
-            {isMine && !isDraft && !showWarning && (
+            {isMine && !showWarning && (
               <span className="text-primary">meu</span>
             )}
-            {isDraft && <span className="text-amber-600 dark:text-amber-400">rascunho</span>}
           </div>
         )}
       </CardContent>
@@ -277,7 +262,6 @@ const Cases = () => {
   const [productsFilter, setProductsFilter] = useState<V4Product[]>([]);
   const [sortKey, setSortKey] = useState<SortKey>("recent");
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
-  const [confirmClearDrafts, setConfirmClearDrafts] = useState(false);
   const [currentEmail, setCurrentEmail] = useState<string>("");
 
   useEffect(() => {
@@ -393,9 +377,7 @@ const Cases = () => {
 
   const explore = useMemo(
     () =>
-      sortRecords(
-        applyCommonFilters(cases.filter((c) => c.status !== "rascunho")),
-      ),
+      sortRecords(applyCommonFilters(cases)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [cases, search, segmentFilter, nichoFilter, salesModelFilter, stateFilter, reachFilter, productsFilter, sortKey],
   );
@@ -404,28 +386,11 @@ const Cases = () => {
     () =>
       sortRecords(
         applyCommonFilters(
-          cases.filter(
-            (c) =>
-              c.status !== "rascunho" &&
-              c.ownerEmail?.toLowerCase() === myEmailLower,
-          ),
+          cases.filter((c) => c.ownerEmail?.toLowerCase() === myEmailLower),
         ),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [cases, search, segmentFilter, nichoFilter, salesModelFilter, stateFilter, reachFilter, productsFilter, sortKey, myEmailLower],
-  );
-
-  const myDrafts = useMemo(
-    () =>
-      sortRecords(
-        cases.filter(
-          (c) =>
-            c.status === "rascunho" &&
-            (!c.ownerEmail || c.ownerEmail.toLowerCase() === myEmailLower),
-        ),
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cases, sortKey, myEmailLower],
   );
 
   const myStats = useMemo(() => {
@@ -435,7 +400,6 @@ const Cases = () => {
     return {
       total: mine.length,
       complete: mine.filter((c) => c.status === "completo").length,
-      drafts: mine.filter((c) => c.status === "rascunho").length,
       noEvidence: mine.filter((c) => c.status === "sem_evidencia").length,
     };
   }, [cases, myEmailLower]);
@@ -634,12 +598,6 @@ const Cases = () => {
             <TabsTrigger value="meus">
               Meus cases ({myCases.length})
             </TabsTrigger>
-            <TabsTrigger value="rascunhos">
-              Rascunhos ({myDrafts.length})
-              {myDrafts.length > 0 && (
-                <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
-              )}
-            </TabsTrigger>
             <TabsTrigger value="ranking">
               <BarChart3 className="mr-1.5 h-3.5 w-3.5" />
               Ranking
@@ -690,13 +648,7 @@ const Cases = () => {
                     record={c}
                     showOwner
                     isMine={c.ownerEmail?.toLowerCase() === myEmailLower}
-                    onOpen={() =>
-                      navigate(
-                        c.status === "rascunho"
-                          ? `/cases/${c.id}/editar`
-                          : `/cases/${c.id}`,
-                      )
-                    }
+                    onOpen={() => navigate(`/cases/${c.id}`)}
                   />
                 ))}
               </div>
@@ -704,12 +656,11 @@ const Cases = () => {
           </TabsContent>
 
           <TabsContent value="meus" className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-3">
               {[
                 { label: "Total registrados", value: myStats.total, tone: "text-foreground" },
                 { label: "Completos", value: myStats.complete, tone: "text-ter" },
                 { label: "Sem evidência", value: myStats.noEvidence, tone: "text-orange-600" },
-                { label: "Rascunhos", value: myStats.drafts, tone: "text-amber-600" },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -744,53 +695,11 @@ const Cases = () => {
                     key={c.id}
                     record={c}
                     isMine
-                    onOpen={() =>
-                      navigate(
-                        c.status === "rascunho"
-                          ? `/cases/${c.id}/editar`
-                          : `/cases/${c.id}`,
-                      )
-                    }
+                    onOpen={() => navigate(`/cases/${c.id}`)}
                     onDelete={() => setPendingDelete(c.id)}
                   />
                 ))}
               </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="rascunhos" className="space-y-4">
-            {myDrafts.length === 0 ? (
-              <EmptyState
-                title="Sem rascunhos pendentes"
-                description="Quando você começar um registro e não terminar, ele aparecerá aqui para você retomar de onde parou."
-              />
-            ) : (
-              <>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground">
-                    {myDrafts.length} {myDrafts.length === 1 ? "rascunho" : "rascunhos"} pendentes
-                  </p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setConfirmClearDrafts(true)}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                    Limpar todos os rascunhos
-                  </Button>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {myDrafts.map((c) => (
-                    <CaseCard
-                      key={c.id}
-                      record={c}
-                      onOpen={() => navigate(`/cases/${c.id}/editar`)}
-                      onDelete={() => setPendingDelete(c.id)}
-                    />
-                  ))}
-                </div>
-              </>
             )}
           </TabsContent>
 
@@ -818,37 +727,6 @@ const Cases = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={confirmClearDrafts} onOpenChange={setConfirmClearDrafts}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Limpar todos os rascunhos?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Todos os rascunhos serão removidos permanentemente. Cases publicados e
-              exemplos não serão afetados.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={async () => {
-                try {
-                  const count = await clearAllDrafts();
-                  setConfirmClearDrafts(false);
-                  await refresh();
-                  toast({
-                    title: count === 0 ? "Nenhum rascunho encontrado" : `${count} ${count === 1 ? "rascunho removido" : "rascunhos removidos"}`,
-                  });
-                } catch (err) {
-                  toast({ variant: "destructive", title: "Erro ao limpar rascunhos", description: err instanceof Error ? err.message : "" });
-                }
-              }}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              Limpar tudo
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </Layout>
   );
 };

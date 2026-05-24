@@ -62,13 +62,6 @@ const REACH_LABEL = Object.fromEntries(
 );
 
 const StatusBadge = ({ status }: { status: CaseRecord["status"] }) => {
-  if (status === "rascunho") {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
-        Rascunho
-      </span>
-    );
-  }
   if (status === "sem_evidencia") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-orange-400/40 bg-orange-400/10 px-2.5 py-0.5 text-xs font-semibold text-orange-700 dark:text-orange-400">
@@ -266,11 +259,6 @@ const CaseDetail = () => {
         </section>
       </Layout>
     );
-  }
-
-  if (record.status === "rascunho") {
-    navigate(`/cases/${record.id}/editar`, { replace: true });
-    return null;
   }
 
   const handleDelete = async () => {
