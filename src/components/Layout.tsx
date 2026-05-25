@@ -59,7 +59,7 @@ const navigationGroups: { label: string; items: NavigationItem[] }[] = [
           { title: "SABER", url: "/portfolio-produtos?categoria=saber", category: "saber" },
           { title: "TER", url: "/portfolio-produtos?categoria=ter", category: "ter" },
           { title: "EXECUTAR", url: "/portfolio-produtos?categoria=executar", category: "executar" },
-          { title: "POTERNCIALIZAR", url: "/portfolio-produtos?categoria=potencializar", category: "potencializar" },
+          { title: "POTENCIALIZAR", url: "/portfolio-produtos?categoria=potencializar", category: "potencializar" },
         ],
       },
       { title: "Stack Digital", url: "/stack-digital", icon: Network },
