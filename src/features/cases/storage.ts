@@ -64,6 +64,7 @@ interface CaseRow {
   final_notes: string;
   created_at: string;
   updated_at: string;
+  filled_at: string | null;
 }
 
 const arr = <T,>(v: Json): T[] => (Array.isArray(v) ? (v as T[]) : []);
@@ -73,6 +74,7 @@ const rowToRecord = (row: CaseRow): CaseRecord => ({
   id: row.id,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
+  filledAt: row.filled_at,
   status: (row.status as CaseStatus) || "sem_evidencia",
   currentStep: row.current_step || 1,
 
@@ -209,10 +211,9 @@ export const upsertCase = async (record: CaseRecord): Promise<CaseRecord> => {
       : typeof crypto !== "undefined" && "randomUUID" in crypto
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random()}`;
-  const payload = {
-    ...recordToRow({ ...record, id: safeId }),
-    filled_at: new Date().toISOString(),
-  };
+  // filled_at é a data real de criação do case: preenchida pelo DEFAULT now()
+  // do banco no primeiro insert e preservada nas edições (por isso não é enviada aqui).
+  const payload = recordToRow({ ...record, id: safeId });
   const { data, error } = await supabase
     .from("cases")
     .upsert([payload as never], { onConflict: "id" })

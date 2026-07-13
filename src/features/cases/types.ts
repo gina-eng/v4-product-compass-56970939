@@ -42,6 +42,7 @@ export interface CaseRecord {
   id: string;
   createdAt: string;
   updatedAt: string;
+  filledAt: string | null;
   status: CaseStatus;
   currentStep: number;
 
@@ -104,6 +105,7 @@ export const emptyCase = (ownerEmail = ""): CaseRecord => ({
   id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `case-${Date.now()}`,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
+  filledAt: null,
   status: "sem_evidencia",
   currentStep: 1,
   ownerEmail,

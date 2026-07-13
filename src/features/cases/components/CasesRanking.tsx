@@ -4,6 +4,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -128,7 +129,7 @@ const computeStats = (records: CaseRecord[]): Stats => {
   };
 
   for (const r of published) {
-    const date = new Date(r.createdAt || r.updatedAt);
+    const date = new Date(r.filledAt || r.createdAt || r.updatedAt);
     if (Number.isNaN(date.getTime())) continue;
     const key = monthKey(date);
     if (monthlyMap.has(key)) {
@@ -543,7 +544,17 @@ export const CasesRanking = ({ cases }: { cases: CaseRecord[] }) => {
                   strokeWidth={2.5}
                   dot={{ fill: "hsl(var(--primary))", r: 3 }}
                   activeDot={{ r: 5 }}
-                />
+                >
+                  <LabelList
+                    dataKey="total"
+                    position="top"
+                    offset={10}
+                    fontSize={11}
+                    fontWeight={600}
+                    fill="hsl(var(--foreground))"
+                    formatter={(value: number) => (value > 0 ? value : "")}
+                  />
+                </Line>
               </LineChart>
             </ResponsiveContainer>
           </div>
