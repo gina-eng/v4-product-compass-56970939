@@ -2,6 +2,7 @@ import { ExternalLink, FileText, Mic, Monitor } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldShell } from "../components/FieldShell";
+import { hasDeliveryResult } from "../options";
 import type { CaseRecord } from "../types";
 
 interface StepProps {
@@ -62,16 +63,26 @@ export const Step6Evidence = ({ record, errors, update }: StepProps) => {
   const hasAnyEvidence = Boolean(
     record.dashboardUrl || record.presentationUrl || record.testimonialUrl,
   );
+  // Cases de entrega não têm números de negócio — o link é a prova, então é obrigatório.
+  const evidenceRequired = hasDeliveryResult(record.resultType);
 
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 text-sm text-foreground">
         <p className="font-semibold">Última etapa.</p>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          Cases com evidências comprováveis ganham prioridade nas buscas. Sem nenhum link, o case
-          é registrado com a flag <span className="font-semibold">"Sem evidência"</span> e fica
-          pendente de curadoria.
-        </p>
+        {evidenceRequired ? (
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            Cases de entrega / percepção precisam de{" "}
+            <span className="font-semibold">ao menos um link de evidência</span> — o material é o
+            que comprova o resultado (ex.: perfil, apresentação da entrega, depoimento do cliente).
+          </p>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            Cases com evidências comprováveis ganham prioridade nas buscas. Sem nenhum link, o case
+            é registrado com a flag <span className="font-semibold">"Sem evidência"</span> e fica
+            pendente de curadoria.
+          </p>
+        )}
       </div>
 
       <div className="space-y-3">
@@ -101,11 +112,23 @@ export const Step6Evidence = ({ record, errors, update }: StepProps) => {
         />
       </div>
 
-      {!hasAnyEvidence && (
+      {errors.evidence && (
+        <p role="alert" className="text-xs font-medium text-destructive">
+          {errors.evidence}
+        </p>
+      )}
+
+      {!hasAnyEvidence && !evidenceRequired && (
         <div className="rounded-lg border border-amber-400/40 bg-amber-400/5 px-4 py-3 text-xs text-amber-700 dark:text-amber-400">
           Nenhum link informado — o case será marcado como{" "}
           <span className="font-semibold">"Sem evidência"</span>. Você ainda pode finalizar o
           registro.
+        </div>
+      )}
+
+      {!hasAnyEvidence && evidenceRequired && !errors.evidence && (
+        <div className="rounded-lg border border-amber-400/40 bg-amber-400/5 px-4 py-3 text-xs text-amber-700 dark:text-amber-400">
+          Informe ao menos um link para finalizar o registro deste case de entrega.
         </div>
       )}
 

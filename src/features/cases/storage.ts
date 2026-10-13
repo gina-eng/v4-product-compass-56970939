@@ -13,6 +13,7 @@ import type {
   ClientStatus,
   OperationReach,
   PreviousAttempt,
+  ResultType,
   SalesModel,
   V4Product,
 } from "./options";
@@ -58,6 +59,13 @@ interface CaseRow {
   secondary_metrics: Json;
   media_investment: string;
   attributed_revenue: string;
+  // Colunas aditivas (20261010120000) — opcionais para tolerar linhas antigas.
+  result_type?: string | null;
+  success_thesis?: string | null;
+  qualitative_before?: string | null;
+  qualitative_after?: string | null;
+  success_proofs?: Json;
+  delivery_metrics?: Json;
   dashboard_url: string;
   presentation_url: string;
   testimonial_url: string;
@@ -65,9 +73,30 @@ interface CaseRow {
   created_at: string;
   updated_at: string;
   filled_at: string | null;
+  // Relação embutida via select("*, case_campaign_links(campaign_id)").
+  case_campaign_links?: { campaign_id: string }[] | null;
 }
 
-const arr = <T,>(v: Json): T[] => (Array.isArray(v) ? (v as T[]) : []);
+const CASE_SELECT = "*, case_campaign_links(campaign_id)";
+
+// Resiliência à ordem de deploy: se o select com a relação embutida falhar
+// (migration 20261010120000 ainda não aplicada), cai para select("*") e os
+// cases vêm com campaignIds = []. Avisa uma única vez no console.
+let embeddedSelectWarned = false;
+const warnEmbeddedSelectOnce = (error: unknown) => {
+  if (embeddedSelectWarned) return;
+  embeddedSelectWarned = true;
+  console.warn(
+    "Select de cases com case_campaign_links falhou; usando select('*') sem campanhas:",
+    error,
+  );
+};
+
+const RESULT_TYPES: ResultType[] = ["negocio", "entrega", "ambos"];
+const toResultType = (v: unknown): ResultType =>
+  RESULT_TYPES.includes(v as ResultType) ? (v as ResultType) : "negocio";
+
+const arr = <T,>(v: Json | undefined): T[] => (Array.isArray(v) ? (v as T[]) : []);
 const str = (v: unknown): string => (typeof v === "string" ? v : "");
 
 const rowToRecord = (row: CaseRow): CaseRecord => ({
@@ -94,6 +123,9 @@ const rowToRecord = (row: CaseRow): CaseRecord => ({
   nicho: str(row.nicho),
   products: arr<V4Product>(row.products),
   primaryDriver: (row.primary_driver as V4Product) || "",
+  // Sem valor (linhas legadas) = "negocio", que é o comportamento de antes.
+  resultType: toResultType(row.result_type),
+  campaignIds: (row.case_campaign_links ?? []).map((l) => l.campaign_id),
 
   initialChallenges: arr<string>(row.initial_challenges),
   initialChallengesOther: str(row.initial_challenges_other),
@@ -120,6 +152,11 @@ const rowToRecord = (row: CaseRow): CaseRecord => ({
   secondaryMetrics: arr<SecondaryMetric>(row.secondary_metrics),
   mediaInvestment: str(row.media_investment),
   attributedRevenue: str(row.attributed_revenue),
+  successThesis: str(row.success_thesis),
+  qualitativeBefore: str(row.qualitative_before),
+  qualitativeAfter: str(row.qualitative_after),
+  successProofs: arr<string>(row.success_proofs),
+  deliveryMetrics: arr<PrimaryMetricEntry>(row.delivery_metrics),
 
   dashboardUrl: str(row.dashboard_url),
   presentationUrl: str(row.presentation_url),
@@ -169,6 +206,13 @@ const recordToRow = (r: CaseRecord) => ({
   secondary_metrics: r.secondaryMetrics as unknown as Json,
   media_investment: r.mediaInvestment,
   attributed_revenue: r.attributedRevenue,
+  // A validação garante resultType preenchido ao salvar; fallback por segurança.
+  result_type: r.resultType || "negocio",
+  success_thesis: r.successThesis,
+  qualitative_before: r.qualitativeBefore,
+  qualitative_after: r.qualitativeAfter,
+  success_proofs: r.successProofs as unknown as Json,
+  delivery_metrics: r.deliveryMetrics as unknown as Json,
   dashboard_url: r.dashboardUrl,
   presentation_url: r.presentationUrl,
   testimonial_url: r.testimonialUrl,
@@ -176,6 +220,13 @@ const recordToRow = (r: CaseRecord) => ({
 });
 
 export const listCases = async (): Promise<CaseRecord[]> => {
+  const embedded = await supabase
+    .from("cases")
+    .select(CASE_SELECT)
+    .order("updated_at", { ascending: false });
+  if (!embedded.error) return (embedded.data as unknown as CaseRow[]).map(rowToRecord);
+  warnEmbeddedSelectOnce(embedded.error);
+
   const { data, error } = await supabase
     .from("cases")
     .select("*")
@@ -184,10 +235,20 @@ export const listCases = async (): Promise<CaseRecord[]> => {
     console.error("Erro ao listar cases:", error);
     return [];
   }
-  return (data as CaseRow[]).map(rowToRecord);
+  return (data as unknown as CaseRow[]).map(rowToRecord);
 };
 
 export const getCase = async (id: string): Promise<CaseRecord | undefined> => {
+  const embedded = await supabase
+    .from("cases")
+    .select(CASE_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+  if (!embedded.error) {
+    return embedded.data ? rowToRecord(embedded.data as unknown as CaseRow) : undefined;
+  }
+  warnEmbeddedSelectOnce(embedded.error);
+
   const { data, error } = await supabase
     .from("cases")
     .select("*")
@@ -197,11 +258,43 @@ export const getCase = async (id: string): Promise<CaseRecord | undefined> => {
     console.error("Erro ao buscar case:", error);
     return undefined;
   }
-  return data ? rowToRecord(data as CaseRow) : undefined;
+  return data ? rowToRecord(data as unknown as CaseRow) : undefined;
 };
 
 const isUuid = (v: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+
+// Sincroniza case_campaign_links com a seleção do form: remove vínculos
+// desmarcados e insere os novos (sem duplicar os que já existem).
+const syncCampaignLinks = async (caseId: string, campaignIds: string[]) => {
+  const { data: current, error: listError } = await supabase
+    .from("case_campaign_links")
+    .select("campaign_id")
+    .eq("case_id", caseId);
+  if (listError) throw listError;
+
+  const toRemove = (current ?? [])
+    .map((l) => l.campaign_id)
+    .filter((cid) => !campaignIds.includes(cid));
+  if (toRemove.length > 0) {
+    const { error } = await supabase
+      .from("case_campaign_links")
+      .delete()
+      .eq("case_id", caseId)
+      .in("campaign_id", toRemove);
+    if (error) throw error;
+  }
+
+  if (campaignIds.length > 0) {
+    const { error } = await supabase
+      .from("case_campaign_links")
+      .upsert(
+        campaignIds.map((campaign_id) => ({ case_id: caseId, campaign_id })),
+        { onConflict: "case_id,campaign_id", ignoreDuplicates: true },
+      );
+    if (error) throw error;
+  }
+};
 
 export const upsertCase = async (record: CaseRecord): Promise<CaseRecord> => {
   // Garante UUID válido (ids legados ou de exemplo viram novos uuids)
@@ -220,7 +313,20 @@ export const upsertCase = async (record: CaseRecord): Promise<CaseRecord> => {
     .select()
     .single();
   if (error) throw error;
-  return rowToRecord(data as CaseRow);
+  const campaignIds = Array.from(new Set(record.campaignIds));
+  if (campaignIds.length > 0) {
+    await syncCampaignLinks(safeId, campaignIds);
+  } else {
+    // Sem campanhas: só limpa vínculos antigos (caso o usuário tenha desmarcado
+    // todas) em modo best-effort — se a tabela ainda não existir (migration não
+    // aplicada), o erro é ignorado e o save do case segue normalmente.
+    const { error: clearError } = await supabase
+      .from("case_campaign_links")
+      .delete()
+      .eq("case_id", safeId);
+    if (clearError) console.warn("Não foi possível limpar campanhas do case:", clearError);
+  }
+  return { ...rowToRecord(data as CaseRow), campaignIds };
 };
 
 export const deleteCase = async (id: string): Promise<void> => {

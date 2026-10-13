@@ -3,6 +3,7 @@ import type {
   ClientStatus,
   OperationReach,
   PreviousAttempt,
+  ResultType,
   SalesModel,
   V4Product,
 } from "./options";
@@ -64,6 +65,9 @@ export interface CaseRecord {
   nicho: string;
   products: V4Product[];
   primaryDriver: V4Product | "";
+  resultType: ResultType | "";
+  // Vem de case_campaign_links (não é coluna de cases).
+  campaignIds: string[];
 
   // Etapa 3 — contexto
   initialChallenges: string[];
@@ -93,6 +97,12 @@ export interface CaseRecord {
   secondaryMetrics: SecondaryMetric[];
   mediaInvestment: string;
   attributedRevenue: string;
+  // Cases de entrega / percepção
+  successThesis: string;
+  qualitativeBefore: string;
+  qualitativeAfter: string;
+  successProofs: string[];
+  deliveryMetrics: PrimaryMetricEntry[];
 
   // Etapa 6 — evidências
   dashboardUrl: string;
@@ -123,6 +133,9 @@ export const emptyCase = (ownerEmail = ""): CaseRecord => ({
   nicho: "",
   products: [],
   primaryDriver: "",
+  // Vazio de propósito: cases novos precisam escolher o tipo de resultado.
+  resultType: "",
+  campaignIds: [],
   initialChallenges: [],
   initialChallengesOther: "",
   problem: "",
@@ -146,6 +159,11 @@ export const emptyCase = (ownerEmail = ""): CaseRecord => ({
   secondaryMetrics: [],
   mediaInvestment: "",
   attributedRevenue: "",
+  successThesis: "",
+  qualitativeBefore: "",
+  qualitativeAfter: "",
+  successProofs: [],
+  deliveryMetrics: [],
   dashboardUrl: "",
   presentationUrl: "",
   testimonialUrl: "",

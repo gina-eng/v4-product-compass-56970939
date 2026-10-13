@@ -18,6 +18,7 @@ import {
   Calendar,
   Handshake,
   Layers,
+  Megaphone,
   TrendingUp,
   UserCircle2,
 } from "lucide-react";
@@ -25,6 +26,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { SALES_MODELS } from "../options";
 import type { CaseRecord } from "../types";
+import type { CaseCampaign } from "@/features/campaigns/storage";
 
 const SALES_LABEL = Object.fromEntries(SALES_MODELS.map((m) => [m.value, m.label]));
 
@@ -80,11 +82,12 @@ type Stats = {
   ownerRanking: RankRow[];
   segmentDistribution: CategoryRow[];
   salesModelDistribution: CategoryRow[];
+  campaignDistribution: CategoryRow[];
   currentMonthLabel: string;
   prevMonthLabel: string;
 };
 
-const computeStats = (records: CaseRecord[]): Stats => {
+const computeStats = (records: CaseRecord[], campaigns: CaseCampaign[]): Stats => {
   const published = records;
 
   const now = new Date();
@@ -103,6 +106,8 @@ const computeStats = (records: CaseRecord[]): Stats => {
   const ownerAgg = new Map<string, { total: number; thisMonth: number; prevMonth: number }>();
   const segmentAgg = new Map<string, { total: number; thisMonth: number }>();
   const salesAgg = new Map<string, { total: number; thisMonth: number }>();
+  const campaignAgg = new Map<string, { total: number; thisMonth: number }>();
+  const campaignName = new Map(campaigns.map((c) => [c.id, c.name]));
 
   const bumpCategory = (
     map: Map<string, { total: number; thisMonth: number }>,
@@ -149,6 +154,11 @@ const computeStats = (records: CaseRecord[]): Stats => {
 
     const salesKey = r.salesModel ? SALES_LABEL[r.salesModel] ?? r.salesModel : "Não informado";
     bumpCategory(salesAgg, salesKey, isThis);
+
+    // Um case pode estar em mais de uma campanha — conta em cada uma.
+    for (const campaignId of r.campaignIds) {
+      bumpCategory(campaignAgg, campaignName.get(campaignId) ?? "Campanha removida", isThis);
+    }
   }
 
   const monthly: MonthlyPoint[] = Array.from(monthlyMap.entries()).map(([key, total]) => ({
@@ -195,6 +205,7 @@ const computeStats = (records: CaseRecord[]): Stats => {
 
   const segmentDistribution = toCategoryRows(segmentAgg);
   const salesModelDistribution = toCategoryRows(salesAgg);
+  const campaignDistribution = toCategoryRows(campaignAgg);
 
   // Unidades/operadores únicos no mês atual
   const unitsThisMonth = Array.from(unitAgg.values()).filter((v) => v.thisMonth > 0).length;
@@ -212,6 +223,7 @@ const computeStats = (records: CaseRecord[]): Stats => {
     ownerRanking,
     segmentDistribution,
     salesModelDistribution,
+    campaignDistribution,
     currentMonthLabel: formatMonthLabel(currentKey),
     prevMonthLabel: formatMonthLabel(prevKey),
   };
@@ -442,8 +454,14 @@ const obfuscateEmail = (email: string) => {
   return `${local}@${domain}`;
 };
 
-export const CasesRanking = ({ cases }: { cases: CaseRecord[] }) => {
-  const stats = useMemo(() => computeStats(cases), [cases]);
+export const CasesRanking = ({
+  cases,
+  campaigns = [],
+}: {
+  cases: CaseRecord[];
+  campaigns?: CaseCampaign[];
+}) => {
+  const stats = useMemo(() => computeStats(cases, campaigns), [cases, campaigns]);
 
   if (stats.totalAll === 0) {
     return (
@@ -643,6 +661,19 @@ export const CasesRanking = ({ cases }: { cases: CaseRecord[] }) => {
           </CardContent>
         </Card>
       </div>
+
+      {stats.campaignDistribution.length > 0 && (
+        <Card className="overflow-hidden">
+          <CardContent className="space-y-4 p-5">
+            <SectionTitle
+              icon={Megaphone}
+              title="Cases por campanha"
+              subtitle="Cases vinculados a campanhas especiais"
+            />
+            <CategoryChart rows={stats.campaignDistribution} />
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="overflow-hidden">
         <CardContent className="space-y-4 p-5">

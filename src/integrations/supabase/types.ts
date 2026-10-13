@@ -47,6 +47,75 @@ export type Database = {
         }
         Relationships: []
       }
+      case_campaign_links: {
+        Row: {
+          campaign_id: string
+          case_id: string
+          created_at: string
+        }
+        Insert: {
+          campaign_id: string
+          case_id: string
+          created_at?: string
+        }
+        Update: {
+          campaign_id?: string
+          case_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_campaign_links_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "case_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "case_campaign_links_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_campaigns: {
+        Row: {
+          archived_at: string | null
+          color: string
+          created_at: string
+          description: string
+          ends_at: string
+          id: string
+          name: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          color?: string
+          created_at?: string
+          description?: string
+          ends_at: string
+          id?: string
+          name: string
+          starts_at: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          color?: string
+          created_at?: string
+          description?: string
+          ends_at?: string
+          id?: string
+          name?: string
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cases: {
         Row: {
           attributed_revenue: string | null
@@ -59,6 +128,7 @@ export type Database = {
           created_at: string | null
           current_step: number | null
           dashboard_url: string | null
+          delivery_metrics: Json
           executar_channels: Json | null
           executar_creatives: Json | null
           executar_creatives_communication: string | null
@@ -84,8 +154,11 @@ export type Database = {
           primary_metrics: Json | null
           problem: string | null
           products: Json | null
+          qualitative_after: string
+          qualitative_before: string
           restrictions: Json | null
           restrictions_other: string | null
+          result_type: string
           resumo: string | null
           root_cause: string | null
           saber_directions: Json | null
@@ -94,6 +167,8 @@ export type Database = {
           secondary_metrics: Json | null
           segment: string | null
           status: string | null
+          success_proofs: Json
+          success_thesis: string
           ter_value_perception: string | null
           testimonial_url: string | null
           time_to_result: string | null
@@ -111,6 +186,7 @@ export type Database = {
           created_at?: string | null
           current_step?: number | null
           dashboard_url?: string | null
+          delivery_metrics?: Json
           executar_channels?: Json | null
           executar_creatives?: Json | null
           executar_creatives_communication?: string | null
@@ -136,8 +212,11 @@ export type Database = {
           primary_metrics?: Json | null
           problem?: string | null
           products?: Json | null
+          qualitative_after?: string
+          qualitative_before?: string
           restrictions?: Json | null
           restrictions_other?: string | null
+          result_type?: string
           resumo?: string | null
           root_cause?: string | null
           saber_directions?: Json | null
@@ -146,6 +225,8 @@ export type Database = {
           secondary_metrics?: Json | null
           segment?: string | null
           status?: string | null
+          success_proofs?: Json
+          success_thesis?: string
           ter_value_perception?: string | null
           testimonial_url?: string | null
           time_to_result?: string | null
@@ -163,6 +244,7 @@ export type Database = {
           created_at?: string | null
           current_step?: number | null
           dashboard_url?: string | null
+          delivery_metrics?: Json
           executar_channels?: Json | null
           executar_creatives?: Json | null
           executar_creatives_communication?: string | null
@@ -188,8 +270,11 @@ export type Database = {
           primary_metrics?: Json | null
           problem?: string | null
           products?: Json | null
+          qualitative_after?: string
+          qualitative_before?: string
           restrictions?: Json | null
           restrictions_other?: string | null
+          result_type?: string
           resumo?: string | null
           root_cause?: string | null
           saber_directions?: Json | null
@@ -198,6 +283,8 @@ export type Database = {
           secondary_metrics?: Json | null
           segment?: string | null
           status?: string | null
+          success_proofs?: Json
+          success_thesis?: string
           ter_value_perception?: string | null
           testimonial_url?: string | null
           time_to_result?: string | null

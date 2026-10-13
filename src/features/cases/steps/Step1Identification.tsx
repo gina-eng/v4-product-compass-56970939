@@ -90,7 +90,7 @@ export const Step1Identification = ({ record, errors, update }: StepProps) => {
           />
         </FieldShell>
 
-        <FieldShell label="CNPJ do cliente" required error={errors.clientCnpj}>
+        <FieldShell label="CNPJ do cliente" error={errors.clientCnpj}>
           <Input
             value={record.clientCnpj}
             onChange={(e) => update({ clientCnpj: formatCnpj(e.target.value) })}
@@ -147,7 +147,7 @@ export const Step1Identification = ({ record, errors, update }: StepProps) => {
           </Select>
         </FieldShell>
 
-        <FieldShell label="Status atual do cliente" required error={errors.clientStatus}>
+        <FieldShell label="Status atual do cliente" error={errors.clientStatus}>
           <Select
             value={record.clientStatus}
             onValueChange={(v) => update({ clientStatus: v as ClientStatus })}

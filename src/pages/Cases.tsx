@@ -44,6 +44,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { LOCAL_PREVIEW_EMAIL, isLocalPreviewAuthEnabled } from "@/lib/auth";
 import { deleteCase, listCases } from "@/features/cases/storage";
+import { listCampaigns } from "@/features/campaigns/storage";
+import type { CaseCampaign } from "@/features/campaigns/storage";
+import { CampaignBadge } from "@/features/campaigns/components/CampaignBadge";
 import { fuzzyMatch } from "@/features/cases/search";
 import { CasesRanking } from "@/features/cases/components/CasesRanking";
 import type { CaseRecord } from "@/features/cases/types";
@@ -54,7 +57,12 @@ import {
   isImprovement,
   normalizedImprovement,
 } from "@/features/cases/format";
-import { getMetricDirection } from "@/features/cases/options";
+import {
+  getMetricDirection,
+  getPrincipalMetricKeys,
+  hasBusinessResult,
+  hasDeliveryResult,
+} from "@/features/cases/options";
 import {
   BRAZIL_STATES,
   OPERATION_REACH_OPTIONS,
@@ -89,6 +97,22 @@ type SortKey = "recent" | "variation";
 
 const ALL = "__all__";
 
+// Filtro por tipo de resultado: "ambos" aparece nos dois recortes.
+const RESULT_FILTER_NEGOCIO = "negocio";
+const RESULT_FILTER_ENTREGA = "entrega";
+
+// primaryMetrics guarda todas as linhas do catálogo (muitas vazias).
+const filledPrimaryMetrics = (record: CaseRecord) =>
+  record.primaryMetrics.filter((m) => m.before && m.after);
+
+// Métrica de destaque do card e da ordenação "Maior variação": a primeira
+// principal preenchida do modelo de venda; senão, a primeira preenchida.
+const highlightMetric = (record: CaseRecord) => {
+  const filled = filledPrimaryMetrics(record);
+  const principalKeys = getPrincipalMetricKeys(record.salesModel);
+  return filled.find((m) => principalKeys.includes(m.metricKey)) ?? filled[0];
+};
+
 const PRODUCT_INITIAL: Record<string, string> = {
   saber: "S",
   ter: "T",
@@ -115,21 +139,28 @@ const CaseCard = ({
   onDelete,
   onOpen,
   isMine,
+  campaignsById,
 }: {
   record: CaseRecord;
   onDelete?: () => void;
   onOpen: () => void;
   showOwner?: boolean;
   isMine?: boolean;
+  campaignsById: Map<string, CaseCampaign>;
 }) => {
-  const firstMetric = record.primaryMetrics[0];
+  const filledMetrics = filledPrimaryMetrics(record);
+  const firstMetric = highlightMetric(record);
   const variation = firstMetric
     ? computeVariation(firstMetric.before, firstMetric.after)
     : null;
   const isPositive = firstMetric
     ? isImprovement(variation, getMetricDirection(firstMetric.metricKey))
     : null;
-  const extraMetrics = Math.max(0, record.primaryMetrics.length - 1);
+  const extraMetrics = Math.max(0, filledMetrics.length - 1);
+  const showDelivery = !firstMetric && hasDeliveryResult(record.resultType);
+  const campaigns = record.campaignIds
+    .map((cid) => campaignsById.get(cid))
+    .filter((c): c is CaseCampaign => Boolean(c));
 
   const showWarning = record.status === "sem_evidencia";
 
@@ -207,7 +238,26 @@ const CaseCard = ({
               {formatVariation(variation)}
             </span>
           </div>
+        ) : showDelivery ? (
+          <div className="space-y-1">
+            <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+              Entrega
+            </span>
+            {record.successThesis && (
+              <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                {record.successThesis}
+              </p>
+            )}
+          </div>
         ) : null}
+
+        {campaigns.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {campaigns.map((c) => (
+              <CampaignBadge key={c.id} campaign={c} />
+            ))}
+          </div>
+        )}
 
         {(showWarning || isMine) && (
           <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
@@ -260,6 +310,9 @@ const Cases = () => {
   const [stateFilter, setStateFilter] = useState<string>(ALL);
   const [reachFilter, setReachFilter] = useState<string>(ALL);
   const [productsFilter, setProductsFilter] = useState<V4Product[]>([]);
+  const [resultTypeFilter, setResultTypeFilter] = useState<string>(ALL);
+  const [campaignFilter, setCampaignFilter] = useState<string>(ALL);
+  const [campaigns, setCampaigns] = useState<CaseCampaign[]>([]);
   const [sortKey, setSortKey] = useState<SortKey>("recent");
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const [currentEmail, setCurrentEmail] = useState<string>("");
@@ -285,7 +338,19 @@ const Cases = () => {
 
   useEffect(() => {
     void refresh();
+    void listCampaigns().then(setCampaigns);
   }, []);
+
+  const campaignsById = useMemo(
+    () => new Map(campaigns.map((c) => [c.id, c])),
+    [campaigns],
+  );
+
+  // Campanhas não arquivadas + qualquer uma já usada em algum case.
+  const campaignOptions = useMemo(() => {
+    const referenced = new Set(cases.flatMap((c) => c.campaignIds));
+    return campaigns.filter((c) => !c.archivedAt || referenced.has(c.id));
+  }, [campaigns, cases]);
 
   const toggleProduct = (product: V4Product) => {
     setProductsFilter((prev) =>
@@ -301,6 +366,8 @@ const Cases = () => {
     setStateFilter(ALL);
     setReachFilter(ALL);
     setProductsFilter([]);
+    setResultTypeFilter(ALL);
+    setCampaignFilter(ALL);
   };
 
   const hasActiveFilters =
@@ -310,6 +377,8 @@ const Cases = () => {
     salesModelFilter !== ALL ||
     stateFilter !== ALL ||
     reachFilter !== ALL ||
+    resultTypeFilter !== ALL ||
+    campaignFilter !== ALL ||
     productsFilter.length > 0;
 
   const nichoOptions = useMemo(() => {
@@ -339,6 +408,8 @@ const Cases = () => {
           ...(c.initialChallenges ?? []),
           c.problem ?? "",
           c.rootCause ?? "",
+          c.successThesis ?? "",
+          ...c.campaignIds.map((cid) => campaignsById.get(cid)?.name ?? ""),
           c.ownerEmail ?? "",
         ]
           .filter(Boolean)
@@ -354,6 +425,12 @@ const Cases = () => {
     if (productsFilter.length > 0) {
       result = result.filter((c) => productsFilter.every((p) => c.products.includes(p)));
     }
+    if (resultTypeFilter === RESULT_FILTER_NEGOCIO)
+      result = result.filter((c) => hasBusinessResult(c.resultType));
+    if (resultTypeFilter === RESULT_FILTER_ENTREGA)
+      result = result.filter((c) => hasDeliveryResult(c.resultType));
+    if (campaignFilter !== ALL)
+      result = result.filter((c) => c.campaignIds.includes(campaignFilter));
     return result;
   };
 
@@ -363,7 +440,7 @@ const Cases = () => {
       list.sort((a, b) => (a.updatedAt > b.updatedAt ? -1 : 1));
     } else if (sortKey === "variation") {
       const score = (c: CaseRecord) => {
-        const m = c.primaryMetrics[0];
+        const m = highlightMetric(c);
         if (!m) return -Infinity;
         const v = computeVariation(m.before, m.after);
         return normalizedImprovement(v, m.metricKey);
@@ -379,7 +456,7 @@ const Cases = () => {
     () =>
       sortRecords(applyCommonFilters(cases)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cases, search, segmentFilter, nichoFilter, salesModelFilter, stateFilter, reachFilter, productsFilter, sortKey],
+    [cases, search, segmentFilter, nichoFilter, salesModelFilter, stateFilter, reachFilter, productsFilter, resultTypeFilter, campaignFilter, campaignsById, sortKey],
   );
 
   const myCases = useMemo(
@@ -390,7 +467,7 @@ const Cases = () => {
         ),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cases, search, segmentFilter, nichoFilter, salesModelFilter, stateFilter, reachFilter, productsFilter, sortKey, myEmailLower],
+    [cases, search, segmentFilter, nichoFilter, salesModelFilter, stateFilter, reachFilter, productsFilter, resultTypeFilter, campaignFilter, campaignsById, sortKey, myEmailLower],
   );
 
   const myStats = useMemo(() => {
@@ -447,7 +524,7 @@ const Cases = () => {
         </div>
       </div>
 
-      <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
         <Select value={segmentFilter} onValueChange={setSegmentFilter}>
           <SelectTrigger>
             <SelectValue placeholder="Segmento" />
@@ -517,6 +594,35 @@ const Cases = () => {
             {OPERATION_REACH_OPTIONS.map((r) => (
               <SelectItem key={r.value} value={r.value}>
                 {r.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={resultTypeFilter} onValueChange={setResultTypeFilter}>
+          <SelectTrigger aria-label="Tipo de resultado">
+            <SelectValue placeholder="Tipo de resultado" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL}>Todos os tipos de resultado</SelectItem>
+            <SelectItem value={RESULT_FILTER_NEGOCIO}>Resultado de negócio</SelectItem>
+            <SelectItem value={RESULT_FILTER_ENTREGA}>Entrega / percepção</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={campaignFilter}
+          onValueChange={setCampaignFilter}
+          disabled={campaignOptions.length === 0}
+        >
+          <SelectTrigger aria-label="Campanha">
+            <SelectValue placeholder="Campanha" />
+          </SelectTrigger>
+          <SelectContent className="max-h-72">
+            <SelectItem value={ALL}>Todas as campanhas</SelectItem>
+            {campaignOptions.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {c.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -648,6 +754,7 @@ const Cases = () => {
                     record={c}
                     showOwner
                     isMine={c.ownerEmail?.toLowerCase() === myEmailLower}
+                    campaignsById={campaignsById}
                     onOpen={() => navigate(`/cases/${c.id}`)}
                   />
                 ))}
@@ -679,7 +786,7 @@ const Cases = () => {
             {myCases.length === 0 ? (
               <EmptyState
                 title="Você ainda não publicou nenhum case"
-                description="Conclua o wizard de 6 etapas e seu case aparecerá aqui — pronto para alimentar a Zyman AI."
+                description="Conclua o formulário de 5 etapas e seu case aparecerá aqui — pronto para alimentar a Zyman AI."
                 cta={
                   <Button asChild size="sm">
                     <Link to="/cases/novo">
@@ -695,6 +802,7 @@ const Cases = () => {
                     key={c.id}
                     record={c}
                     isMine
+                    campaignsById={campaignsById}
                     onOpen={() => navigate(`/cases/${c.id}`)}
                     onDelete={() => setPendingDelete(c.id)}
                   />
@@ -704,7 +812,7 @@ const Cases = () => {
           </TabsContent>
 
           <TabsContent value="ranking" className="space-y-4">
-            <CasesRanking cases={cases} />
+            <CasesRanking cases={cases} campaigns={campaigns} />
           </TabsContent>
         </Tabs>
       </section>
@@ -714,8 +822,8 @@ const Cases = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir este case?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O registro será removido permanentemente do seu
-              navegador.
+              Esta ação não pode ser desfeita. O registro será removido permanentemente da
+              base.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

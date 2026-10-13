@@ -7,6 +7,32 @@ export type PreviousAttempt =
   | "freelancer"
   | "nao";
 export type CaseStatus = "completo" | "sem_evidencia";
+export type ResultType = "negocio" | "entrega" | "ambos";
+
+// Tipo de resultado do case. Cases legados (sem a coluna) são tratados como "negocio".
+export const RESULT_TYPE_OPTIONS: { value: ResultType; label: string; description: string }[] = [
+  {
+    value: "negocio",
+    label: "Resultado de negócio",
+    description: "Impacto em vendas, receita, leads ou eficiência de mídia, com números antes × depois.",
+  },
+  {
+    value: "entrega",
+    label: "Entrega / percepção",
+    description:
+      "Projetos cujo valor está na entrega e na percepção do cliente — ex.: social media, manual de marca.",
+  },
+  {
+    value: "ambos",
+    label: "Ambos",
+    description: "Teve entrega qualitativa e também impacto mensurável em negócio.",
+  },
+];
+
+export const hasBusinessResult = (resultType: ResultType | "") =>
+  resultType === "negocio" || resultType === "ambos";
+export const hasDeliveryResult = (resultType: ResultType | "") =>
+  resultType === "entrega" || resultType === "ambos";
 
 export const SALES_MODELS: { value: SalesModel; label: string; description: string }[] = [
   {
@@ -151,6 +177,9 @@ export const INITIAL_CHALLENGES = [
   "Marca / posicionamento confuso ou pouco diferenciado",
   "Dependência excessiva de poucos canais",
   "Dados / tracking não confiáveis",
+  "Identidade visual inconsistente",
+  "Presença digital fraca",
+  "Baixo engajamento orgânico",
 ];
 
 export const RESTRICTIONS = [
@@ -191,6 +220,20 @@ export const EXECUTAR_PROFESSIONALS = [
   "Profissional de Web Design",
 ];
 
+// Só com este profissional alocado o case precisa provar mídia paga (canais com
+// investimento/receita e ROAS). Sem ele, os campos de mídia ficam opcionais.
+export const PAID_MEDIA_PROFESSIONAL = "Profissional de Gestão de Mídia Paga";
+
+// Profissionais que produzem/veiculam criativo. Com ao menos um deles alocado,
+// tipos de criativo e comunicação dos criativos passam a ser obrigatórios.
+export const CREATIVE_PROFESSIONALS = [
+  PAID_MEDIA_PROFESSIONAL,
+  "Profissional de Social Media",
+  "Profissional de Designer Gráfico",
+  "Profissional de Audiovisual",
+  "Profissional de Redação Publicitária",
+];
+
 const ECOM_CHANNELS = [
   "Meta Ads",
   "Google Ads",
@@ -217,6 +260,18 @@ export const CHANNELS_BY_MODEL: Record<SalesModel, string[]> = {
   hibrido: Array.from(new Set([...ECOM_CHANNELS, ...IS_CHANNELS, ...PDV_CHANNELS])),
 };
 
+// Canais orgânicos: iguais para todo modelo de venda. Entram em executarChannels
+// sem investimento/receita e ficam fora de somas e ROAS.
+export const ORGANIC_CHANNELS = [
+  "Instagram (orgânico)",
+  "TikTok (orgânico)",
+  "LinkedIn (orgânico)",
+  "YouTube (orgânico)",
+  "Facebook (orgânico)",
+];
+
+export const isOrganicChannel = (name: string) => ORGANIC_CHANNELS.includes(name);
+
 export const CREATIVE_TYPES = [
   "UGC",
   "Demonstração de produto/serviço",
@@ -224,6 +279,10 @@ export const CREATIVE_TYPES = [
   "Depoimento de cliente",
   "Educacional/autoridade",
   "Estático/anúncio direto",
+  "Reels / vídeo curto",
+  "Carrossel",
+  "Stories",
+  "Live",
 ];
 
 export const CREATIVES_BY_MODEL: Record<SalesModel, string[]> = {
@@ -317,6 +376,29 @@ export const METRICS_BY_MODEL: Record<SalesModel, MetricOption[]> = {
   hibrido: HIBRIDO_METRICS,
 };
 
+// Chaves das métricas `principal: true` do modelo (sem modelo = Híbrido, como no form).
+export const getPrincipalMetricKeys = (salesModel: SalesModel | ""): string[] =>
+  METRICS_BY_MODEL[salesModel || "hibrido"].filter((m) => m.principal).map((m) => m.value);
+
+// Métricas de social media para cases de entrega — todas "maior é melhor".
+export const DELIVERY_METRICS: MetricOption[] = [
+  { value: "seguidores", label: "Seguidores", unit: "number", direction: "higher_is_better" },
+  { value: "alcance", label: "Alcance", unit: "number", direction: "higher_is_better" },
+  { value: "impressoes", label: "Impressões", unit: "number", direction: "higher_is_better" },
+  { value: "taxa_engajamento", label: "Taxa de engajamento", unit: "percent", direction: "higher_is_better" },
+  { value: "visitas_perfil", label: "Visitas ao perfil", unit: "number", direction: "higher_is_better" },
+  { value: "cliques_link", label: "Cliques no link", unit: "number", direction: "higher_is_better" },
+  { value: "conversas_dm", label: "Conversas / DMs recebidas", unit: "number", direction: "higher_is_better" },
+];
+
+export const SUCCESS_PROOF_OPTIONS = [
+  "Aprovação formal do cliente",
+  "Depoimento do cliente",
+  "NPS / CSAT",
+  "Renovação ou upsell",
+  "Reconhecimento / prêmio",
+];
+
 export const TIME_TO_RESULT_OPTIONS = [
   { value: "1m", label: "1 mês" },
   { value: "3m", label: "3 meses" },
@@ -330,7 +412,8 @@ export const STEPS = [
   { id: 1, key: "client_setup", title: "Cliente e classificação", subtitle: "Quem registra, qual cliente e como o case se enquadra." },
   { id: 2, key: "context", title: "Contexto do desafio", subtitle: "Problema, causa raiz e restrições." },
   { id: 3, key: "strategy", title: "Estratégia aplicada", subtitle: "O que foi entregue para gerar o resultado." },
-  { id: 4, key: "results", title: "Resultado quantitativo", subtitle: "Antes vs. depois com números reais." },
+  // Título curto/genérico para o indicador; o cabeçalho do wizard adapta ao tipo de resultado (CaseForm).
+  { id: 4, key: "results", title: "Resultado", subtitle: "Antes vs. depois com números reais." },
   { id: 5, key: "evidence", title: "Evidências", subtitle: "Links e contexto complementar." },
 ] as const;
 

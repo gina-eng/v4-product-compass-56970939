@@ -32,6 +32,20 @@ import {
   validateStep,
 } from "@/features/cases/validation";
 import type { StepCompletion } from "@/features/cases/validation";
+import type { ResultType } from "@/features/cases/options";
+
+// Cabeçalho da etapa de resultado conforme o tipo de resultado do case.
+const RESULTS_HEADER: Record<ResultType, { title: string; subtitle: string }> = {
+  negocio: { title: "Resultado quantitativo", subtitle: "Antes vs. depois com números reais." },
+  entrega: {
+    title: "Resultado e prova do case",
+    subtitle: "Por que é um case, antes × depois e métricas de entrega.",
+  },
+  ambos: {
+    title: "Resultado do case",
+    subtitle: "Números de negócio e prova qualitativa da entrega.",
+  },
+};
 
 const CaseForm = () => {
   const { id } = useParams();
@@ -40,6 +54,9 @@ const CaseForm = () => {
   const [record, setRecord] = useState<CaseRecord>(() => emptyCase());
   const [showStepErrors, setShowStepErrors] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  // Maior etapa que o usuário já abriu — limita o estado "Completa" no indicador.
+  const [maxVisitedStep, setMaxVisitedStep] = useState(1);
   const initializedRef = useRef(false);
 
   useEffect(() => {
@@ -59,6 +76,8 @@ const CaseForm = () => {
         const existing = await getCase(id);
         if (existing) {
           setRecord(existing);
+          setIsEditing(true);
+          setMaxVisitedStep(STEPS.length);
           return;
         }
       }
@@ -82,10 +101,10 @@ const CaseForm = () => {
   const completion = useMemo(() => {
     const map: Record<number, StepCompletion> = {};
     STEPS.forEach((s) => {
-      map[s.id] = getStepCompletion(s.id, record);
+      map[s.id] = getStepCompletion(s.id, record, s.id <= maxVisitedStep);
     });
     return map;
-  }, [record]);
+  }, [record, maxVisitedStep]);
 
   const completeCount = useMemo(
     () => Object.values(completion).filter((s) => s === "complete").length,
@@ -105,6 +124,7 @@ const CaseForm = () => {
       return;
     }
     setShowStepErrors(false);
+    setMaxVisitedStep((prev) => Math.max(prev, step));
     setRecord((prev) => ({ ...prev, currentStep: step }));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -188,7 +208,10 @@ const CaseForm = () => {
     );
   }
 
-  const stepMeta = STEPS[record.currentStep - 1];
+  const stepMeta =
+    STEPS[record.currentStep - 1].key === "results"
+      ? RESULTS_HEADER[record.resultType || "negocio"]
+      : STEPS[record.currentStep - 1];
   const isLastStep = record.currentStep === STEPS.length;
 
   return (
@@ -203,7 +226,7 @@ const CaseForm = () => {
               <ArrowLeft className="h-3.5 w-3.5" /> Voltar para Zyman AI (Cases)
             </Link>
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-              Registrar novo case
+              {isEditing ? "Editar case" : "Registrar novo case"}
             </h1>
             <p className="max-w-2xl text-sm text-muted-foreground">
               Cases viram munição comercial e alimentam a Zyman AI. Quanto mais estruturada a

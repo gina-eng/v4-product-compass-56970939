@@ -1,4 +1,12 @@
 import type { CaseRecord } from "./types";
+import {
+  CREATIVE_PROFESSIONALS,
+  PAID_MEDIA_PROFESSIONAL,
+  getPrincipalMetricKeys,
+  hasBusinessResult,
+  hasDeliveryResult,
+  isOrganicChannel,
+} from "./options";
 
 export interface StepValidation {
   isValid: boolean;
@@ -13,6 +21,16 @@ const cnpjRegex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const urlRegex = /^https?:\/\/.+/i;
 
+// Mídia paga só é exigida quando EXECUTAR tem o profissional de Gestão de Mídia Paga alocado.
+export const hasPaidMedia = (record: CaseRecord): boolean =>
+  record.products.includes("executar") &&
+  record.executarProfessionals.includes(PAID_MEDIA_PROFESSIONAL);
+
+// Criativos só são exigidos quando há profissional de criativo alocado em EXECUTAR.
+export const hasCreativeWork = (record: CaseRecord): boolean =>
+  record.products.includes("executar") &&
+  record.executarProfessionals.some((p) => CREATIVE_PROFESSIONALS.includes(p));
+
 const runStepValidation = (step: number, record: CaseRecord): StepValidation => {
   const errors: Record<string, string> = {};
 
@@ -22,9 +40,9 @@ const runStepValidation = (step: number, record: CaseRecord): StepValidation => 
       errors.ownerEmail = "Email do investidor é obrigatório.";
     if (!isNonEmpty(record.v4Unit)) errors.v4Unit = "Selecione a unidade V4.";
     if (!isNonEmpty(record.clientName)) errors.clientName = "Informe o nome do cliente.";
-    if (!cnpjRegex.test(record.clientCnpj))
+    // CNPJ e status do cliente são opcionais; CNPJ preenchido ainda precisa do formato.
+    if (isNonEmpty(record.clientCnpj) && !cnpjRegex.test(record.clientCnpj))
       errors.clientCnpj = "CNPJ no formato 00.000.000/0000-00.";
-    if (!isNonEmpty(record.clientStatus)) errors.clientStatus = "Informe o status do cliente.";
     if (!isNonEmpty(record.clientState)) errors.clientState = "Selecione o estado de atuação.";
     if (!isNonEmpty(record.operationReach))
       errors.operationReach = "Selecione a abrangência da operação.";
@@ -36,6 +54,8 @@ const runStepValidation = (step: number, record: CaseRecord): StepValidation => 
     if (!isNonEmpty(record.segment)) errors.segment = "Selecione o segmento.";
     if (record.products.length === 0)
       errors.products = "Marque ao menos um produto V4 envolvido.";
+    if (!isNonEmpty(record.resultType))
+      errors.resultType = "Selecione o tipo de resultado do case.";
   }
 
   if (step === 2) {
@@ -62,13 +82,21 @@ const runStepValidation = (step: number, record: CaseRecord): StepValidation => 
     if (record.products.includes("executar")) {
       if (record.executarProfessionals.length === 0)
         errors.executarProfessionals = "Selecione ao menos um profissional V4 alocado.";
-      const validChannels = record.executarChannels.filter(
-        (c) => isNonEmpty(c.channel) && isNonEmpty(c.investment) && isNonEmpty(c.revenue),
-      );
-      if (validChannels.length === 0)
-        errors.executarChannels =
-          "Adicione ao menos um canal com investimento e receita preenchidos.";
+      // Canal pago válido exige investimento e receita; orgânico só o nome.
+      if (hasPaidMedia(record)) {
+        const validPaidChannels = record.executarChannels.filter(
+          (c) =>
+            !isOrganicChannel(c.channel) &&
+            isNonEmpty(c.channel) &&
+            isNonEmpty(c.investment) &&
+            isNonEmpty(c.revenue),
+        );
+        if (validPaidChannels.length === 0)
+          errors.executarChannels =
+            "Adicione ao menos um canal pago com investimento e receita preenchidos.";
+      }
       record.executarChannels.forEach((c, i) => {
+        if (isOrganicChannel(c.channel)) return;
         const filled =
           isNonEmpty(c.channel) || isNonEmpty(c.investment) || isNonEmpty(c.revenue);
         const valid =
@@ -76,11 +104,13 @@ const runStepValidation = (step: number, record: CaseRecord): StepValidation => 
         if (filled && !valid)
           errors[`executarChannels.${i}`] = "Preencha canal, investimento e receita.";
       });
-      if (record.executarCreatives.length === 0)
-        errors.executarCreatives = "Marque ao menos um tipo de criativo.";
-      if (!isNonEmpty(record.executarCreativesCommunication))
-        errors.executarCreativesCommunication =
-          "Descreva brevemente a comunicação dos criativos.";
+      if (hasCreativeWork(record)) {
+        if (record.executarCreatives.length === 0)
+          errors.executarCreatives = "Marque ao menos um tipo de criativo.";
+        if (!isNonEmpty(record.executarCreativesCommunication))
+          errors.executarCreativesCommunication =
+            "Descreva brevemente a comunicação dos criativos.";
+      }
       const firstStrategy = record.executarStrategies[0];
       if (!firstStrategy || !isNonEmpty(firstStrategy.strategy))
         errors.executarStrategies = "Descreva a estratégia aplicada.";
@@ -95,26 +125,45 @@ const runStepValidation = (step: number, record: CaseRecord): StepValidation => 
 
   if (step === 4) {
     if (!isNonEmpty(record.timeToResult)) errors.timeToResult = "Selecione o tempo até o resultado.";
-    const validPrimary = record.primaryMetrics.filter(
-      (m) => isNonEmpty(m.metricKey) && isNonEmpty(m.before) && isNonEmpty(m.after),
-    );
-    if (validPrimary.length === 0)
-      errors.primaryMetrics =
-        "Adicione ao menos uma métrica principal com valores antes e depois.";
-    record.primaryMetrics.forEach((m, i) => {
-      const partial =
-        isNonEmpty(m.metricKey) || isNonEmpty(m.before) || isNonEmpty(m.after);
-      const valid =
-        isNonEmpty(m.metricKey) && isNonEmpty(m.before) && isNonEmpty(m.after);
-      if (partial && !valid)
-        errors[`primaryMetrics.${i}`] = "Preencha métrica e os dois valores.";
-    });
+    if (hasBusinessResult(record.resultType)) {
+      // Exige 1 das métricas `principal` do modelo de venda; as demais são opcionais.
+      const principalKeys = getPrincipalMetricKeys(record.salesModel);
+      const validPrincipal = record.primaryMetrics.filter(
+        (m) =>
+          principalKeys.includes(m.metricKey) && isNonEmpty(m.before) && isNonEmpty(m.after),
+      );
+      if (validPrincipal.length === 0)
+        errors.primaryMetrics = "Preencha antes e depois de pelo menos 1 das métricas principais.";
+      record.primaryMetrics.forEach((m, i) => {
+        const partial =
+          isNonEmpty(m.metricKey) || isNonEmpty(m.before) || isNonEmpty(m.after);
+        const valid =
+          isNonEmpty(m.metricKey) && isNonEmpty(m.before) && isNonEmpty(m.after);
+        if (partial && !valid)
+          errors[`primaryMetrics.${i}`] = "Preencha métrica e os dois valores.";
+      });
+    }
+    if (hasDeliveryResult(record.resultType)) {
+      if (!isNonEmpty(record.successThesis))
+        errors.successThesis = "Explique por que esse projeto é um case de sucesso.";
+      else if (record.successThesis.length > 500)
+        errors.successThesis = "Limite de 500 caracteres.";
+      if (!isNonEmpty(record.qualitativeBefore))
+        errors.qualitativeBefore = "Descreva como era antes.";
+      if (!isNonEmpty(record.qualitativeAfter))
+        errors.qualitativeAfter = "Descreva como ficou depois.";
+      record.deliveryMetrics.forEach((m, i) => {
+        const partial = isNonEmpty(m.before) || isNonEmpty(m.after);
+        const valid = isNonEmpty(m.before) && isNonEmpty(m.after);
+        if (partial && !valid) errors[`deliveryMetrics.${i}`] = "Preencha os dois valores.";
+      });
+    }
     record.secondaryMetrics.forEach((m, i) => {
       const partial = isNonEmpty(m.name) || isNonEmpty(m.before) || isNonEmpty(m.after);
       const complete = isNonEmpty(m.name) && isNonEmpty(m.before) && isNonEmpty(m.after);
       if (partial && !complete) errors[`secondaryMetrics.${i}`] = "Preencha todos os campos da métrica.";
     });
-    if (record.products.includes("executar")) {
+    if (hasPaidMedia(record)) {
       if (!isNonEmpty(record.mediaInvestment))
         errors.mediaInvestment = "Informe o investimento total em mídia.";
       if (!isNonEmpty(record.attributedRevenue))
@@ -123,6 +172,13 @@ const runStepValidation = (step: number, record: CaseRecord): StepValidation => 
   }
 
   if (step === 5) {
+    if (
+      hasDeliveryResult(record.resultType) &&
+      !isNonEmpty(record.dashboardUrl) &&
+      !isNonEmpty(record.presentationUrl) &&
+      !isNonEmpty(record.testimonialUrl)
+    )
+      errors.evidence = "Cases de entrega precisam de ao menos um link de evidência.";
     if (record.dashboardUrl && !urlRegex.test(record.dashboardUrl))
       errors.dashboardUrl = "URL inválida.";
     if (record.presentationUrl && !urlRegex.test(record.presentationUrl))
@@ -154,6 +210,7 @@ const stepFieldKeys: Record<number, (keyof CaseRecord)[]> = {
     "segment",
     "products",
     "primaryDriver",
+    "resultType",
   ],
   2: [
     "initialChallenges",
@@ -182,6 +239,11 @@ const stepFieldKeys: Record<number, (keyof CaseRecord)[]> = {
     "primaryMetrics",
     "mediaInvestment",
     "attributedRevenue",
+    "successThesis",
+    "qualitativeBefore",
+    "qualitativeAfter",
+    "successProofs",
+    "deliveryMetrics",
   ],
   5: ["dashboardUrl", "presentationUrl", "testimonialUrl", "finalNotes"],
 };
@@ -190,6 +252,7 @@ const hasAnyAnswerForStep = (step: number, record: CaseRecord): boolean => {
   if (
     step === 4 &&
     (record.primaryMetrics.some((m) => m.metricKey || m.before || m.after) ||
+      record.deliveryMetrics.some((m) => m.before || m.after) ||
       record.secondaryMetrics.some((m) => m.name || m.before || m.after))
   ) {
     return true;
@@ -209,7 +272,8 @@ const hasAnyAnswerForStep = (step: number, record: CaseRecord): boolean => {
       key === "saberDirections" ||
       key === "executarStrategies" ||
       key === "executarChannels" ||
-      key === "primaryMetrics"
+      key === "primaryMetrics" ||
+      key === "deliveryMetrics"
     )
       return false;
     if (Array.isArray(value)) return value.length > 0;
@@ -218,8 +282,14 @@ const hasAnyAnswerForStep = (step: number, record: CaseRecord): boolean => {
   });
 };
 
-export const getStepCompletion = (step: number, record: CaseRecord): StepCompletion => {
-  const isComplete = runStepValidation(step, record).isValid;
+// `visited`: etapa só pode ficar "complete" depois que o usuário passou por ela —
+// senão etapas sem regras (ex.: sem produtos) apareceriam completas num form vazio.
+export const getStepCompletion = (
+  step: number,
+  record: CaseRecord,
+  visited = true,
+): StepCompletion => {
+  const isComplete = visited && runStepValidation(step, record).isValid;
   if (isComplete) return "complete";
   return hasAnyAnswerForStep(step, record) ? "partial" : "empty";
 };

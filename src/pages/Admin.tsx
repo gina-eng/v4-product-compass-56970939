@@ -20,7 +20,7 @@ import SalesMaterials from "@/components/SalesMaterials";
 import OperationalMaterials from "@/components/OperationalMaterials";
 import TrainingMaterialsOnly from "@/components/TrainingMaterialsOnly";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
-import { Plus, Edit, Trash2, Search, ExternalLink, Copy, Users } from "lucide-react";
+import { Plus, Edit, Trash2, Search, ExternalLink, Copy, Users, Megaphone } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import { calculateFaturamentoAncoragem } from "@/lib/productCalculations";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -1522,6 +1522,10 @@ const Admin = () => {
             <Button variant="outline" onClick={() => navigate("/admin/unidades")}>
               <Users className="h-4 w-4 mr-2" />
               Unidades V4
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/admin/campanhas")}>
+              <Megaphone className="h-4 w-4 mr-2" />
+              Campanhas especiais
             </Button>
             <Button variant="outline" onClick={() => navigate("/admin/usuarios-liberados")}>
               <Users className="h-4 w-4 mr-2" />

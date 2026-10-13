@@ -9,11 +9,13 @@ import {
   CHANNELS_BY_MODEL,
   CREATIVES_BY_MODEL,
   EXECUTAR_PROFESSIONALS,
+  ORGANIC_CHANNELS,
   SABER_EXECUTION_OPTIONS,
   V4_PRODUCTS,
 } from "../options";
 import type { SalesModel } from "../options";
 import type { CaseRecord, ExecutarStrategy, SaberDirection } from "../types";
+import { hasCreativeWork, hasPaidMedia } from "../validation";
 
 const emptyDirection: SaberDirection = { direction: "", rationale: "", impact: "" };
 const emptyStrategy: ExecutarStrategy = { strategy: "", appliedAt: "" };
@@ -49,6 +51,10 @@ export const Step4Strategy = ({ record, errors, update }: StepProps) => {
   const salesModel = (record.salesModel || "hibrido") as SalesModel;
   const channels = CHANNELS_BY_MODEL[salesModel];
   const creatives = CREATIVES_BY_MODEL[salesModel];
+  const paidMediaRequired = hasPaidMedia(record);
+  const creativeRequired = hasCreativeWork(record);
+  const creativeHint =
+    "Obrigatório quando há profissional de criativo alocado (Mídia Paga, Social Media, Designer Gráfico, Audiovisual ou Redação Publicitária).";
 
   const initRef = useRef(false);
   useEffect(() => {
@@ -193,14 +199,19 @@ export const Step4Strategy = ({ record, errors, update }: StepProps) => {
 
           <FieldShell
             label="Canais de mídia operados"
-            required
+            required={paidMediaRequired}
             error={errors.executarChannels}
-            hint={`Ative cada canal e informe investimento e receita gerada para validar o ROAS direto. Opções ajustadas para o modelo ${
+            hint={`${
+              paidMediaRequired
+                ? "Com Gestão de Mídia Paga alocada, informe ao menos um canal pago com investimento e receita gerada para validar o ROAS direto."
+                : "Opcional — canais pagos com investimento e receita só são obrigatórios quando Gestão de Mídia Paga está entre os profissionais alocados."
+            } Opções ajustadas para o modelo ${
               salesModel === "hibrido" ? "Híbrido" : salesModel.replace("_", " ")
             }.`}
           >
             <ChannelInvestmentList
               options={channels}
+              organicOptions={ORGANIC_CHANNELS}
               value={record.executarChannels}
               errors={errors}
               onChange={(executarChannels) => update({ executarChannels })}
@@ -209,8 +220,9 @@ export const Step4Strategy = ({ record, errors, update }: StepProps) => {
 
           <FieldShell
             label="Tipos de criativo principais utilizados"
-            required
+            required={creativeRequired}
             error={errors.executarCreatives}
+            hint={creativeRequired ? undefined : `Opcional. ${creativeHint}`}
           >
             <CheckboxGroup
               options={creatives}
@@ -222,9 +234,11 @@ export const Step4Strategy = ({ record, errors, update }: StepProps) => {
 
           <FieldShell
             label="Como foi a comunicação dos criativos"
-            required
+            required={creativeRequired}
             error={errors.executarCreativesCommunication}
-            hint="Tom de voz, mensagem central e gancho usados nas peças. Texto curto."
+            hint={`Tom de voz, mensagem central e gancho usados nas peças. Texto curto.${
+              creativeRequired ? "" : ` Opcional. ${creativeHint}`
+            }`}
           >
             <Textarea
               rows={3}

@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 
 interface ChannelInvestmentListProps {
   options: string[];
+  // Canais orgânicos: só marca/desmarca, sem investimento/receita, fora dos totais.
+  organicOptions?: string[];
   value: ChannelInvestment[];
   errors: Record<string, string>;
   onChange: (next: ChannelInvestment[]) => void;
@@ -26,6 +28,7 @@ const sumNumbers = (values: string[]): number =>
 
 export const ChannelInvestmentList = ({
   options,
+  organicOptions = [],
   value,
   errors,
   onChange,
@@ -52,13 +55,16 @@ export const ChannelInvestmentList = ({
     onChange([...value, { channel: "", investment: "", revenue: "" }]);
   };
 
-  const totalInvestment = sumNumbers(value.map((v) => v.investment));
-  const totalRevenue = sumNumbers(value.map((v) => v.revenue));
+  const paidEntries = value.filter((v) => !organicOptions.includes(v.channel));
+  const totalInvestment = sumNumbers(paidEntries.map((v) => v.investment));
+  const totalRevenue = sumNumbers(paidEntries.map((v) => v.revenue));
   const totalRoas = totalInvestment > 0 ? totalRevenue / totalInvestment : null;
 
   const customEntries = value
     .map((v, i) => ({ entry: v, index: i }))
-    .filter(({ entry }) => !options.includes(entry.channel));
+    .filter(
+      ({ entry }) => !options.includes(entry.channel) && !organicOptions.includes(entry.channel),
+    );
 
   return (
     <div className="space-y-3">
@@ -221,7 +227,49 @@ export const ChannelInvestmentList = ({
         <Plus className="mr-1 h-4 w-4" /> Adicionar outro canal
       </Button>
 
-      {value.length > 0 && (
+      {organicOptions.length > 0 && (
+        <div className="space-y-2 pt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Canais orgânicos
+            </span>
+            <span className="h-px flex-1 bg-border/60" />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Marque os perfis trabalhados sem mídia paga. Não pedem investimento nem receita.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {organicOptions.map((name) => {
+              const active = isActive(name);
+              return (
+                <button
+                  type="button"
+                  key={name}
+                  aria-pressed={active}
+                  onClick={() => togglePredefined(name)}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all",
+                    active
+                      ? "border-executar/50 bg-executar/5 font-semibold text-foreground shadow-sm"
+                      : "border-border/70 bg-background text-foreground hover:border-executar/40 hover:bg-muted/40",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "h-4 w-4 shrink-0 rounded border transition-colors",
+                      active ? "border-executar bg-executar" : "border-border bg-background",
+                    )}
+                    aria-hidden
+                  />
+                  {name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {paidEntries.length > 0 && (
         <div className="rounded-xl border border-executar/30 bg-executar/5 px-4 py-3">
           <div className="grid gap-2 sm:grid-cols-3">
             <div>

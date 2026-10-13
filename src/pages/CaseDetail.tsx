@@ -30,6 +30,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { LOCAL_PREVIEW_EMAIL, isLocalPreviewAuthEnabled } from "@/lib/auth";
 import { deleteCase, getCase } from "@/features/cases/storage";
+import { listCampaigns } from "@/features/campaigns/storage";
+import type { CaseCampaign } from "@/features/campaigns/storage";
+import { CampaignBadge } from "@/features/campaigns/components/CampaignBadge";
 import type { CaseRecord } from "@/features/cases/types";
 import {
   computeRoas,
@@ -39,10 +42,16 @@ import {
   formatVariation,
   isImprovement,
 } from "@/features/cases/format";
-import { getMetricDirection } from "@/features/cases/options";
+import {
+  getMetricDirection,
+  hasBusinessResult,
+  hasDeliveryResult,
+  isOrganicChannel,
+} from "@/features/cases/options";
 import {
   BRAZIL_STATES,
   OPERATION_REACH_OPTIONS,
+  RESULT_TYPE_OPTIONS,
   SABER_EXECUTION_OPTIONS,
   SALES_MODELS,
   TIME_TO_RESULT_OPTIONS,
@@ -59,6 +68,9 @@ const SABER_EXECUTION_LABEL = Object.fromEntries(
 const STATE_LABEL = Object.fromEntries(BRAZIL_STATES.map((s) => [s.value, s.label]));
 const REACH_LABEL = Object.fromEntries(
   OPERATION_REACH_OPTIONS.map((r) => [r.value, r.label]),
+);
+const RESULT_TYPE_LABEL = Object.fromEntries(
+  RESULT_TYPE_OPTIONS.map((r) => [r.value, r.label]),
 );
 
 const StatusBadge = ({ status }: { status: CaseRecord["status"] }) => {
@@ -220,11 +232,16 @@ const CaseDetail = () => {
   const [record, setRecord] = useState<CaseRecord | null>(null);
   const [currentEmail, setCurrentEmail] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [campaigns, setCampaigns] = useState<CaseCampaign[]>([]);
 
   useEffect(() => {
     if (!id) return;
     void getCase(id).then((r) => setRecord(r ?? null));
   }, [id]);
+
+  useEffect(() => {
+    void listCampaigns().then(setCampaigns);
+  }, []);
 
   useEffect(() => {
     const sync = async () => {
@@ -273,6 +290,10 @@ const CaseDetail = () => {
   };
 
   const roas = computeRoas(record.attributedRevenue, record.mediaInvestment);
+  const showDelivery = hasDeliveryResult(record.resultType);
+  const linkedCampaigns = record.campaignIds
+    .map((cid) => campaigns.find((c) => c.id === cid))
+    .filter((c): c is CaseCampaign => Boolean(c));
 
   return (
     <Layout>
@@ -304,6 +325,14 @@ const CaseDetail = () => {
                   >
                     {PRODUCT_META[p]?.label}
                   </span>
+                ))}
+                {record.resultType && (
+                  <span className="rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[11px] font-semibold text-foreground">
+                    {RESULT_TYPE_LABEL[record.resultType] ?? record.resultType}
+                  </span>
+                )}
+                {linkedCampaigns.map((c) => (
+                  <CampaignBadge key={c.id} campaign={c} className="text-[11px]" />
                 ))}
               </div>
               <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
@@ -446,6 +475,23 @@ const CaseDetail = () => {
             <Field label="Segmento" value={record.segment} />
             <Field label="Nicho do cliente" value={record.nicho} />
             <Field
+              label="Tipo de resultado"
+              value={record.resultType ? RESULT_TYPE_LABEL[record.resultType] ?? record.resultType : ""}
+            />
+            {linkedCampaigns.length > 0 && (
+              <Field
+                label="Campanhas especiais"
+                className="sm:col-span-2"
+                value={
+                  <div className="flex flex-wrap gap-1.5">
+                    {linkedCampaigns.map((c) => (
+                      <CampaignBadge key={c.id} campaign={c} className="text-[11px]" />
+                    ))}
+                  </div>
+                }
+              />
+            )}
+            <Field
               label="Produtos V4 contratados"
               className="sm:col-span-2"
               value={
@@ -573,6 +619,18 @@ const CaseDetail = () => {
                 ) : (
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     {record.executarChannels.map((c, i) => {
+                      // Canal orgânico não tem investimento/receita/ROAS.
+                      if (isOrganicChannel(c.channel)) {
+                        return (
+                          <div
+                            key={i}
+                            className="rounded-lg border border-border/60 bg-background p-3"
+                          >
+                            <p className="text-sm font-semibold text-foreground">{c.channel}</p>
+                            <p className="text-xs text-muted-foreground">Sem mídia paga</p>
+                          </div>
+                        );
+                      }
                       const r = computeRoas(c.revenue, c.investment);
                       return (
                         <div
@@ -664,6 +722,74 @@ const CaseDetail = () => {
           )}
         </SectionShell>
 
+        {showDelivery && (
+          <SectionShell
+            title="Por que é um case"
+            subtitle="Valor da entrega e percepção do cliente"
+          >
+            <Field
+              label="Por que esse projeto é um case de sucesso"
+              value={<Prose text={record.successThesis} />}
+            />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Como era antes" value={<Prose text={record.qualitativeBefore} />} />
+              <Field label="Como ficou depois" value={<Prose text={record.qualitativeAfter} />} />
+            </div>
+            <Field
+              label="Como o sucesso foi comprovado"
+              value={
+                <TagList
+                  items={record.successProofs}
+                  toneClass="border-primary/30 bg-primary/5 text-primary"
+                />
+              }
+            />
+            {(() => {
+              const filledDelivery = record.deliveryMetrics.filter((m) => m.before && m.after);
+              if (filledDelivery.length === 0) return null;
+              return (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Métricas de social media
+                  </p>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    {filledDelivery.map((m, i) => {
+                      const variation = computeVariation(m.before, m.after);
+                      const positive = isImprovement(variation, getMetricDirection(m.metricKey));
+                      return (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-background px-3 py-2"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-foreground">
+                              {m.label}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatMetricValue(m.before, m.unit)} →{" "}
+                              <span className="font-semibold text-foreground">
+                                {formatMetricValue(m.after, m.unit)}
+                              </span>
+                            </p>
+                          </div>
+                          <span
+                            className={cn(
+                              "text-sm font-semibold",
+                              positive ? "text-ter" : "text-destructive",
+                            )}
+                          >
+                            {formatVariation(variation)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+          </SectionShell>
+        )}
+
         <SectionShell title="Resultado quantitativo">
           <Field
             label="Tempo até o resultado"
@@ -672,6 +798,8 @@ const CaseDetail = () => {
 
           {(() => {
             const filledPrimary = record.primaryMetrics.filter((m) => m.before && m.after);
+            // Cases só de entrega não pedem métricas de negócio — não mostra o bloco vazio.
+            if (filledPrimary.length === 0 && !hasBusinessResult(record.resultType)) return null;
             return (
               <div>
                 <p className="text-xs font-medium text-muted-foreground">Métricas principais</p>

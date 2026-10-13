@@ -24,6 +24,7 @@ import ConsultantDetail from "./pages/ConsultantDetail";
 import ConsultantsAdmin from "./pages/admin/ConsultantsAdmin";
 import ConsultantForm from "./pages/admin/ConsultantForm";
 import UnitsAdmin from "./pages/admin/UnitsAdmin";
+import CaseCampaignsAdmin from "./pages/admin/CaseCampaignsAdmin";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const LegacyPlatformDetailsRedirect = () => {
@@ -79,6 +80,7 @@ const App = () => {
               <Route path="/admin/consultores/novo" element={<ConsultantForm />} />
               <Route path="/admin/consultores/:id/editar" element={<ConsultantForm />} />
               <Route path="/admin/unidades" element={<UnitsAdmin />} />
+              <Route path="/admin/campanhas" element={<CaseCampaignsAdmin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Route>

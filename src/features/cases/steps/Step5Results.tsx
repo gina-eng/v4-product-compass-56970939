@@ -9,10 +9,21 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { FieldShell } from "../components/FieldShell";
-import { METRICS_BY_MODEL, TIME_TO_RESULT_OPTIONS } from "../options";
-import type { SalesModel } from "../options";
+import { CheckboxGroup } from "../components/CheckboxGroup";
+import {
+  DELIVERY_METRICS,
+  METRICS_BY_MODEL,
+  SUCCESS_PROOF_OPTIONS,
+  TIME_TO_RESULT_OPTIONS,
+  hasBusinessResult,
+  hasDeliveryResult,
+  isOrganicChannel,
+} from "../options";
+import type { MetricOption, SalesModel } from "../options";
 import type { CaseRecord, PrimaryMetricEntry, SecondaryMetric } from "../types";
+import { hasPaidMedia } from "../validation";
 import {
   computeRoas,
   computeVariation,
@@ -26,7 +37,9 @@ const sumChannelField = (
   channels: CaseRecord["executarChannels"],
   field: "investment" | "revenue",
 ): number =>
+  // Canais orgânicos não têm investimento/receita — ficam fora da soma.
   channels.reduce((acc, c) => {
+    if (isOrganicChannel(c.channel)) return acc;
     const n = Number((c[field] || "").replace(",", "."));
     return Number.isFinite(n) ? acc + n : acc;
   }, 0);
@@ -38,6 +51,42 @@ interface StepProps {
 }
 
 const MAX_SECONDARY_METRICS = 2;
+const MAX_SUCCESS_THESIS = 500;
+
+type MetricListKey = "primaryMetrics" | "deliveryMetrics";
+
+// Alinha a lista salva ao catálogo: cada métrica vira uma linha fixa, preservando
+// antes/depois existentes. Entradas fora do catálogo são descartadas.
+const syncToCatalog = (
+  catalog: MetricOption[],
+  current: PrimaryMetricEntry[],
+): PrimaryMetricEntry[] | null => {
+  const byKey = new Map(current.map((m) => [m.metricKey, m]));
+  const next: PrimaryMetricEntry[] = catalog.map((m) => {
+    const existing = byKey.get(m.value);
+    return {
+      metricKey: m.value,
+      label: m.label,
+      unit: m.unit,
+      before: existing?.before ?? "",
+      after: existing?.after ?? "",
+    };
+  });
+  const same =
+    next.length === current.length &&
+    next.every((m, i) => {
+      const cur = current[i];
+      return (
+        cur &&
+        cur.metricKey === m.metricKey &&
+        cur.label === m.label &&
+        cur.unit === m.unit &&
+        cur.before === m.before &&
+        cur.after === m.after
+      );
+    });
+  return same ? null : next;
+};
 
 const emptySecondary: SecondaryMetric = { name: "", before: "", after: "" };
 
@@ -50,12 +99,26 @@ const isFilledSecondary = (m: SecondaryMetric) =>
       (m.after ?? "").trim(),
   );
 
+const MetricTableHeader = () => (
+  <div className="hidden grid-cols-[1.4fr_1fr_1fr_110px_36px] gap-3 px-1 md:grid">
+    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Métrica</span>
+    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Antes</span>
+    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Depois</span>
+    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Variação</span>
+    <span />
+  </div>
+);
+
 export const Step5Results = ({ record, errors, update }: StepProps) => {
   const salesModel = (record.salesModel || "hibrido") as SalesModel;
   const metrics = METRICS_BY_MODEL[salesModel];
 
+  const showBusiness = hasBusinessResult(record.resultType);
+  const showDelivery = hasDeliveryResult(record.resultType);
+
   const roas = computeRoas(record.attributedRevenue, record.mediaInvestment);
   const roasMode = record.products.includes("executar");
+  const paidMediaRequired = hasPaidMedia(record);
 
   const channelTotalInvestment = useMemo(
     () => sumChannelField(record.executarChannels, "investment"),
@@ -108,34 +171,18 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
   // Sincroniza primaryMetrics com o catálogo do modelo de venda — cada métrica vira uma linha fixa.
   // Preserva valores antes/depois de entradas existentes; entradas fora do catálogo (legado de outro modelo) são descartadas.
   useEffect(() => {
-    const catalog = metrics;
-    const byKey = new Map(record.primaryMetrics.map((m) => [m.metricKey, m]));
-    const next: PrimaryMetricEntry[] = catalog.map((m) => {
-      const existing = byKey.get(m.value);
-      return {
-        metricKey: m.value,
-        label: m.label,
-        unit: m.unit,
-        before: existing?.before ?? "",
-        after: existing?.after ?? "",
-      };
-    });
-    const same =
-      next.length === record.primaryMetrics.length &&
-      next.every((m, i) => {
-        const cur = record.primaryMetrics[i];
-        return (
-          cur &&
-          cur.metricKey === m.metricKey &&
-          cur.label === m.label &&
-          cur.unit === m.unit &&
-          cur.before === m.before &&
-          cur.after === m.after
-        );
-      });
-    if (!same) update({ primaryMetrics: next });
+    const next = syncToCatalog(metrics, record.primaryMetrics);
+    if (next) update({ primaryMetrics: next });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [salesModel]);
+
+  // Mesma lógica para as métricas de social media, só quando o case tem entrega.
+  useEffect(() => {
+    if (!showDelivery) return;
+    const next = syncToCatalog(DELIVERY_METRICS, record.deliveryMetrics);
+    if (next) update({ deliveryMetrics: next });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showDelivery]);
 
   // Pad slots de métricas secundárias na primeira entrada.
   const secondaryPadRef = useRef(false);
@@ -158,6 +205,7 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
 
   const filledPrimaryCount = record.primaryMetrics.filter(isFilledPrimary).length;
   const filledSecondaryCount = record.secondaryMetrics.filter(isFilledSecondary).length;
+  const filledDeliveryCount = record.deliveryMetrics.filter(isFilledPrimary).length;
 
   // Particiona as métricas em principais (visíveis sempre) e extras (atrás de toggle).
   const principalIndices = useMemo(() => {
@@ -187,24 +235,27 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
     if (hasFilledExtras) setShowExtras(true);
   }, [hasFilledExtras]);
 
-  const updatePrimary = (index: number, patch: Partial<PrimaryMetricEntry>) => {
-    const next = record.primaryMetrics.map((m, i) =>
-      i === index ? { ...m, ...patch } : m,
-    );
-    update({ primaryMetrics: next });
+  const updateMetric = (
+    listKey: MetricListKey,
+    index: number,
+    patch: Partial<PrimaryMetricEntry>,
+  ) => {
+    const next = record[listKey].map((m, i) => (i === index ? { ...m, ...patch } : m));
+    update(listKey === "primaryMetrics" ? { primaryMetrics: next } : { deliveryMetrics: next });
   };
 
-  const clearPrimary = (index: number) => {
-    updatePrimary(index, { before: "", after: "" });
+  const clearMetric = (listKey: MetricListKey, index: number) => {
+    updateMetric(listKey, index, { before: "", after: "" });
   };
 
-  const renderMetricRow = (index: number) => {
-    const entry = record.primaryMetrics[index];
+  const renderMetricRow = (index: number, listKey: MetricListKey = "primaryMetrics") => {
+    const entry = record[listKey][index];
     if (!entry) return null;
+    const catalog = listKey === "primaryMetrics" ? metrics : DELIVERY_METRICS;
     const variation = computeVariation(entry.before, entry.after);
-    const metricMeta = metrics.find((m) => m.value === entry.metricKey);
+    const metricMeta = catalog.find((m) => m.value === entry.metricKey);
     const positive = isImprovement(variation, metricMeta?.direction);
-    const error = errors[`primaryMetrics.${index}`];
+    const error = errors[`${listKey}.${index}`];
     const isEmpty = !isFilledPrimary(entry);
     const hasResult =
       Boolean(entry.before) && Boolean(entry.after) && variation !== null;
@@ -220,16 +271,18 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
             type="number"
             step="any"
             value={entry.before}
-            onChange={(e) => updatePrimary(index, { before: e.target.value })}
+            onChange={(e) => updateMetric(listKey, index, { before: e.target.value })}
             placeholder="Antes"
+            aria-label={`${entry.label} — antes`}
           />
 
           <Input
             type="number"
             step="any"
             value={entry.after}
-            onChange={(e) => updatePrimary(index, { after: e.target.value })}
+            onChange={(e) => updateMetric(listKey, index, { after: e.target.value })}
             placeholder="Depois"
+            aria-label={`${entry.label} — depois`}
           />
 
           <div className="flex items-center justify-end gap-1 text-sm font-bold md:justify-start">
@@ -259,7 +312,7 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => clearPrimary(index)}
+                onClick={() => clearMetric(listKey, index)}
                 aria-label="Limpar métrica"
               >
                 <Trash2 className="h-4 w-4" />
@@ -325,70 +378,142 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
         </div>
       </FieldShell>
 
-      <FieldShell
-        label="Métricas principais de resultado"
-        required
-        error={errors.primaryMetrics}
-        hint="As métricas mostradas dependem do modelo de venda. Preencha as principais que se aplicam (mínimo 1) — abaixo, expanda para registrar outras."
-      >
-        <div className="space-y-2">
-          <div className="hidden grid-cols-[1.4fr_1fr_1fr_110px_36px] gap-3 px-1 md:grid">
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Métrica</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Antes</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Depois</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Variação</span>
-            <span />
-          </div>
+      {showBusiness && (
+        <FieldShell
+          label="Métricas principais de resultado"
+          required
+          error={errors.primaryMetrics}
+          hint={`Preencha pelo menos 1 das ${principalIndices.length} principais (antes e depois). As métricas dependem do modelo de venda; as outras, abaixo, são opcionais.`}
+        >
+          <div className="space-y-2">
+            <MetricTableHeader />
 
-          {principalIndices.map((index) => renderMetricRow(index))}
+            {principalIndices.map((index) => renderMetricRow(index))}
 
-          {extraIndices.length > 0 && (
-            <>
-              {!showExtras ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowExtras(true)}
-                  className="w-full justify-center"
-                >
-                  <ChevronDown className="mr-1.5 h-3.5 w-3.5" />
-                  Mostrar outras {extraIndices.length} métricas
-                </Button>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 pt-2">
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      Outras métricas
-                    </span>
-                    <span className="h-px flex-1 bg-border/60" />
-                  </div>
-                  {extraIndices.map((index) => renderMetricRow(index))}
+            {extraIndices.length > 0 && (
+              <>
+                {!showExtras ? (
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    onClick={() => setShowExtras(false)}
-                    disabled={hasFilledExtras}
+                    onClick={() => setShowExtras(true)}
                     className="w-full justify-center"
                   >
-                    <ChevronUp className="mr-1.5 h-3.5 w-3.5" />
-                    {hasFilledExtras ? "Há métricas extras preenchidas" : "Ocultar outras métricas"}
+                    <ChevronDown className="mr-1.5 h-3.5 w-3.5" />
+                    Mostrar outras {extraIndices.length} métricas (opcionais)
                   </Button>
-                </>
-              )}
-            </>
-          )}
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 pt-2">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        Outras métricas (opcional)
+                      </span>
+                      <span className="h-px flex-1 bg-border/60" />
+                    </div>
+                    {extraIndices.map((index) => renderMetricRow(index))}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowExtras(false)}
+                      disabled={hasFilledExtras}
+                      className="w-full justify-center"
+                    >
+                      <ChevronUp className="mr-1.5 h-3.5 w-3.5" />
+                      {hasFilledExtras ? "Há métricas extras preenchidas" : "Ocultar outras métricas"}
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
 
-          <p className="text-[11px] text-muted-foreground">
-            {filledPrimaryCount}/{record.primaryMetrics.length} métricas preenchidas
-          </p>
-        </div>
-      </FieldShell>
+            <p className="text-[11px] text-muted-foreground">
+              {filledPrimaryCount}/{record.primaryMetrics.length} métricas preenchidas
+            </p>
+          </div>
+        </FieldShell>
+      )}
+
+      {showDelivery && (
+        <section className="space-y-5 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+          <header className="flex flex-col gap-1">
+            <span className="text-xs font-bold uppercase tracking-wide text-primary">
+              Por que isso é um case
+            </span>
+            <span className="text-xs text-muted-foreground">
+              Para projetos cujo valor está na entrega e na percepção do cliente.
+            </span>
+          </header>
+
+          <FieldShell
+            label="Por que esse projeto é um case de sucesso?"
+            required
+            error={errors.successThesis}
+            counter={`${record.successThesis.length}/${MAX_SUCCESS_THESIS}`}
+            hint="A tese do case em poucas frases: o que mudou e por que isso importa para o cliente."
+          >
+            <Textarea
+              rows={3}
+              maxLength={MAX_SUCCESS_THESIS}
+              value={record.successThesis}
+              onChange={(e) => update({ successThesis: e.target.value })}
+              placeholder="Saímos de um perfil sem audiência para o principal canal de entrada de pacientes novos, sem mídia paga."
+              className="bg-background"
+            />
+          </FieldShell>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <FieldShell label="Como era antes" required error={errors.qualitativeBefore}>
+              <Textarea
+                rows={4}
+                value={record.qualitativeBefore}
+                onChange={(e) => update({ qualitativeBefore: e.target.value })}
+                placeholder="Ex.: perfil parado, identidade visual inconsistente, sem linha editorial."
+                className="bg-background"
+              />
+            </FieldShell>
+            <FieldShell label="Como ficou depois" required error={errors.qualitativeAfter}>
+              <Textarea
+                rows={4}
+                value={record.qualitativeAfter}
+                onChange={(e) => update({ qualitativeAfter: e.target.value })}
+                placeholder="Ex.: calendário editorial semanal, marca reconhecível e DMs diárias de novos clientes."
+                className="bg-background"
+              />
+            </FieldShell>
+          </div>
+
+          <FieldShell
+            label="Como o sucesso foi comprovado?"
+            hint="Opcional — marque todas as formas de comprovação que se aplicam."
+          >
+            <CheckboxGroup
+              options={SUCCESS_PROOF_OPTIONS}
+              value={record.successProofs}
+              onChange={(successProofs) => update({ successProofs })}
+              columns={2}
+            />
+          </FieldShell>
+
+          <FieldShell
+            label="Métricas de social media (opcional)"
+            hint="Preencha as que tiver — antes e depois do trabalho."
+          >
+            <div className="space-y-2">
+              <MetricTableHeader />
+              {record.deliveryMetrics.map((_, index) => renderMetricRow(index, "deliveryMetrics"))}
+              <p className="text-[11px] text-muted-foreground">
+                {filledDeliveryCount}/{record.deliveryMetrics.length} métricas preenchidas
+              </p>
+            </div>
+          </FieldShell>
+        </section>
+      )}
 
       <FieldShell
         label="Métricas secundárias"
-        hint="Indicadores complementares com nome livre (até 2)."
+        hint="Indicadores complementares com nome livre (até 2). Servem também para outras frentes — ex.: branding, SEO, retenção."
       >
         <div className="space-y-2">
           {record.secondaryMetrics.map((metric, index) => {
@@ -454,7 +579,8 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
                 EXECUTAR
               </span>
               <span className="text-xs text-muted-foreground">
-                Investimento e receita atribuída no período do case.
+                Investimento e receita atribuída no período do case
+                {paidMediaRequired ? "." : " — opcional sem Gestão de Mídia Paga alocada."}
               </span>
             </div>
             {record.executarChannels.length > 0 && (
@@ -486,7 +612,7 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
           <div className="grid gap-4 md:grid-cols-2">
             <FieldShell
               label="Investimento total em mídia (R$)"
-              required
+              required={paidMediaRequired}
               error={errors.mediaInvestment}
               hint={
                 channelTotalInvestment > 0
@@ -504,7 +630,7 @@ export const Step5Results = ({ record, errors, update }: StepProps) => {
             </FieldShell>
             <FieldShell
               label="Receita atribuída (R$)"
-              required
+              required={paidMediaRequired}
               error={errors.attributedRevenue}
               hint={
                 channelTotalRevenue > 0
